@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb4028562a9014e2e8d2834eb95f8d99, type: 3}
+  m_Name: NeighbourConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.NeighbourConfig
+  minPurchasesToAsk: 3
+  askChance: 0.1
+  requestTimeoutSeconds: 25
+  rentPerMinute: 20
+  rentIntervalSeconds: 60
+  housePrefabs:
+  - {fileID: 5965183032890159508, guid: 8096de4a4d4d946ae8615d54ab7b3fba, type: 3}
+  - {fileID: 7602836805127651896, guid: b9a1e5a5e8f5949269b84c9a064a5d3b, type: 3}
+  - {fileID: 5240743204321241007, guid: e01f5a2726a0c4164a0027a1b2afae5d, type: 3}
+  houseBuildSeconds: 3
+  names:
+  - Mia
+  - Leo
+  - Ana
+  - Noah
+  - Iva
+  - Luka
+  - Sara
+  - Marko
+  - Ema
+  - Teo

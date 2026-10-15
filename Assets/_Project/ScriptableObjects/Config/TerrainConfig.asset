@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5ccf268de8d74c618d4df3f7e0a7806, type: 3}
+  m_Name: TerrainConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.TerrainConfig
+  terrainMaterial: {fileID: 2100000, guid: f4bc0af62d05a482e8262aa1fdb0940f, type: 2}
+  waterMaterial: {fileID: 2100000, guid: 904c94c6c69c54d78a07e4c46f4f73b9, type: 2}
+  rockMaterial: {fileID: 2100000, guid: d63919bad30004844ac854ac1f829385, type: 2}
+  grassTuftMaterial: {fileID: 2100000, guid: fb82b2c3c7d6843678ef3e304e7402e5, type: 2}
+  meshCellSize: 0.5
+  sideMargin: 9
+  seaMargin: 12
+  backMargin: 7
+  waterLevel: -0.05
+  seaFloorHeight: -2.4
+  coastFalloff: 5
+  coastNoiseAmplitude: 1
+  coastNoiseScale: 0.09
+  duneAmplitude: 0.12
+  duneScale: 0.16
+  lotFlattenMargin: 1.2
+  noiseSeed: 11
+  textureSize: 512
+  bandBlend: 1.4
+  colorNoise: 0.07
+  wetHeight: 0.16
+  underwaterTint: {r: 0.55, g: 0.78, b: 0.74, a: 1}
+  grassVariation: {r: 0.62, g: 0.74, b: 0.4, a: 1}
+  pathColor: {r: 0.86, g: 0.76, b: 0.56, a: 1}
+  path:
+    serializedVersion: 2
+    x: -2.4
+    y: -15
+    width: 4.8
+    height: 7
+  drySmoothness: 0.08
+  wetSmoothness: 0.55
+  grassSmoothness: 0.04
+  normalStrength: 2.5
+  shoreDepthRange: 0.9
+  deepDepthRange: 2.2
+  waterCellSize: 1
+  waterExtent: 160
+  rockCount: 26
+  grassTuftCount: 220
+  rockScaleRange: {x: 0.25, y: 0.8}
+  tuftScaleRange: {x: 0.6, y: 1.3}

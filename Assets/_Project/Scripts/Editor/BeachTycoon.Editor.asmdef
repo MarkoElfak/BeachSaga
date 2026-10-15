@@ -1,0 +1,27 @@
+{
+    "name": "BeachTycoon.Editor",
+    "rootNamespace": "BeachTycoon.EditorTools",
+    "references": [
+        "BeachTycoon.Core",
+        "BeachTycoon.Data",
+        "BeachTycoon.Services",
+        "BeachTycoon.Gameplay",
+        "BeachTycoon.UI",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

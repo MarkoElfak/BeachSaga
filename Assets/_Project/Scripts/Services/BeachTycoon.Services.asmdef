@@ -1,0 +1,17 @@
+{
+    "name": "BeachTycoon.Services",
+    "rootNamespace": "BeachTycoon.Services",
+    "references": [
+        "BeachTycoon.Core",
+        "BeachTycoon.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

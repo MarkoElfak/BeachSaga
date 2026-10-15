@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5fcbf3dc0d7c472a9d25d20c783fdf7, type: 3}
+  m_Name: Foodie
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.VisitorTypeDefinition
+  id: foodie
+  spawnWeight: 2
+  spendMultiplier: 1.5
+  patienceSeconds: 14
+  preferredProducts:
+  - {fileID: 11400000, guid: 84b7e2631b5d84a9fb30d9f03af2d38c, type: 2}
+  minTier: 1
+  prefab: {fileID: 7555245007732729267, guid: da77e9b21323146708ff8783f899a3b7, type: 3}

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5fcbf3dc0d7c472a9d25d20c783fdf7, type: 3}
+  m_Name: Partygoer
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.VisitorTypeDefinition
+  id: partygoer
+  spawnWeight: 4
+  spendMultiplier: 1.3
+  patienceSeconds: 18
+  preferredProducts:
+  - {fileID: 11400000, guid: eeef448bf489a41408a39f70dd0da66c, type: 2}
+  minTier: 3
+  prefab: {fileID: 6216780792226252548, guid: 419b8b8f227704aa5a4412baf8df6e76, type: 3}
