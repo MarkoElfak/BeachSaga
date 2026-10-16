@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BeachTycoon.Core;
+using BeachTycoon.Data;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
@@ -69,7 +70,12 @@ namespace BeachTycoon.Gameplay
         public bool Rotate(int direction)
         {
             if (!HasSelection) return false;
-            if (_placement.TryRotate(Selected, direction)) return true;
+            if (_placement.TryRotate(Selected, direction))
+            {
+                EventBus.Publish(new SoundRequested(SoundId.Place));
+                return true;
+            }
+
             EventBus.Publish(new RotateBlocked());
             return false;
         }

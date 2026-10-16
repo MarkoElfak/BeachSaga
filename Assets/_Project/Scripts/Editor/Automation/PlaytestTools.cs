@@ -39,6 +39,19 @@ namespace BeachTycoon.EditorTools
             AutoTestRunner.Fail($"button '{buttonName}' not found under {owner.name}");
         }
 
+        /// <summary>Drags the named Slider under a UI component to value (fires onValueChanged like a finger).</summary>
+        public static void SetSlider(Component owner, string sliderName, float value)
+        {
+            foreach (Slider slider in owner.GetComponentsInChildren<Slider>(true))
+            {
+                if (slider.name != sliderName) continue;
+                slider.value = value;
+                return;
+            }
+
+            AutoTestRunner.Fail($"slider '{sliderName}' not found under {owner.name}");
+        }
+
         /// <summary>Clicks the build bar button for the product at this index in GameDatabase.products.</summary>
         public static void ClickProduct(int index)
         {

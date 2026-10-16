@@ -28,6 +28,7 @@ namespace BeachTycoon.Gameplay
         private CoinSpawner _coinSpawner;
         private BuildingView _buildingView;
         private int _shownTier;
+        private bool _bound;
 
         private PlacementService _placement;
 
@@ -57,6 +58,8 @@ namespace BeachTycoon.Gameplay
             {
                 if (_stands.Get(i).Model.lotIndex == _lotIndex) SpawnStandView(i);
             }
+
+            _bound = true;
         }
 
         // An empty main lot builds; a building or house is selected (rotate arrows, upgrade for the main one).
@@ -126,9 +129,11 @@ namespace BeachTycoon.Gameplay
 
         private void OnStandCreated(StandCreated evt)
         {
-            if (evt.LotIndex != _lotIndex) return;
-            SpawnStandView(evt.StandIndex);
+            if (evt.LotIndex == _lotIndex && SpawnStandView(evt.StandIndex) is StandView view) view.Punch();
         }
+
+        private void Punch(Transform target) =>
+            ScalePunch.On(target, _database.presentation.punchScale, _database.presentation.punchSeconds);
 
         private void OnRentDue(RentDue evt)
         {
@@ -162,6 +167,7 @@ namespace BeachTycoon.Gameplay
 
             GameObject instance = Instantiate(prefab, buildingRoot, false);
             _buildingView = instance.GetComponent<BuildingView>();
+            if (_bound) Punch(instance.transform); // a building that just finished, not one loaded with the save
         }
 
         private GameObject TierPrefab(int tier)
@@ -177,19 +183,20 @@ namespace BeachTycoon.Gameplay
         }
 
         // Stands are siblings of the lot (not children), so moving the building leaves them where they are.
-        private void SpawnStandView(int standIndex)
+        private StandView SpawnStandView(int standIndex)
         {
             StandController stand = _stands.Get(standIndex);
             if (stand.Product.standPrefab == null)
             {
                 Debug.LogWarning($"Product '{stand.Product.id}' has no stand prefab.", stand.Product);
-                return;
+                return null;
             }
 
             GameObject instance = Instantiate(stand.Product.standPrefab, transform.parent, false);
             var view = instance.GetComponent<StandView>();
             view.Bind(stand, _coinSpawner);
             _standViews.Add(view);
+            return view;
         }
     }
 }

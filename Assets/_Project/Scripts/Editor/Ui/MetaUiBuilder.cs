@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Meta HUD pieces: tutorial banner and arrow, 2x boost button, settings, offline popup, daily rewards.</summary>
+    /// <summary>Meta HUD pieces: tutorial banner and arrow, 2x boost button, offline popup, daily rewards.</summary>
     internal static class MetaUiBuilder
     {
         private static readonly Color Window = new Color(1f, 0.97f, 0.9f);
         private static readonly Color Dim = new Color(0f, 0f, 0f, 0.55f);
         private static readonly Color Boost = new Color(1f, 0.55f, 0.25f);
-        private static readonly Color Secondary = new Color(0.55f, 0.8f, 0.95f);
+        internal static readonly Color Secondary = new Color(0.55f, 0.8f, 0.95f);
         private static readonly Color Daily = new Color(0.98f, 0.75f, 0.85f);
         private const int DailyTiles = 7;
 
@@ -51,31 +51,6 @@ namespace BeachTycoon.EditorTools
             var view = rect.gameObject.AddComponent<BoostButtonView>();
             PrimitiveKit.SetReference(view, "button", button);
             PrimitiveKit.SetReference(view, "label", label);
-        }
-
-        public static void BuildSettings(Transform parent)
-        {
-            RectTransform openRect = UiKit.Rect("SettingsButton", parent, Vector2.one, Vector2.one, Vector2.one, new Vector2(-30f, -265f), new Vector2(200f, 90f));
-            Button open = UiKit.AddButton(openRect, UiKit.PanelColor, out _);
-            UiKit.ChildText(openRect, "Label", "Settings", 36f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
-
-            RectTransform host = UiKit.Stretch("SettingsPanel", parent);
-            RectTransform root = Modal(host, "Settings", new Vector2(820f, 820f), out RectTransform window, out Button close);
-            Button sound = Row(window, "SoundButton", 0, Secondary, out TextMeshProUGUI soundLabel);
-            Button music = Row(window, "MusicButton", 1, Secondary, out TextMeshProUGUI musicLabel);
-            Button removeAds = Row(window, "RemoveAdsButton", 2, UiKit.ButtonColor, out TextMeshProUGUI removeAdsLabel);
-
-            var view = host.gameObject.AddComponent<SettingsPanelView>();
-            PrimitiveKit.SetReference(view, "openButton", open);
-            PrimitiveKit.SetReference(view, "root", root.gameObject);
-            PrimitiveKit.SetReference(view, "soundButton", sound);
-            PrimitiveKit.SetReference(view, "soundLabel", soundLabel);
-            PrimitiveKit.SetReference(view, "musicButton", music);
-            PrimitiveKit.SetReference(view, "musicLabel", musicLabel);
-            PrimitiveKit.SetReference(view, "removeAdsButton", removeAds);
-            PrimitiveKit.SetReference(view, "removeAdsLabel", removeAdsLabel);
-            PrimitiveKit.SetReference(view, "closeButton", close);
-            root.gameObject.SetActive(false);
         }
 
         public static void BuildOfflinePopup(Transform parent)
@@ -188,7 +163,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // Wide button in a vertical stack below the title (index 0 is the top row).
-        private static Button Row(RectTransform window, string name, int index, Color color, out TextMeshProUGUI label)
+        internal static Button Row(RectTransform window, string name, int index, Color color, out TextMeshProUGUI label)
         {
             const float top = -190f, spacing = 150f;
             RectTransform rect = UiKit.Rect(name, window, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, top - index * spacing), new Vector2(640f, 120f));

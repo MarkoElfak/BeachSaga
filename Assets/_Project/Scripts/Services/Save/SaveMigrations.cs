@@ -18,6 +18,7 @@ namespace BeachTycoon.Services
             new AddManagers(),
             new AddSeasons(),
             new AddMiniGames(),
+            new AddVolumes(),
         };
 
         /// <summary>
@@ -102,6 +103,19 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 11;
             public string Migrate(string json) => json.Replace("\"version\":11", "\"version\":12");
+        }
+
+        /// <summary>
+        /// v12 -> v13: sound and music volumes replace the on/off switches. A switch that was off becomes volume 0;
+        /// everything else gets the defaults (full volume, vibration on).
+        /// </summary>
+        private sealed class AddVolumes : ISaveMigration
+        {
+            public int FromVersion => 12;
+
+            public string Migrate(string json) => json.Replace("\"version\":12", "\"version\":13")
+                .Replace("\"soundOn\":false", "\"soundOn\":false,\"soundVolume\":0.0")
+                .Replace("\"musicOn\":false", "\"musicOn\":false,\"musicVolume\":0.0");
         }
     }
 }

@@ -23,5 +23,12 @@ namespace BeachTycoon.Data
 
         [Tooltip("Shrinks the land rectangle the focus point is clamped to.")]
         [Min(0f)] public float focusBoundsInset = 2f;
+
+        [Header("Shake (a building finishes)")]
+        [Tooltip("Largest camera offset in metres at full strength.")]
+        [Min(0f)] public float shakeAmplitude = 0.35f;
+        [Min(0.05f)] public float shakeSeconds = 0.45f;
+        [Tooltip("Wobbles per second.")]
+        [Min(1f)] public float shakeFrequency = 18f;
     }
 }

@@ -49,7 +49,13 @@ namespace BeachTycoon.Data
     [Serializable]
     public sealed class SettingsModel
     {
+        // Version 3 on/off switches; since version 13 the volumes decide (0 = off) and these are unused.
         public bool soundOn = true;
         public bool musicOn = true;
+
+        // Version 13: volume sliders and vibration.
+        public float soundVolume = 1f;
+        public float musicVolume = 1f;
+        public bool vibrationOn = true;
     }
 }
