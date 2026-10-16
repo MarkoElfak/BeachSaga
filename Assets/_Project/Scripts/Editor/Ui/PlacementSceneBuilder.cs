@@ -63,7 +63,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "label", label);
         }
 
-        /// <summary>Rotate arrows (and Upgrade) that float above the selected object.</summary>
+        /// <summary>Rotate arrows (and Upgrade, Play) that float above the selected object.</summary>
         public static void BuildSelectionArrows(Transform parent, Camera worldCamera)
         {
             RectTransform host = UiKit.Stretch("SelectionArrows", parent);
@@ -71,6 +71,7 @@ namespace BeachTycoon.EditorTools
             Button left = BarButton(bar, "RotateLeft", "<", new Vector2(-80f, 0f), new Vector2(130f, 130f), Color.white);
             Button right = BarButton(bar, "RotateRight", ">", new Vector2(80f, 0f), new Vector2(130f, 130f), Color.white);
             Button upgrade = BarButton(bar, "UpgradeButton", "Upgrade", new Vector2(0f, 150f), new Vector2(260f, 100f), UiKit.ButtonColor);
+            Button play = BarButton(bar, "PlayButton", "Play", new Vector2(0f, 265f), new Vector2(260f, 100f), new Color(0.55f, 0.85f, 0.55f));
 
             var view = host.gameObject.AddComponent<SelectionArrowsView>();
             PrimitiveKit.SetReference(view, "worldCamera", worldCamera);
@@ -79,6 +80,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "leftButton", left);
             PrimitiveKit.SetReference(view, "rightButton", right);
             PrimitiveKit.SetReference(view, "upgradeButton", upgrade);
+            PrimitiveKit.SetReference(view, "playButton", play);
         }
 
         private static Button BarButton(RectTransform bar, string name, string text, Vector2 at, Vector2 size, Color color)

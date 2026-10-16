@@ -7,7 +7,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Validity: a footprint must be inside the unlocked land (decorations also above the water), off the
     /// footpath (up to where it meets the beach) and the towel area, and its blocking area (footprint plus a
-    /// stand's queue) must keep 'gap' away from every other object's blocking area.
+    /// stand's queue) must keep 'gap' away from every other object's blocking area. Shore-only stands must touch the shore.
     /// </summary>
     public sealed partial class PlacementService
     {
@@ -32,6 +32,7 @@ namespace BeachTycoon.Gameplay
         private bool IsFree(Rect footprint, Rect blocking, PlaceableId self)
         {
             if (!IsOnLand(footprint, self.Kind == PlaceableKind.Decoration)) return false;
+            if (IsShoreOnlyStand(self) && !TouchesShore(footprint)) return false;
 
             WorldLayoutConfig layout = _database.world;
             if (PlacementRules.Overlaps(blocking, layout.relaxArea, 0f)) return false;

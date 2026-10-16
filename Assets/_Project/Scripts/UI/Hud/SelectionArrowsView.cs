@@ -6,8 +6,9 @@ using UnityEngine.UI;
 namespace BeachTycoon.UI
 {
     /// <summary>
-    /// Floats over the selected object: left/right arrows turn it one step, and Upgrade (main building and
-    /// stands only) opens the upgrade panel for it. Hidden while nothing is selected.
+    /// Floats over the selected object: left/right arrows turn it one step, Upgrade (main building and stands
+    /// only) opens the upgrade panel for it and Play (stands with a mini-game) opens its mini-game. Hidden while
+    /// nothing is selected.
     /// </summary>
     public sealed class SelectionArrowsView : MonoBehaviour
     {
@@ -17,10 +18,13 @@ namespace BeachTycoon.UI
         [SerializeField] private Button leftButton = null;
         [SerializeField] private Button rightButton = null;
         [SerializeField] private Button upgradeButton = null;
+        [SerializeField] private Button playButton = null;
         [Tooltip("Gap in canvas units between the top of the object and the arrows.")]
         [SerializeField] private float lift = 20f;
 
         private SelectionService _selection;
+        private MiniGameService _miniGames;
+        private StandService _stands;
 
         private void Start()
         {
@@ -29,6 +33,9 @@ namespace BeachTycoon.UI
             leftButton.onClick.AddListener(() => _selection.Rotate(-1));
             rightButton.onClick.AddListener(() => _selection.Rotate(1));
             upgradeButton.onClick.AddListener(OnUpgrade);
+            playButton.onClick.AddListener(OnPlay);
+            ServiceLocator.TryGet(out _miniGames);
+            ServiceLocator.TryGet(out _stands);
             EventBus.Subscribe<SelectionChanged>(OnSelectionChanged);
         }
 
@@ -39,7 +46,12 @@ namespace BeachTycoon.UI
 
         private void OnSelectionChanged(SelectionChanged evt)
         {
-            if (evt.HasSelection) upgradeButton.gameObject.SetActive(_selection.UpgradeLot >= 0);
+            if (evt.HasSelection)
+            {
+                upgradeButton.gameObject.SetActive(_selection.UpgradeLot >= 0);
+                playButton.gameObject.SetActive(SelectedStand() >= 0);
+            }
+
             Follow();
         }
 
@@ -70,6 +82,22 @@ namespace BeachTycoon.UI
             int stand = selected.Kind == PlaceableKind.Stand ? selected.Index : -1;
             _selection.Clear();
             if (lot >= 0) EventBus.Publish(new UpgradePanelRequested(lot, stand));
+        }
+
+        private void OnPlay()
+        {
+            int stand = SelectedStand();
+            _selection.Clear();
+            if (stand >= 0) EventBus.Publish(new MiniGameRequested(stand));
+        }
+
+        // The selected stand when its product has a mini-game, else -1.
+        private int SelectedStand()
+        {
+            PlaceableId selected = _selection.Selected;
+            if (selected.Kind != PlaceableKind.Stand || _miniGames == null || _stands == null) return -1;
+            if (selected.Index < 0 || selected.Index >= _stands.Count) return -1;
+            return _miniGames.ForProduct(_stands.Get(selected.Index).Model.productId) != null ? selected.Index : -1;
         }
     }
 }

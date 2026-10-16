@@ -110,6 +110,7 @@ namespace BeachTycoon.EditorTools
             long plain = EconomyMath.ApplyMultiplier(EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level, bonus),
                 ServiceLocator.Get<IncomeBoost>().Multiplier);
             long expected = EconomyMath.ApplyMultiplier(plain, Season.IncomeMultiplier);
+            expected = EconomyMath.ApplyMultiplier(expected, ServiceLocator.Get<MiniGameService>().IncomeMultiplier(stand.Product));
             expected = EconomyMath.ApplyMultiplier(expected, ServiceLocator.Get<BeachEventService>().PriceMultiplier(stand.Product));
             _saleOk = evt.Amount == expected && evt.Amount > plain;
             _saleText = $"a {stand.Product.displayName} sale includes the seashell bonus ({plain} -> {evt.Amount} coins)";

@@ -46,6 +46,7 @@ namespace BeachTycoon.EditorTools
             OnlineUiBuilder.BuildVisitPanel(safe);
             AchievementUiBuilder.Build(safe);
             SeasonUiBuilder.Build(safe);
+            MiniGameUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
             BringWindowsToFront(safe);
         }

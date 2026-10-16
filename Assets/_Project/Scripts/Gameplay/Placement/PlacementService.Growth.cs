@@ -79,7 +79,9 @@ namespace BeachTycoon.Gameplay
         {
             PlaceableId stand = PlaceableId.Stand(evt.StandIndex);
             Vector2 slot = GetStandPosition(evt.StandIndex);
-            if (!CanPlace(stand, slot) && TryFindFreeSpot(stand, slot, out Vector2 spot)) SetPosition(stand, spot);
+            bool shore = IsShoreOnlyStand(stand); // goes straight to the water
+            Vector2 near = shore ? ShoreStart(evt.StandIndex, slot) : slot;
+            if ((shore || !CanPlace(stand, slot)) && TryFindFreeSpot(stand, near, out Vector2 spot)) SetPosition(stand, spot);
         }
 
         private void OnLotStateChanged(LotStateChanged evt)

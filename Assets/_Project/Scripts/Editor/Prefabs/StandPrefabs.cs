@@ -120,12 +120,14 @@ namespace BeachTycoon.EditorTools
             GameObject queueAnchor = PrimitiveKit.Empty("QueueAnchor", t, new Vector3(0f, 0f, -1.7f), new Vector3(0f, 180f, 0f));
             ProgressBarView bar = PrimitiveKit.ProgressBar(t, new Vector3(0f, 2.9f, 0f), 1.4f, p.GetMaterial("barBack"), p.GetMaterial("barFill"));
             GameObject hat = ManagerHat(t, p);
+            GameObject[] upgrades = StandUpgradePrefabs.Build(t, p);
 
             var view = root.AddComponent<StandView>();
             PrimitiveKit.SetReference(view, "coinAnchor", coinAnchor.transform);
             PrimitiveKit.SetReference(view, "progressBar", bar);
             PrimitiveKit.SetReference(view, "queueAnchor", queueAnchor.transform);
             PrimitiveKit.SetReference(view, "managerHat", hat);
+            PrimitiveKit.SetReferences(view, "upgradePieces", upgrades);
             return root;
         }
 

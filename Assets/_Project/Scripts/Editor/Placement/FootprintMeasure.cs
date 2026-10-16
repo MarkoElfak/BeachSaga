@@ -155,7 +155,7 @@ namespace BeachTycoon.EditorTools
             if (part.GetComponentInParent<ProgressBarView>(true) != null) return true;
             for (Transform t = part; t != null; t = t.parent)
             {
-                if (t.name == StandPrefabs.ManagerHatName) return true;
+                if (t.name == StandPrefabs.ManagerHatName || t.name == StandUpgradePrefabs.GroupName) return true;
             }
 
             return false;

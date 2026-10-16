@@ -82,9 +82,11 @@ namespace BeachTycoon.Gameplay
             var buildings = Add(new BuildingManager(database, economy, data.lots));
             var placement = Add(new PlacementService(database, buildings, data.stands, data.decorations));
             var events = Add(new BeachEventService(database.beachEvents, buildings, analytics));
-            var sales = Add(new SaleMultipliers(boost, season, events));
+            var miniGames = Add(new MiniGameService(database, data.miniGames, analytics));
+            var sales = Add(new SaleMultipliers(boost, season, events, miniGames));
             var stands = Add(new StandService(database, economy, buildings, data.stands, sales));
             events.AttachStands(stands);
+            placement.EnsureShoreStands();
             Add(new DayClock(database.dayNight, data.meta));
             var popularity = Add(new PopularityService(database, progression, stands));
             Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
@@ -95,7 +97,7 @@ namespace BeachTycoon.Gameplay
             Add(new QuestService(database, neighbours, stands, economy, progression));
 
             // Meta systems read the restored island, so they come last.
-            var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours, season));
+            var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours, season, miniGames));
             Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics));
             Add(new TutorialService(database.tutorial, data.meta, buildings));
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
@@ -149,10 +151,7 @@ namespace BeachTycoon.Gameplay
         private void Update()
         {
             float deltaTime = Time.deltaTime;
-            for (int i = 0; i < _tickables.Count; i++)
-            {
-                _tickables[i].Tick(deltaTime);
-            }
+            for (int i = 0; i < _tickables.Count; i++) _tickables[i].Tick(deltaTime);
         }
 
         private void OnApplicationPause(bool paused)

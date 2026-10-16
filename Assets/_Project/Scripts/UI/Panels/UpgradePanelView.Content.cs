@@ -1,3 +1,4 @@
+using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Gameplay;
 
@@ -47,6 +48,7 @@ namespace BeachTycoon.UI
             _text.Append(model.manager
                 ? "\nManager: collecting this stand's coins for you"
                 : "\nA manager collects this stand's coins for you");
+            AppendMiniGame(stand.Product);
 
             if (_stands.IsMaxLevel(stand)) SetButton("Max level", false);
             else
@@ -57,6 +59,17 @@ namespace BeachTycoon.UI
 
             hireLabel.text = model.manager ? "Manager hired" : "Hire manager  " + NumberFormatter.Format(stand.Product.managerCost);
             hireButton.interactable = _stands.CanHireManager(stand);
+        }
+
+        // Mini-game levels passed and the sales bonus they give (play it from the stand's Play button).
+        private void AppendMiniGame(ProductDefinition product)
+        {
+            if (!ServiceLocator.TryGet(out MiniGameService games)) return;
+            MiniGameDefinition game = games.ForProduct(product.id);
+            if (game == null) return;
+            int passed = games.LevelsPassed(game);
+            _text.Append("\nMini-game: ").Append(passed).Append(" of ").Append(game.LevelCount).Append(" levels, sales +")
+                .Append(UnityEngine.Mathf.RoundToInt((games.IncomeMultiplier(product) - 1f) * 100f)).Append('%');
         }
 
         private void AppendUnlocks(TierDefinition tier)

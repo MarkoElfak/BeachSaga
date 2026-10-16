@@ -19,11 +19,14 @@ namespace BeachTycoon.Gameplay
         private readonly PopularityService _popularity;
         private readonly NeighbourService _neighbours;
         private readonly SeasonService _season;
+        private readonly MiniGameService _miniGames;
 
         public IncomeEstimator(GameDatabase database, BuildingManager buildings, StandService stands,
-            PopularityService popularity, NeighbourService neighbours, SeasonService season = null)
+            PopularityService popularity, NeighbourService neighbours, SeasonService season = null,
+            MiniGameService miniGames = null)
         {
             _season = season;
+            _miniGames = miniGames;
             _database = database;
             _buildings = buildings;
             _stands = stands;
@@ -57,8 +60,9 @@ namespace BeachTycoon.Gameplay
             {
                 StandController stand = _stands.Get(i);
                 capacity += 1.0 / Math.Max(0.1f, stand.Product.serveSeconds);
-                totalValue += EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
+                double value = EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
                     _database.economy.standLevelIncomeBonus);
+                totalValue += _miniGames != null ? value * _miniGames.IncomeMultiplier(stand.Product) : value;
             }
 
             double averageSale = totalValue / _stands.Count;

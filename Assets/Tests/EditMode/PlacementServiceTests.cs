@@ -37,7 +37,7 @@ namespace BeachTycoon.Tests
             _database.economy = Asset<EconomyConfig>();
             _database.visitors = Asset<VisitorConfig>();
             _database.tiers = new[] { Tier(TentFootprint, FirstArea), Tier(ResortFootprint, LastArea) };
-            _database.products = new[] { Product("donuts"), Product("towels") };
+            _database.products = new[] { Product("donuts"), Product("towels"), Product("surf_lessons") };
             var decoration = Asset<DecorationDefinition>();
             decoration.id = DecorationId;
             decoration.area = new Rect(-0.7f, -0.7f, 1.4f, 1.4f);

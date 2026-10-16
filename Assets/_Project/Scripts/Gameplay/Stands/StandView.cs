@@ -5,8 +5,8 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Shows a stand's serve progress and drops coins on sales (they collect themselves once a manager is hired,
-    /// shown by a hat). Tapping selects it (rotate, upgrade); long-pressing moves it on its own. Tells
-    /// WorldNavigation where its queue starts so visitors can line up.
+    /// shown by a hat) and wears one more decoration per mini-game level passed. Tapping selects it (rotate,
+    /// upgrade, play); long-pressing moves it on its own. Tells WorldNavigation where its queue starts.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
     {
@@ -18,6 +18,9 @@ namespace BeachTycoon.Gameplay
 
         [Tooltip("Shown while the stand has a manager.")]
         [SerializeField] private GameObject managerHat = null;
+
+        [Tooltip("Shown one by one as the stand's mini-game levels are passed.")]
+        [SerializeField] private GameObject[] upgradePieces = new GameObject[0];
 
         private CoinSpawner _coinSpawner;
         private PlacementService _placement;
@@ -37,7 +40,9 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<ManagerHired>(OnManagerHired);
+            EventBus.Subscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
             ShowManager(stand.Model.manager);
+            ShowUpgrades(ServiceLocator.TryGet(out MiniGameService games) ? games.LevelsPassed(stand.Model.productId) : 0);
             SnapToPlacement();
         }
 
@@ -68,11 +73,31 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
+            EventBus.Unsubscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
         }
 
         public void ShowManager(bool hired)
         {
             if (managerHat != null) managerHat.SetActive(hired);
+        }
+
+        /// <summary>Pieces shown so far (one per level passed).</summary>
+        public int UpgradesShown { get; private set; }
+
+        public void ShowUpgrades(int levelsPassed)
+        {
+            UpgradesShown = 0;
+            for (int i = 0; i < upgradePieces.Length; i++)
+            {
+                bool show = i < levelsPassed;
+                if (upgradePieces[i] != null) upgradePieces[i].SetActive(show);
+                if (show) UpgradesShown++;
+            }
+        }
+
+        private void OnMiniGameLevelPassed(MiniGameLevelPassed evt)
+        {
+            if (Stand != null && evt.ProductId == Stand.Model.productId) ShowUpgrades(evt.LevelsPassed);
         }
 
         // The new manager picks up whatever is already lying at the stand.

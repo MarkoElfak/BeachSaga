@@ -17,6 +17,7 @@ namespace BeachTycoon.Services
             new AddRotation(),
             new AddManagers(),
             new AddSeasons(),
+            new AddMiniGames(),
         };
 
         /// <summary>
@@ -94,6 +95,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 10;
             public string Migrate(string json) => json.Replace("\"version\":10", "\"version\":11");
+        }
+
+        /// <summary>v11 -> v12: mini-games. The new list starts empty (no levels passed).</summary>
+        private sealed class AddMiniGames : ISaveMigration
+        {
+            public int FromVersion => 11;
+            public string Migrate(string json) => json.Replace("\"version\":11", "\"version\":12");
         }
     }
 }

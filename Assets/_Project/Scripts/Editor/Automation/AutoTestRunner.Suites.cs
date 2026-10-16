@@ -8,6 +8,9 @@ namespace BeachTycoon.EditorTools
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Mini-games", priority = 32)]
+        private static void RequestMiniGames() => File.WriteAllText(RequestPath, SuiteMiniGames);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 10 (new season)", priority = 33)]
         private static void RequestSeason() => File.WriteAllText(RequestPath, SuiteSeason);
 
@@ -44,10 +47,11 @@ namespace BeachTycoon.EditorTools
         private const string SuiteManagers = "m8";
         private const string SuiteEvents = "m9";
         private const string SuiteSeason = "m10";
+        private const string SuiteMiniGames = "games";
 
         private static bool IsKnownSuite(string suite) =>
             suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
-            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason;
+            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -62,6 +66,7 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteManagers) return "M8 managers";
                 if (Suite == SuiteEvents) return "M9 day/night + events";
                 if (Suite == SuiteSeason) return "M10 new season";
+                if (Suite == SuiteMiniGames) return "Mini-games";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -75,6 +80,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteManagers) return ManagerPlaytestSteps.IsReady(step);
             if (Suite == SuiteEvents) return EventPlaytestSteps.IsReady(step);
             if (Suite == SuiteSeason) return SeasonPlaytestSteps.IsReady(step);
+            if (Suite == SuiteMiniGames) return MiniGamePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -87,6 +93,7 @@ namespace BeachTycoon.EditorTools
             else if (Suite == SuiteManagers) ManagerPlaytestSteps.Run(step);
             else if (Suite == SuiteEvents) EventPlaytestSteps.Run(step);
             else if (Suite == SuiteSeason) SeasonPlaytestSteps.Run(step);
+            else if (Suite == SuiteMiniGames) MiniGamePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
         }

@@ -24,6 +24,12 @@ namespace BeachTycoon.Data
         [Tooltip("How far to look for a free spot when a default position is taken.")]
         [Min(1f)] public float searchRadius = 18f;
 
+        [Header("Shore")]
+        [Tooltip("Stands of these products must stand on the shore: the sea-side edge of their footprint within " +
+                 "Shore Distance of the water (the top of the unlocked land).")]
+        public string[] shoreOnlyProducts = { "surf_lessons" };
+        [Min(0.1f)] public float shoreDistance = 1.5f;
+
         [Header("Feel")]
         [Tooltip("How high a picked-up object floats while dragged.")]
         [Min(0f)] public float liftHeight = 0.6f;
