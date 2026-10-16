@@ -1,0 +1,27 @@
+{
+    "name": "BeachTycoon.Tests.EditMode",
+    "rootNamespace": "BeachTycoon.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "BeachTycoon.Core",
+        "BeachTycoon.Data",
+        "BeachTycoon.Services",
+        "BeachTycoon.Gameplay"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

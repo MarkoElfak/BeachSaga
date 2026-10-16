@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a3ff60a35d14aa4b2062fb3ecdf4ac, type: 3}
+  m_Name: LifeguardTower
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.DecorationDefinition
+  id: LifeguardTower
+  displayName: Lifeguard tower
+  cost: 4000
+  popularity: 0.25
+  requiredTier: 4
+  maxCount: 2
+  prefab: {fileID: 4658282524073140269, guid: effa3065431664e7f9148a2177bed298, type: 3}
+  area:
+    serializedVersion: 2
+    x: -0.7
+    y: -1
+    width: 1.75
+    height: 1.7
+  autoFootprint: 1

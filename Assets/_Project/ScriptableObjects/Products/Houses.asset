@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae043bd4bca84682806cbd0bd605bfa, type: 3}
+  m_Name: Houses
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
+  id: houses
+  displayName: Houses
+  icon: {fileID: 0}
+  unlockCost: 25000
+  price: 5000
+  serveSeconds: 20
+  upgradeBaseCost: 25
+  requiredTier: 5
+  standPrefab: {fileID: 3529815805896294033, guid: fb8215d916c4140ac8c4ade7227382a1, type: 3}
+  standFootprint:
+    serializedVersion: 2
+    x: -1
+    y: -0.65000004
+    width: 2.35
+    height: 1.4000001
+  queueStart: {x: 0, y: -1.7}
+  autoFootprint: 1

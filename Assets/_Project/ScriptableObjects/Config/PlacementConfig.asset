@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f2a923b0fa6245078487580bf32b2eb, type: 3}
+  m_Name: PlacementConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.PlacementConfig
+  gridSize: 0.5
+  gap: 0.05
+  buildArea:
+    serializedVersion: 2
+    x: -11.8
+    y: -14.8
+    width: 23.6
+    height: 21.3
+  minHeightAboveWater: 0
+  mainFrontClearance: 4.2
+  searchRadius: 14
+  liftHeight: 0.6
+  edgePanZone: 0.08
+  edgePanSpeed: 900

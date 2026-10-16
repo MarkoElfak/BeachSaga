@@ -1,0 +1,20 @@
+{
+    "name": "BeachTycoon.Gameplay",
+    "rootNamespace": "BeachTycoon.Gameplay",
+    "references": [
+        "BeachTycoon.Core",
+        "BeachTycoon.Data",
+        "BeachTycoon.Services",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

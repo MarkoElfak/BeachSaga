@@ -1,0 +1,21 @@
+{
+    "name": "BeachTycoon.UI",
+    "rootNamespace": "BeachTycoon.UI",
+    "references": [
+        "BeachTycoon.Core",
+        "BeachTycoon.Data",
+        "BeachTycoon.Services",
+        "BeachTycoon.Gameplay",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
