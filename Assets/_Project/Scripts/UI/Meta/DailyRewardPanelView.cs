@@ -152,7 +152,7 @@ namespace BeachTycoon.UI
             collectLabel.text = $"Collect {NumberFormatter.Format(_daily.TodayCoins)}";
             doubleButton.gameObject.SetActive(canClaim && _ads.IsRewardedReady);
             doubleButton.interactable = true;
-            doubleLabel.text = $"Watch ad: {NumberFormatter.Format(_daily.DoubledCoins)}";
+            doubleLabel.text = $"{AdWording.Watch(_ads)}: {NumberFormatter.Format(_daily.DoubledCoins)}";
         }
 
         private string RewardText(int dayIndex)

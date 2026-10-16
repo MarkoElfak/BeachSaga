@@ -49,6 +49,7 @@ namespace BeachTycoon.EditorTools
             MiniGameUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
             BringWindowsToFront(safe);
+            safe.Find("PrivacyPanel").SetAsLastSibling(); // the first-launch question sits above everything
             FeelUiBuilder.BuildConfetti(safe); // over everything, windows included
         }
 

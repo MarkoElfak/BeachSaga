@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Settings: sound and music volume sliders, vibration on/off, plus the (mock) Remove Ads purchase.</summary>
+    /// <summary>Settings: sound and music sliders, vibration, Remove ads with its store price, privacy and restore purchases.</summary>
     public sealed class SettingsPanelView : MonoBehaviour
     {
         [SerializeField] private Button openButton = null;
@@ -21,6 +21,10 @@ namespace BeachTycoon.UI
         [SerializeField] private TMP_Text vibrationLabel = null;
         [SerializeField] private Button removeAdsButton = null;
         [SerializeField] private TMP_Text removeAdsLabel = null;
+        [SerializeField] private Button privacyButton = null;
+        [SerializeField] private PrivacyPanelView privacyPanel = null;
+        [SerializeField] private Button restoreButton = null;
+        [SerializeField] private TMP_Text restoreLabel = null;
         [SerializeField] private Button closeButton = null;
 
         private SettingsService _settings;
@@ -30,6 +34,8 @@ namespace BeachTycoon.UI
         public bool IsOpen => root.activeSelf;
         public string SoundText => soundLabel.text;
         public string VibrationText => vibrationLabel.text;
+        public string RemoveAdsText => removeAdsLabel.text;
+        public string RestoreText => restoreLabel.text;
 
         private void Start()
         {
@@ -47,6 +53,8 @@ namespace BeachTycoon.UI
             musicSlider.onValueChanged.AddListener(SetMusic);
             vibrationButton.onClick.AddListener(ToggleVibration);
             removeAdsButton.onClick.AddListener(BuyRemoveAds);
+            privacyButton.onClick.AddListener(privacyPanel.Open);
+            restoreButton.onClick.AddListener(Restore);
         }
 
         private void OnDestroy()
@@ -57,6 +65,8 @@ namespace BeachTycoon.UI
             musicSlider.onValueChanged.RemoveListener(SetMusic);
             vibrationButton.onClick.RemoveListener(ToggleVibration);
             removeAdsButton.onClick.RemoveListener(BuyRemoveAds);
+            privacyButton.onClick.RemoveListener(privacyPanel.Open);
+            restoreButton.onClick.RemoveListener(Restore);
         }
 
         public void Open()
@@ -64,6 +74,8 @@ namespace BeachTycoon.UI
             root.SetActive(true);
             soundSlider.SetValueWithoutNotify(_settings.SoundVolume);
             musicSlider.SetValueWithoutNotify(_settings.MusicVolume);
+            restoreLabel.text = "Restore purchases";
+            restoreButton.interactable = true;
             Refresh();
         }
 
@@ -93,6 +105,19 @@ namespace BeachTycoon.UI
             _iap.Purchase(_removeAdsId, success => Refresh());
         }
 
+        // A reinstall or a new phone: the store gives back what was bought, and the label says how it went.
+        private void Restore()
+        {
+            restoreButton.interactable = false;
+            restoreLabel.text = "Restoring...";
+            _iap.Restore(success =>
+            {
+                restoreLabel.text = !success ? "Try again later" : _iap.IsOwned(_removeAdsId) ? "Restored" : "Nothing to restore";
+                restoreButton.interactable = true;
+                Refresh();
+            });
+        }
+
         // Runs on changes only (open, slider drag, taps), so its strings are not a per-frame cost.
         private void Refresh()
         {
@@ -100,8 +125,9 @@ namespace BeachTycoon.UI
             musicLabel.text = VolumeText("Music", _settings.MusicVolume);
             vibrationLabel.text = _settings.VibrationOn ? "Vibration: ON" : "Vibration: OFF";
             bool owned = _iap.IsOwned(_removeAdsId);
-            removeAdsLabel.text = owned ? "Ads removed - thank you!" : "Remove ads";
-            removeAdsButton.interactable = !owned;
+            string price = _iap.PriceText(_removeAdsId);
+            removeAdsLabel.text = owned ? "Ads removed - thank you!" : string.IsNullOrEmpty(price) ? "Remove ads" : "Remove ads  " + price;
+            removeAdsButton.interactable = !owned && _iap.IsReady;
         }
 
         private static string VolumeText(string name, float volume) =>

@@ -52,7 +52,7 @@ namespace BeachTycoon.Gameplay
         }
 
         // Order follows the design doc: Save, Economy, Progression, Building, Visitors, Neighbours, UI.
-        // Platform seams (analytics, ads, IAP) come right after Save so every later service can use them.
+        // Platform seams (privacy, analytics, ads, IAP) come right after Save so every later service can use them.
         private void CreateServices()
         {
             ServiceLocator.Register(database);
@@ -65,12 +65,8 @@ namespace BeachTycoon.Gameplay
             GameSaveData data = _save.Data;
             MonetizationConfig monetization = database.monetization;
 
-            var analytics = new MockAnalyticsService(monetization.logAnalyticsToConsole);
-            ServiceLocator.Register<IAnalyticsService>(analytics);
-            var ads = new MockAdsService(monetization.mockAdSeconds);
-            ServiceLocator.Register<IAdsService>(ads);
-            _tickables.Add(ads);
-            ServiceLocator.Register<IIapService>(new MockIapService(data.meta, monetization.removeAdsProductId));
+            var privacy = Add(new PrivacyService(data.meta.settings));
+            IAnalyticsService analytics = AddPlatform(data, monetization, privacy, out IAdsService ads);
 
             var economy = new EconomyService(data.wallet);
             ServiceLocator.Register<IEconomyService>(economy);

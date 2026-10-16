@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>The HUD Settings button and window: sound and music sliders, vibration and Remove ads.</summary>
+    /// <summary>The HUD Settings button and window (sliders, vibration, Remove ads, Privacy, Restore) and the privacy window.</summary>
     internal static class SettingsUiBuilder
     {
         private static readonly Color Track = new Color(0.82f, 0.78f, 0.7f);
@@ -19,11 +19,14 @@ namespace BeachTycoon.EditorTools
             UiKit.ChildText(openRect, "Label", "Settings", 36f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
 
             RectTransform host = UiKit.Stretch("SettingsPanel", parent);
-            RectTransform root = MetaUiBuilder.Modal(host, "Settings", new Vector2(820f, 960f), out RectTransform window, out Button close);
+            RectTransform root = MetaUiBuilder.Modal(host, "Settings", new Vector2(820f, 1100f), out RectTransform window, out Button close);
             Slider sound = VolumeSlider(window, "Sound", -170f, out TextMeshProUGUI soundLabel);
             Slider music = VolumeSlider(window, "Music", -360f, out TextMeshProUGUI musicLabel);
             Button vibration = MetaUiBuilder.Row(window, "VibrationButton", 3, MetaUiBuilder.Secondary, out TextMeshProUGUI vibrationLabel);
             Button removeAds = MetaUiBuilder.Row(window, "RemoveAdsButton", 4, UiKit.ButtonColor, out TextMeshProUGUI removeAdsLabel);
+            Button privacy = HalfRow(window, "PrivacyButton", 5, -165f, out TextMeshProUGUI privacyLabel);
+            privacyLabel.text = "Privacy";
+            Button restore = HalfRow(window, "RestoreButton", 5, 165f, out TextMeshProUGUI restoreLabel);
 
             var view = host.gameObject.AddComponent<SettingsPanelView>();
             PrimitiveKit.SetReference(view, "openButton", open);
@@ -36,8 +39,52 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "vibrationLabel", vibrationLabel);
             PrimitiveKit.SetReference(view, "removeAdsButton", removeAds);
             PrimitiveKit.SetReference(view, "removeAdsLabel", removeAdsLabel);
+            PrimitiveKit.SetReference(view, "privacyButton", privacy);
+            PrimitiveKit.SetReference(view, "privacyPanel", BuildPrivacy(parent));
+            PrimitiveKit.SetReference(view, "restoreButton", restore);
+            PrimitiveKit.SetReference(view, "restoreLabel", restoreLabel);
             PrimitiveKit.SetReference(view, "closeButton", close);
             root.gameObject.SetActive(false);
+        }
+
+        // Asked once on first launch and reachable from Settings; HudBuilder puts it above every other window.
+        private static PrivacyPanelView BuildPrivacy(Transform parent)
+        {
+            RectTransform host = UiKit.Stretch("PrivacyPanel", parent);
+            RectTransform root = MetaUiBuilder.Modal(host, "Your privacy", new Vector2(900f, 1100f), out RectTransform window, out Button close);
+            RectTransform bodyRect = UiKit.Rect("Body", window, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(-110f, 320f));
+            UiKit.AddText(bodyRect, "Beach Tycoon can send anonymous play statistics that help us improve the game, " +
+                "and show ads picked for you. Nothing is collected unless you accept.", 40f, TextAlignmentOptions.Center, UiKit.TextDark);
+            RectTransform statusRect = UiKit.Rect("Status", window, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -480f), new Vector2(-110f, 100f));
+            TextMeshProUGUI status = UiKit.AddText(statusRect, "Status", 34f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Italic);
+
+            Button accept = MetaUiBuilder.Row(window, "AcceptButton", 3, MetaUiBuilder.Secondary, out TextMeshProUGUI acceptLabel);
+            acceptLabel.text = "Accept";
+            Button necessary = MetaUiBuilder.Row(window, "NecessaryButton", 4, UiKit.ButtonColor, out TextMeshProUGUI necessaryLabel);
+            necessaryLabel.text = "Only necessary";
+            Button policy = MetaUiBuilder.Row(window, "PolicyButton", 5, new Color(0.9f, 0.88f, 0.82f), out TextMeshProUGUI policyLabel);
+            policyLabel.text = "Read the privacy policy";
+
+            var view = host.gameObject.AddComponent<PrivacyPanelView>();
+            PrimitiveKit.SetReference(view, "root", root.gameObject);
+            PrimitiveKit.SetReference(view, "window", window);
+            PrimitiveKit.SetReference(view, "status", status);
+            PrimitiveKit.SetReference(view, "acceptButton", accept);
+            PrimitiveKit.SetReference(view, "necessaryButton", necessary);
+            PrimitiveKit.SetReference(view, "policyButton", policy);
+            PrimitiveKit.SetReference(view, "closeButton", close);
+            root.gameObject.SetActive(false);
+            return view;
+        }
+
+        private static Button HalfRow(RectTransform window, string name, int index, float x, out TextMeshProUGUI label)
+        {
+            Button button = MetaUiBuilder.Row(window, name, index, MetaUiBuilder.Secondary, out label);
+            var rect = (RectTransform)button.transform;
+            rect.anchoredPosition = new Vector2(x, rect.anchoredPosition.y);
+            rect.sizeDelta = new Vector2(310f, rect.sizeDelta.y);
+            label.fontSize = 38f;
+            return button;
         }
 
         // A label ("Sound: 80%") above a 0..1 slider with a round handle.

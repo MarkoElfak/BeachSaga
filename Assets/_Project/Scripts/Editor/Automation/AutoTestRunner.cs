@@ -114,13 +114,14 @@ namespace BeachTycoon.EditorTools
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
                     {
                         ApplySimulatedAbsence();
+                        ApplyDamagedSave();
                         EnterPlay();
                     }
                     break;
                 case Stage.Cleanup:
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
                     {
-                        File.Delete(SavePath); // leave the user a fresh game
+                        DeleteSaves(); // leave the user a fresh game
                         DeleteIslandSnapshots();
                         CurrentStage = Stage.Idle;
                     }
@@ -135,7 +136,7 @@ namespace BeachTycoon.EditorTools
             CurrentStep = 0;
             CurrentStage = Stage.WaitingForPlay; // marks the run active so setup logs are captured
             Write($"Automated playtest ({SuiteTitle}) started " + System.DateTime.UtcNow.ToString("u"));
-            File.Delete(SavePath);
+            DeleteSaves();
             DeleteIslandSnapshots();
 
             bool setupOk;
@@ -175,6 +176,7 @@ namespace BeachTycoon.EditorTools
             if (GameBootstrap.IsReady && Camera.main != null && SceneManager.GetActiveScene().name == SceneNames.Beach)
             {
                 Write($"Beach scene running (step {CurrentStep})");
+                AnswerPrivacy();
                 CurrentStage = Stage.Playing;
                 _stageStartTime = Now;
             }

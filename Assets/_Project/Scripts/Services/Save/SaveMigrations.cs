@@ -19,6 +19,7 @@ namespace BeachTycoon.Services
             new AddSeasons(),
             new AddMiniGames(),
             new AddVolumes(),
+            new AddPrivacy(),
         };
 
         /// <summary>
@@ -116,6 +117,13 @@ namespace BeachTycoon.Services
             public string Migrate(string json) => json.Replace("\"version\":12", "\"version\":13")
                 .Replace("\"soundOn\":false", "\"soundOn\":false,\"soundVolume\":0.0")
                 .Replace("\"musicOn\":false", "\"musicOn\":false,\"musicVolume\":0.0");
+        }
+
+        /// <summary>v13 -> v14: privacy choice; old saves have not been asked yet (0), so the question shows once.</summary>
+        private sealed class AddPrivacy : ISaveMigration
+        {
+            public int FromVersion => 13;
+            public string Migrate(string json) => json.Replace("\"version\":13", "\"version\":14");
         }
     }
 }
