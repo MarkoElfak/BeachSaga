@@ -1,32 +1,47 @@
 using System.Collections.Generic;
+using BeachTycoon.Core;
 using BeachTycoon.Data;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Walkable layout for visitors: entry points, relax spots and stand queues, plus straight-line
-    /// paths that detour around built lots. No NavMesh; every query is allocation-free.
+    /// Walkable layout for visitors: entry points, relax spots and stand queues, plus straight-line paths that
+    /// detour around every building, stand and decoration in the way. No NavMesh; queries do not allocate.
     /// </summary>
-    public sealed class WorldNavigation
+    public sealed partial class WorldNavigation : System.IDisposable
     {
+        private const int MaxDetours = 6;
+        private const float CornerMargin = 0.1f;
+
         private readonly WorldLayoutConfig _layout;
-        private readonly BuildingManager _buildings;
         private readonly PlacementService _placement;
         private readonly List<Vector3> _spots = new List<Vector3>();
         private readonly List<bool> _spotTaken = new List<bool>();
         private readonly Dictionary<int, Pose> _queueAnchors = new Dictionary<int, Pose>();
         private readonly Dictionary<int, Vector3> _standPositions = new Dictionary<int, Vector3>();
         private readonly float _queueSpacing;
+        private readonly List<Rect> _obstacles = new List<Rect>();
+        private bool _obstaclesDirty = true;
 
-        public WorldNavigation(WorldLayoutConfig layout, VisitorConfig visitors, BuildingManager buildings,
-            PlacementService placement)
+        public WorldNavigation(WorldLayoutConfig layout, VisitorConfig visitors, PlacementService placement)
         {
             _layout = layout;
-            _buildings = buildings;
             _placement = placement;
             _queueSpacing = visitors.queueSpacing;
             CreateRelaxSpots(layout, visitors.randomSeed);
+            EventBus.Subscribe<ObjectMoved>(OnPlacementChanged);
+            EventBus.Subscribe<DecorationPlaced>(OnDecorationPlaced);
+            EventBus.Subscribe<StandCreated>(OnStandCreated);
+            EventBus.Subscribe<LotStateChanged>(OnLotChanged);
+        }
+
+        public void Dispose()
+        {
+            EventBus.Unsubscribe<ObjectMoved>(OnPlacementChanged);
+            EventBus.Unsubscribe<DecorationPlaced>(OnDecorationPlaced);
+            EventBus.Unsubscribe<StandCreated>(OnStandCreated);
+            EventBus.Unsubscribe<LotStateChanged>(OnLotChanged);
         }
 
         public int EntryCount => _layout.entryPoints != null ? _layout.entryPoints.Length : 0;
@@ -92,61 +107,6 @@ namespace BeachTycoon.Gameplay
 
             position = default;
             return false;
-        }
-
-        /// <summary>Fills path with waypoints from 'from' to 'to', going around any built lot in the way.</summary>
-        public void BuildPath(Vector3 from, Vector3 to, List<Vector3> path)
-        {
-            path.Clear();
-            for (int i = 0; i < _buildings.LotCount; i++)
-            {
-                if (_buildings.GetLot(i).state == LotState.Empty || !TryGetObstacle(i, out Rect rect))
-                {
-                    continue;
-                }
-
-                if (SegmentHitsRect(from, to, rect) && !Contains(rect, from) && !Contains(rect, to))
-                {
-                    // Walk down the closer side of the building, then on to the target.
-                    float leftCost = Mathf.Abs(from.x - rect.xMin) + Mathf.Abs(to.x - rect.xMin);
-                    float rightCost = Mathf.Abs(from.x - rect.xMax) + Mathf.Abs(to.x - rect.xMax);
-                    float sideX = leftCost <= rightCost ? rect.xMin : rect.xMax;
-                    path.Add(new Vector3(sideX, 0f, from.z));
-                    path.Add(new Vector3(sideX, 0f, to.z));
-                    break;
-                }
-            }
-
-            path.Add(to);
-        }
-
-        private bool TryGetObstacle(int lotIndex, out Rect rect)
-        {
-            // Footprints follow the buildings wherever the player has moved them.
-            Rect footprint = _placement.GetFootprint(PlaceableId.Lot(lotIndex), _placement.GetLotPosition(lotIndex));
-            float clearance = _layout.pathClearance;
-            rect = new Rect(footprint.position - Vector2.one * clearance, footprint.size + Vector2.one * (clearance * 2f));
-            return true;
-        }
-
-        private static bool Contains(Rect rect, Vector3 point) => rect.Contains(new Vector2(point.x, point.z));
-
-        // Liang-Barsky clip of the XZ segment against the rectangle.
-        private static bool SegmentHitsRect(Vector3 a, Vector3 b, Rect r)
-        {
-            float t0 = 0f, t1 = 1f;
-            float dx = b.x - a.x, dz = b.z - a.z;
-            return Clip(-dx, a.x - r.xMin, ref t0, ref t1) && Clip(dx, r.xMax - a.x, ref t0, ref t1)
-                && Clip(-dz, a.z - r.yMin, ref t0, ref t1) && Clip(dz, r.yMax - a.z, ref t0, ref t1);
-        }
-
-        private static bool Clip(float p, float q, ref float t0, ref float t1)
-        {
-            if (Mathf.Approximately(p, 0f)) return q >= 0f;
-            float t = q / p;
-            if (p < 0f) { if (t > t1) return false; if (t > t0) t0 = t; }
-            else { if (t < t0) return false; if (t < t1) t1 = t; }
-            return true;
         }
 
         private void CreateRelaxSpots(WorldLayoutConfig layout, int seed)

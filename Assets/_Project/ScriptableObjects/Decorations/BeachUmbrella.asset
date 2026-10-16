@@ -19,4 +19,10 @@ MonoBehaviour:
   requiredTier: 1
   maxCount: 3
   prefab: {fileID: 6689324770314334436, guid: 8648ce9781953410794aa689d0158582, type: 3}
-  footprint: {x: 1.4, y: 1.4}
+  area:
+    serializedVersion: 2
+    x: -1.4
+    y: -1.2
+    width: 2.4
+    height: 2.4
+  autoFootprint: 1

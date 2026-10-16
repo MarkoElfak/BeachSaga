@@ -21,7 +21,7 @@ namespace BeachTycoon.Gameplay
     /// </summary>
     public sealed class VisitorAgent
     {
-        private const int PathCapacity = 4;
+        private const int PathCapacity = 28; // two legs of up to six detours each, so paths never grow
 
         public VisitorAgent(int id)
         {

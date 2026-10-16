@@ -6,7 +6,8 @@ using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Scene pieces for moving objects: the MoveController with its footprint indicator, and the HUD hint.</summary>
+    /// <summary>Scene pieces for moving objects: the MoveController with its footprint indicator (plate plus an
+    /// outline of the exact footprint), and the HUD hint.</summary>
     internal static class PlacementSceneBuilder
     {
         public static MoveController Build(GameDatabase database, Camera camera, PointerGestureSource gestures)
@@ -20,11 +21,25 @@ namespace BeachTycoon.EditorTools
             var plateRenderer = plate.GetComponent<MeshRenderer>();
             plateRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
+            Material validEdge = database.palette.GetMaterial("placeValidEdge");
+            var edges = new Object[4];
+            string[] names = { "EdgeLeft", "EdgeRight", "EdgeBack", "EdgeFront" };
+            for (int i = 0; i < edges.Length; i++)
+            {
+                GameObject bar = PrimitiveKit.Part(indicatorGo.transform, PrimitiveType.Cube, names[i], Vector3.zero, Vector3.one, validEdge);
+                var barRenderer = bar.GetComponent<MeshRenderer>();
+                barRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                edges[i] = barRenderer;
+            }
+
             var indicator = indicatorGo.AddComponent<PlacementIndicator>();
             PrimitiveKit.SetReference(indicator, "plate", plate.transform);
             PrimitiveKit.SetReference(indicator, "plateRenderer", plateRenderer);
             PrimitiveKit.SetReference(indicator, "validMaterial", valid);
             PrimitiveKit.SetReference(indicator, "invalidMaterial", database.palette.GetMaterial("placeInvalid"));
+            PrimitiveKit.SetReferences(indicator, "edges", edges);
+            PrimitiveKit.SetReference(indicator, "validEdgeMaterial", validEdge);
+            PrimitiveKit.SetReference(indicator, "invalidEdgeMaterial", database.palette.GetMaterial("placeInvalidEdge"));
 
             PrimitiveKit.SetReference(mover, "worldCamera", camera);
             PrimitiveKit.SetReference(mover, "gestures", gestures);

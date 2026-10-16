@@ -144,9 +144,10 @@ namespace BeachTycoon.Gameplay
             _target = PlacementRules.Snap(ground + _grabOffset, _config.gridSize);
             _valid = _placement.CanPlace(id, _target);
 
-            float baseHeight = id.IsLot || _terrain == null ? 0f : _terrain.Height(_target.x, _target.y);
+            bool onGround = id.Kind == PlaceableKind.Decoration && _terrain != null; // buildings and stands sit on levelled ground
+            float baseHeight = onGround ? _terrain.Height(_target.x, _target.y) : 0f;
             _active.MoveRoot.position = new Vector3(_target.x, baseHeight + _config.liftHeight, _target.y);
-            indicator.Show(_placement.GetFootprint(id, _target), baseHeight, _valid);
+            indicator.Show(_placement.GetFootprint(id, _target), _placement.GetBlockingArea(id, _target), baseHeight, _valid);
         }
 
         private bool TryGroundPoint(Vector2 screen, out Vector2 point)

@@ -428,37 +428,6 @@ Transform:
   - {fileID: 963881016694865363}
   m_Father: {fileID: 7854276305183824443}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3407834737368956075
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5711459888100177412}
-  m_Layer: 0
-  m_Name: StandsRoot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5711459888100177412
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3407834737368956075}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7854276305183824443}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3818766223040775105
 GameObject:
   m_ObjectHideFlags: 0
@@ -662,7 +631,6 @@ Transform:
   - {fileID: 1210414530610236618}
   - {fileID: 2269917829658153981}
   - {fileID: 4212386820140530905}
-  - {fileID: 5711459888100177412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &7937197573552469561
@@ -702,7 +670,6 @@ MonoBehaviour:
   constructionVisual: {fileID: 1210414530610236618}
   progressBar: {fileID: 5883127037008229245}
   buildingRoot: {fileID: 4212386820140530905}
-  standsRoot: {fileID: 5711459888100177412}
 --- !u!1 &6024515239128247197
 GameObject:
   m_ObjectHideFlags: 0

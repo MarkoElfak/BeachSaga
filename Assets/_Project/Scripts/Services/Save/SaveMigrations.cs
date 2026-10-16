@@ -10,6 +10,7 @@ namespace BeachTycoon.Services
             new AddNeighboursAndDecorations(),
             new AddMeta(),
             new AddPositions(),
+            new AddStandPositions(),
         };
 
         /// <summary>
@@ -35,6 +36,16 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 3;
             public string Migrate(string json) => json.Replace("\"version\":3", "\"version\":4");
+        }
+
+        /// <summary>
+        /// v4 -> v5: stands are placed on their own (placed/x/z). Old stands load unplaced, so they keep their
+        /// default slot beside the main building.
+        /// </summary>
+        private sealed class AddStandPositions : ISaveMigration
+        {
+            public int FromVersion => 4;
+            public string Migrate(string json) => json.Replace("\"version\":4", "\"version\":5");
         }
     }
 }

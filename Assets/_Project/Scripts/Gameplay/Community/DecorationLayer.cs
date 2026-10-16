@@ -8,9 +8,6 @@ namespace BeachTycoon.Gameplay
     /// <summary>Spawns decoration prefabs on the ground (saved and newly bought ones) and follows their moves.</summary>
     public sealed class DecorationLayer : MonoBehaviour
     {
-        private const float FacingStepDegrees = 11f; // small per-spot twist so rows of props don't look cloned
-        private const float SideFacingDegrees = 90f;
-
         private readonly List<Transform> _instances = new List<Transform>();
         private GameDatabase _database;
         private DecorationService _decorations;
@@ -39,7 +36,7 @@ namespace BeachTycoon.Gameplay
 
         private void OnMoved(ObjectMoved evt)
         {
-            if (evt.IsLot || evt.Index >= _instances.Count || _instances[evt.Index] == null) return;
+            if (evt.Kind != PlaceableKind.Decoration || evt.Index >= _instances.Count || _instances[evt.Index] == null) return;
             Vector2 position = _placement.GetDecorationPosition(evt.Index);
             _instances[evt.Index].position = _ground.Ground(position.x, position.y);
         }
@@ -54,10 +51,9 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
+            // Unrotated, so the footprint measured from the prefab matches what is on screen.
             Vector2 position = _placement.GetDecorationPosition(index);
-            // Face roughly toward the middle of the beach so props read well from the camera.
-            float yaw = (position.x < 0f ? SideFacingDegrees : -SideFacingDegrees) + model.spotIndex * FacingStepDegrees;
-            GameObject instance = Instantiate(definition.prefab, _ground.Ground(position.x, position.y), Quaternion.Euler(0f, yaw, 0f), transform);
+            GameObject instance = Instantiate(definition.prefab, _ground.Ground(position.x, position.y), Quaternion.identity, transform);
             instance.AddComponent<DecorationView>().Bind(index);
             _instances[index] = instance.transform;
         }

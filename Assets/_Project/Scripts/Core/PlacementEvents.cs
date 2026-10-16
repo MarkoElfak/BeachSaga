@@ -1,14 +1,24 @@
+using UnityEngine;
+
 namespace BeachTycoon.Core
 {
-    /// <summary>A lot (IsLot) or a decoration was moved to a new position, or a lot became occupied.</summary>
+    /// <summary>What kind of movable object a placement event is about.</summary>
+    public enum PlaceableKind
+    {
+        Lot = 0,        // main building or a neighbour's house
+        Stand = 1,      // a product stand
+        Decoration = 2,
+    }
+
+    /// <summary>An object was moved (by the player or to make room), or a lot changed the space it takes.</summary>
     public readonly struct ObjectMoved
     {
-        public readonly bool IsLot;
+        public readonly PlaceableKind Kind;
         public readonly int Index;
 
-        public ObjectMoved(bool isLot, int index)
+        public ObjectMoved(PlaceableKind kind, int index)
         {
-            IsLot = isLot;
+            Kind = kind;
             Index = index;
         }
     }
@@ -26,6 +36,19 @@ namespace BeachTycoon.Core
         public MoveEnded(bool committed)
         {
             Committed = committed;
+        }
+    }
+
+    /// <summary>A main-building upgrade opened more land. Area is the whole buildable rectangle (x, z).</summary>
+    public readonly struct AreaUnlocked
+    {
+        public readonly int Tier;
+        public readonly Rect Area;
+
+        public AreaUnlocked(int tier, Rect area)
+        {
+            Tier = tier;
+            Area = area;
         }
     }
 }

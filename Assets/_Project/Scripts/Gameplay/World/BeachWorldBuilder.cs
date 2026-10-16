@@ -25,6 +25,8 @@ namespace BeachTycoon.Gameplay
         private TerrainConfig _terrain;
         private MeshFilter _terrainFilter;
 
+        private LandFence _fence;
+
         public TerrainShape Shape { get; private set; }
         public bool PalmsStaticBatched { get; private set; }
 
@@ -55,7 +57,16 @@ namespace BeachTycoon.Gameplay
                 config.rockScaleRange, random, true, IsRockSpot);
             Scatter(root, "GrassTufts", ProceduralMeshes.GrassTuft(layout.palmSeed), config.grassTuftMaterial,
                 config.grassTuftCount, config.tuftScaleRange, random, false, IsTuftSpot);
+            _fence = new GameObject("LandFence").AddComponent<LandFence>();
+            _fence.transform.SetParent(root, false);
+            _fence.Initialize(Shape, config);
             return Shape.LandRect;
+        }
+
+        /// <summary>Fences the edge of the unlocked land (no fence once everything is unlocked).</summary>
+        public void ShowLandBoundary(Rect area, bool moreToUnlock)
+        {
+            if (_fence != null) _fence.Show(area, moreToUnlock);
         }
 
         /// <summary>
@@ -182,16 +193,8 @@ namespace BeachTycoon.Gameplay
             return land && grassOrEdge && !NearLotOrPath(p, 0.9f);
         }
 
-        // Scenery keeps clear of the footpath and the main building's default spot. House lots and moved objects
-        // are handled by RefreshPlacement, which hides whatever ends up under them.
-        private bool NearLotOrPath(Vector3 p, float clearance)
-        {
-            WorldLayoutConfig layout = _layout;
-            var point = new Vector2(p.x, p.z);
-            Vector2 main = layout.lotPositions.Length > 0 ? layout.lotPositions[BuildingManager.MainLotIndex] : Vector2.zero;
-            if (Expand(new Rect(main + layout.mainFootprint.position, layout.mainFootprint.size), clearance).Contains(point)) return true;
-            return Expand(_terrain.path, clearance).Contains(point);
-        }
+        // Initial scenery only keeps off the footpath; RefreshPlacement hides whatever ends up under an object.
+        private bool NearLotOrPath(Vector3 p, float clearance) => Expand(_terrain.path, clearance).Contains(new Vector2(p.x, p.z));
 
         private static Rect Expand(Rect r, float by) => new Rect(r.x - by, r.y - by, r.width + by * 2f, r.height + by * 2f);
     }

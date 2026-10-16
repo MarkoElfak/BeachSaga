@@ -30,7 +30,6 @@ namespace BeachTycoon.EditorTools
 
             ProgressBarView bar = PrimitiveKit.ProgressBar(t, new Vector3(0f, 3.6f, 0f), 2.4f, p.GetMaterial("barBack"), p.GetMaterial("barFill"));
             GameObject buildingRoot = PrimitiveKit.Empty("BuildingRoot", t, Vector3.zero);
-            GameObject standsRoot = PrimitiveKit.Empty("StandsRoot", t, Vector3.zero);
             PrimitiveKit.AddBox(root, new Vector3(0f, 0.1f, 0f), new Vector3(4f, 0.2f, 4f));
 
             var view = root.AddComponent<LotView>();
@@ -38,7 +37,6 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "constructionVisual", construction.transform);
             PrimitiveKit.SetReference(view, "progressBar", bar);
             PrimitiveKit.SetReference(view, "buildingRoot", buildingRoot.transform);
-            PrimitiveKit.SetReference(view, "standsRoot", standsRoot.transform);
             return root;
         }
 

@@ -7,18 +7,18 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Displays one lot: the empty marker (main lot only), the construction crate, the building or house and its
-    /// stands. Forwards taps (build, upgrade panel, house info) and drops rent coins. Long-press moves the whole
-    /// lot (building plus its stands). Holds no game state.
+    /// stands. Forwards taps (build, upgrade panel, house info) and drops rent coins. Long-press moves the building
+    /// alone: stands are separate objects (StandView) next to it. Holds no game state.
     /// </summary>
     public sealed class LotView : MonoBehaviour, ITappable, IMovable
     {
         private const int RentSourceOffset = 1000;
+        private const float TapBoxHeight = 2.5f;
 
         [SerializeField] private GameObject emptyMarker = null;
         [SerializeField] private Transform constructionVisual = null;
         [SerializeField] private ProgressBarView progressBar = null;
         [SerializeField] private Transform buildingRoot = null;
-        [SerializeField] private Transform standsRoot = null;
 
         private readonly List<StandView> _standViews = new List<StandView>();
         private int _lotIndex = -1;
@@ -99,15 +99,25 @@ namespace BeachTycoon.Gameplay
 
         private void OnObjectMoved(ObjectMoved evt)
         {
-            if (evt.IsLot && evt.Index == _lotIndex) SnapToPlacement();
+            if (evt.Kind == PlaceableKind.Lot && evt.Index == _lotIndex) SnapToPlacement();
         }
 
-        // Lots stand on flattened ground at height 0; stands move with the lot and re-register their queues.
+        // Lots stand on levelled ground at height 0.
         private void SnapToPlacement()
         {
             Vector2 position = _placement.GetLotPosition(_lotIndex);
             transform.position = new Vector3(position.x, 0f, position.y);
-            for (int i = 0; i < _standViews.Count; i++) PlaceStand(_standViews[i]);
+            FitCollider();
+        }
+
+        // Taps and long-presses hit exactly the ground the building covers (it changes with the tier).
+        private void FitCollider()
+        {
+            if (!TryGetComponent(out BoxCollider box)) return;
+            box.enabled = _placement.IsPresent(Placeable); // empty house lots are not there yet
+            Rect footprint = _placement.GetFootprint(Placeable, Vector2.zero);
+            box.center = new Vector3(footprint.center.x, TapBoxHeight * 0.5f, footprint.center.y);
+            box.size = new Vector3(footprint.width, TapBoxHeight, footprint.height);
         }
 
         private void OnLotStateChanged(LotStateChanged evt)
@@ -118,7 +128,6 @@ namespace BeachTycoon.Gameplay
         private void OnStandCreated(StandCreated evt)
         {
             if (evt.LotIndex != _lotIndex) return;
-            Refresh(); // make sure the building (and its stand anchors) exists first
             SpawnStandView(evt.StandIndex);
         }
 
@@ -137,6 +146,7 @@ namespace BeachTycoon.Gameplay
             constructionVisual.gameObject.SetActive(building);
             progressBar.SetVisible(building);
             if (lot.tier != _shownTier) ShowBuilding(lot);
+            FitCollider();
         }
 
         private void ShowBuilding(LotModel lot)
@@ -153,7 +163,6 @@ namespace BeachTycoon.Gameplay
 
             GameObject instance = Instantiate(prefab, buildingRoot, false);
             _buildingView = instance.GetComponent<BuildingView>();
-            for (int i = 0; i < _standViews.Count; i++) PlaceStand(_standViews[i]);
         }
 
         private GameObject TierPrefab(int tier)
@@ -168,6 +177,7 @@ namespace BeachTycoon.Gameplay
             return houses != null && houses.Length > 0 ? houses[Mathf.Abs(variant) % houses.Length] : null;
         }
 
+        // Stands are siblings of the lot (not children), so moving the building leaves them where they are.
         private void SpawnStandView(int standIndex)
         {
             StandController stand = _stands.Get(standIndex);
@@ -177,20 +187,10 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            GameObject instance = Instantiate(stand.Product.standPrefab, standsRoot, false);
+            GameObject instance = Instantiate(stand.Product.standPrefab, transform.parent, false);
             var view = instance.GetComponent<StandView>();
             view.Bind(stand, _coinSpawner);
             _standViews.Add(view);
-            PlaceStand(view);
-        }
-
-        private void PlaceStand(StandView view)
-        {
-            Transform anchor = _buildingView != null
-                ? _buildingView.GetStandAnchor(view.Stand.Model.slotIndex)
-                : standsRoot;
-            view.transform.SetPositionAndRotation(anchor.position, anchor.rotation);
-            view.RegisterQueue();
         }
     }
 }

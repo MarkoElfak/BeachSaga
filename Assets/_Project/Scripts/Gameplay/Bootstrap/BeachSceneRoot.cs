@@ -49,13 +49,14 @@ namespace BeachTycoon.Gameplay
 
             _placement = ServiceLocator.Get<PlacementService>();
             _placement.GetFlatRects(_flats);
-            Rect landBounds = worldBuilder.Build(database, _flats);
+            worldBuilder.Build(database, _flats);
             TerrainShape ground = worldBuilder.Shape;
             ServiceLocator.Register(ground);
             _placement.AttachTerrain(ground);
+            worldBuilder.ShowLandBoundary(_placement.UnlockedArea, MoreLandToUnlock());
             Vector3 startFocus = LotPosition(0);
             Color seaColor = database.palette.GetColor(layout.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, landBounds, startFocus, seaColor);
+            cameraController.Initialize(database.cameraConfig, _placement.UnlockedArea, MaxZoom(), startFocus, seaColor);
 
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
@@ -67,21 +68,43 @@ namespace BeachTycoon.Gameplay
             moveController.Initialize(_placement, database.input);
             RefreshPlacement(false);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
         }
 
         private void OnDestroy()
         {
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
         }
 
-        private void OnObjectMoved(ObjectMoved evt) => RefreshPlacement(evt.IsLot);
+        private void OnObjectMoved(ObjectMoved evt) => RefreshPlacement(evt.Kind != PlaceableKind.Decoration);
 
-        // Ground flattening follows buildings (only lots change it); scenery hides under every object.
+        // Ground levelling follows buildings and stands; scenery hides under every object and stand queue.
         private void RefreshPlacement(bool lotsChanged)
         {
             _placement.GetFlatRects(_flats);
             _placement.GetOccupiedRects(_occupied);
             worldBuilder.RefreshPlacement(_flats, _occupied, lotsChanged);
+        }
+
+        // An upgrade opened more land: move the boundary fence and let the camera roam and zoom out further.
+        private void OnAreaUnlocked(AreaUnlocked evt)
+        {
+            worldBuilder.ShowLandBoundary(evt.Area, MoreLandToUnlock());
+            cameraController.SetLimits(evt.Area, MaxZoom());
+        }
+
+        private bool MoreLandToUnlock()
+        {
+            int tier = ServiceLocator.Get<BuildingManager>().MainTier;
+            return _placement.AreaForTier(tier) != _placement.AreaForTier(ServiceLocator.Get<GameDatabase>().MaxTier);
+        }
+
+        private float MaxZoom()
+        {
+            GameDatabase database = ServiceLocator.Get<GameDatabase>();
+            TierDefinition tier = database.GetTier(Mathf.Max(1, ServiceLocator.Get<BuildingManager>().MainTier));
+            return tier != null ? tier.maxZoomDistance : 0f;
         }
 
         private void SpawnLots()

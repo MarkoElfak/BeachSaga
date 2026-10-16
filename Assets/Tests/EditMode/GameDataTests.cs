@@ -69,9 +69,25 @@ namespace BeachTycoon.Tests
                 Assert.IsNotNull(decoration);
                 Assert.IsTrue(ids.Add(decoration.id), $"duplicate decoration id {decoration.id}");
                 Assert.IsNotNull(decoration.prefab, decoration.id);
-                Assert.Greater(decoration.footprint.x, 0f, decoration.id);
-                Assert.Greater(decoration.footprint.y, 0f, decoration.id);
+                Assert.Greater(decoration.area.width, 0f, decoration.id);
+                Assert.Greater(decoration.area.height, 0f, decoration.id);
                 Assert.AreSame(decoration, _database.FindDecoration(decoration.id));
+            }
+        }
+
+        [Test]
+        public void EveryTierHasAFootprintAndMoreLand()
+        {
+            Rect previous = new Rect();
+            for (int tier = 1; tier <= _database.MaxTier; tier++)
+            {
+                TierDefinition definition = _database.GetTier(tier);
+                Assert.Greater(definition.footprint.width, 0f, $"tier {tier} footprint");
+                Assert.Greater(definition.buildArea.width, 0f, $"tier {tier} land");
+                Assert.IsTrue(tier == 1 || BeachTycoon.Gameplay.PlacementRules.Inside(previous, definition.buildArea, 0f),
+                    $"tier {tier} land contains the previous tier's");
+                Assert.GreaterOrEqual(definition.buildArea.width, previous.width, $"tier {tier} land grows");
+                previous = definition.buildArea;
             }
         }
 

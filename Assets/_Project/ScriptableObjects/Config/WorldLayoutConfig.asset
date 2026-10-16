@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d9e4bad9d684cd9af7e0668756e7ac, type: 3}
   m_Name: WorldLayoutConfig
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.WorldLayoutConfig
-  dataVersion: 3
-  width: 24
+  dataVersion: 4
+  width: 40
   landTopZ: 10
   bands:
   - name: Shallows
@@ -34,12 +34,12 @@ MonoBehaviour:
     elevation: 0.03
   - name: Grass
     paletteKey: grass
-    depth: 6
+    depth: 9
     elevation: 0.06
   seaPaletteKey: sea
   palmPrefab: {fileID: 313925770644489303, guid: d2c48df2b592646dfb56c33a7d29a95b, type: 3}
   palmBandIndex: 4
-  palmCount: 16
+  palmCount: 30
   palmSeed: 7
   palmEdgeMargin: 0.8
   palmClearance: 1.7
@@ -47,60 +47,53 @@ MonoBehaviour:
   palmScaleRange: {x: 0.85, y: 1.3}
   lotPositions:
   - {x: 0, y: -2}
-  - {x: -5.5, y: -9.4}
-  - {x: 5.5, y: -9.4}
-  - {x: -8, y: -9.4}
-  - {x: 8, y: -9.4}
-  - {x: -10.5, y: -9.4}
-  - {x: 10.5, y: -9.4}
-  - {x: -5.5, y: -11.5}
-  - {x: 5.5, y: -11.5}
-  - {x: -8, y: -11.5}
-  - {x: 8, y: -11.5}
-  - {x: -10.5, y: -11.5}
-  - {x: 10.5, y: -11.5}
-  - {x: -5.5, y: -13.6}
-  - {x: 5.5, y: -13.6}
-  - {x: -8, y: -13.6}
-  - {x: 8, y: -13.6}
-  - {x: -10.5, y: -13.6}
-  - {x: 10.5, y: -13.6}
-  - {x: -10.5, y: -6.4}
-  - {x: 10.5, y: -6.4}
-  mainFootprint:
-    serializedVersion: 2
-    x: -6.6
-    y: -1.6
-    width: 15.4
-    height: 5.2
+  - {x: -5.5, y: -10}
+  - {x: 5.5, y: -10}
+  - {x: -8, y: -10}
+  - {x: 8, y: -10}
+  - {x: -10.5, y: -10}
+  - {x: 10.5, y: -10}
+  - {x: -5.5, y: -12.2}
+  - {x: 5.5, y: -12.2}
+  - {x: -8, y: -12.2}
+  - {x: 8, y: -12.2}
+  - {x: -10.5, y: -12.2}
+  - {x: 10.5, y: -12.2}
+  - {x: -5.5, y: -14.4}
+  - {x: 5.5, y: -14.4}
+  - {x: -8, y: -14.4}
+  - {x: 8, y: -14.4}
+  - {x: -10.5, y: -14.4}
+  - {x: 10.5, y: -14.4}
+  - {x: -14, y: -6.4}
+  - {x: 14, y: -6.4}
   houseFootprint:
     serializedVersion: 2
-    x: -1.1
-    y: -1
-    width: 2.2
-    height: 2
+    x: -1.15
+    y: -1.1
+    width: 2.3
+    height: 2.1
+  autoHouseFootprint: 1
+  standRowZ: -0.6
+  standGap: 0.4
   pathClearance: 0.5
   entryPoints:
-  - {x: -1.4, y: -14.1}
-  - {x: 0, y: -14.1}
-  - {x: 1.4, y: -14.1}
+  - {x: -1.4, y: -17.1}
+  - {x: 0, y: -17.1}
+  - {x: 1.4, y: -17.1}
   beachAccessZ: -4.8
   relaxArea:
     serializedVersion: 2
-    x: -9.6
+    x: -8.8
     y: 1.9
-    width: 19.2
+    width: 17.6
     height: 3
   relaxSpotSpacing: 1.15
   relaxSpotJitter: 0.3
   decorationSpots:
-  - {x: -10.3, y: 5}
-  - {x: 10.3, y: 5}
-  - {x: -10.3, y: 2.6}
-  - {x: 10.3, y: 2.6}
-  - {x: -10.3, y: 0.2}
-  - {x: 10.3, y: 0.2}
-  - {x: -10.2, y: -2.6}
-  - {x: 10.2, y: -2.6}
-  - {x: -3.4, y: -8.9}
-  - {x: 3.4, y: -8.9}
+  - {x: -10.4, y: 5}
+  - {x: 10.4, y: 5}
+  - {x: -10.4, y: 2.6}
+  - {x: 10.4, y: 2.6}
+  - {x: -10.4, y: 0.2}
+  - {x: 10.4, y: 0.2}

@@ -9,6 +9,12 @@ namespace BeachTycoon.Data
     [CreateAssetMenu(menuName = "Beach Tycoon/Config/Terrain", fileName = "TerrainConfig")]
     public sealed class TerrainConfig : ScriptableObject
     {
+        /// <summary>Setup refreshes the island-size values (path, scatter counts) on older assets.</summary>
+        public const int CurrentDataVersion = 1;
+
+        [Tooltip("0 = never upgraded. Setup sets it to CurrentDataVersion.")]
+        public int dataVersion;
+
         [Header("Materials (created by Setup)")]
         public Material terrainMaterial;
         public Material waterMaterial;
@@ -46,7 +52,7 @@ namespace BeachTycoon.Data
         public Color grassVariation = new Color(0.62f, 0.74f, 0.4f);
         public Color pathColor = new Color(0.86f, 0.76f, 0.56f);
         [Tooltip("Sandy footpath from the entry points to the beach (x, z, width, depth).")]
-        public Rect path = new Rect(-2.4f, -15f, 4.8f, 7f);
+        public Rect path = new Rect(-2.4f, -18f, 4.8f, 10f);
         [Range(0f, 1f)] public float drySmoothness = 0.08f;
         [Range(0f, 1f)] public float wetSmoothness = 0.55f;
         [Range(0f, 1f)] public float grassSmoothness = 0.04f;
@@ -61,9 +67,19 @@ namespace BeachTycoon.Data
         [Min(0f)] public float waterExtent = 160f;
 
         [Header("Scatter (GPU instanced)")]
-        [Min(0)] public int rockCount = 26;
-        [Min(0)] public int grassTuftCount = 220;
+        [Min(0)] public int rockCount = 40;
+        [Min(0)] public int grassTuftCount = 360;
         public Vector2 rockScaleRange = new Vector2(0.25f, 0.8f);
         public Vector2 tuftScaleRange = new Vector2(0.6f, 1.3f);
+
+        [Header("Land boundary fence (GPU instanced)")]
+        [Tooltip("Rope fence along the edge of the land unlocked so far.")]
+        public Mesh fenceMesh;
+        public Material fencePostMaterial;
+        public Material fenceRopeMaterial;
+        [Min(0.3f)] public float fencePostSpacing = 1.6f;
+        public Vector3 fencePostSize = new Vector3(0.12f, 0.7f, 0.12f);
+        [Min(0.005f)] public float fenceRopeThickness = 0.05f;
+        [Range(0f, 1f)] public float fenceRopeHeight = 0.8f;
     }
 }

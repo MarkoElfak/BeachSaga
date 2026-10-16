@@ -9,8 +9,16 @@ namespace BeachTycoon.Data
         public string productId;
         public int lotIndex;
 
-        /// <summary>Which anchor on the building the stand sits at.</summary>
+        /// <summary>Default place in the row of stands beside the main building (unlock order).</summary>
         public int slotIndex;
+
+        /// <summary>
+        /// False: the stand stays in its default slot beside the main building and follows it as it grows.
+        /// True: it stands at x/z (moved by the player, or the building itself was moved).
+        /// </summary>
+        public bool placed;
+        public float x;
+        public float z;
 
         /// <summary>Upgrade level, 0 = not upgraded.</summary>
         public int level;

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5ccf268de8d74c618d4df3f7e0a7806, type: 3}
   m_Name: TerrainConfig
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.TerrainConfig
+  dataVersion: 1
   terrainMaterial: {fileID: 2100000, guid: f4bc0af62d05a482e8262aa1fdb0940f, type: 2}
   waterMaterial: {fileID: 2100000, guid: 904c94c6c69c54d78a07e4c46f4f73b9, type: 2}
   rockMaterial: {fileID: 2100000, guid: d63919bad30004844ac854ac1f829385, type: 2}
@@ -39,9 +40,9 @@ MonoBehaviour:
   path:
     serializedVersion: 2
     x: -2.4
-    y: -15
+    y: -18
     width: 4.8
-    height: 7
+    height: 10
   drySmoothness: 0.08
   wetSmoothness: 0.55
   grassSmoothness: 0.04
@@ -50,7 +51,14 @@ MonoBehaviour:
   deepDepthRange: 2.2
   waterCellSize: 1
   waterExtent: 160
-  rockCount: 26
-  grassTuftCount: 220
+  rockCount: 40
+  grassTuftCount: 360
   rockScaleRange: {x: 0.25, y: 0.8}
   tuftScaleRange: {x: 0.6, y: 1.3}
+  fenceMesh: {fileID: 4300000, guid: d5413034a0695454884e403cfd4b5313, type: 2}
+  fencePostMaterial: {fileID: 2100000, guid: 6a1aefdb14b0e41c8b552a360e31c6b3, type: 2}
+  fenceRopeMaterial: {fileID: 2100000, guid: c27a6305333624f0288e2be085edde90, type: 2}
+  fencePostSpacing: 1.6
+  fencePostSize: {x: 0.12, y: 0.7, z: 0.12}
+  fenceRopeThickness: 0.05
+  fenceRopeHeight: 0.8

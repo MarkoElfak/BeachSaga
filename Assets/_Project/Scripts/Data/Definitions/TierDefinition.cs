@@ -23,5 +23,17 @@ namespace BeachTycoon.Data
         public ProductDefinition[] unlockedProducts;
         [Min(0)] public int neighbourSlots;
         [Min(0f)] public float popularityBonus;
+
+        [Header("Placement")]
+        [Tooltip("Ground area the building covers (x, z relative to the lot). Measured from the prefab by Setup " +
+                 "while Auto Footprint is on.")]
+        public Rect footprint = new Rect(-1.5f, -1.5f, 3f, 3f);
+        public bool autoFootprint = true;
+
+        [Header("Land")]
+        [Tooltip("Buildable area (x, z, width, depth) once this tier is reached. Each upgrade opens more land.")]
+        public Rect buildArea;
+        [Tooltip("How far the camera may zoom out at this tier (0 = CameraConfig.maxDistance).")]
+        [Min(0f)] public float maxZoomDistance;
     }
 }

@@ -6,7 +6,8 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Fixed-angle camera orbiting a focus point on the ground. Drag pans so the ground stays under the
-    /// finger; pinch or mouse wheel changes distance. The focus point is clamped to the island.
+    /// finger; pinch or mouse wheel changes distance. The focus point is clamped to the unlocked land, and the
+    /// zoom-out limit grows with the main building's tier.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public sealed class TopDownCameraController : MonoBehaviour
@@ -18,30 +19,48 @@ namespace BeachTycoon.Gameplay
         private Rect _focusBounds;
         private Vector3 _focus;
         private float _distance;
+        private float _maxDistance;
         private bool _initialized;
 
-        public void Initialize(CameraConfig config, Rect landBounds, Vector3 startFocus, Color background)
+        /// <param name="area">Land the focus point may move over (the unlocked area).</param>
+        /// <param name="maxDistance">How far the player may zoom out for now.</param>
+        /// <summary>Current zoom-out limit (grows as land is unlocked).</summary>
+        public float MaxDistance => _maxDistance;
+
+        public void Initialize(CameraConfig config, Rect area, float maxDistance, Vector3 startFocus, Color background)
         {
             _camera = GetComponent<Camera>();
             _config = config;
-
-            float inset = config.focusBoundsInset;
-            float insetX = Mathf.Min(inset, landBounds.width * 0.5f);
-            float insetZ = Mathf.Min(inset, landBounds.height * 0.5f);
-            _focusBounds = Rect.MinMaxRect(
-                landBounds.xMin + insetX, landBounds.yMin + insetZ,
-                landBounds.xMax - insetX, landBounds.yMax - insetZ);
-
             _camera.fieldOfView = config.fieldOfView;
             _camera.nearClipPlane = config.nearClip;
             _camera.farClipPlane = config.farClip;
             _camera.clearFlags = CameraClearFlags.SolidColor;
             _camera.backgroundColor = background;
 
-            _distance = Mathf.Clamp(config.startDistance, config.minDistance, config.maxDistance);
+            SetBounds(area, maxDistance);
+            _distance = Mathf.Clamp(config.startDistance, config.minDistance, _maxDistance);
             _focus = ClampFocus(startFocus);
             _initialized = true;
             ApplyPose();
+        }
+
+        /// <summary>New land was unlocked: the camera may roam over it and zoom out further.</summary>
+        public void SetLimits(Rect area, float maxDistance)
+        {
+            SetBounds(area, maxDistance);
+            if (!_initialized) return;
+            _distance = Mathf.Clamp(_distance, _config.minDistance, _maxDistance);
+            _focus = ClampFocus(_focus);
+            ApplyPose();
+        }
+
+        private void SetBounds(Rect area, float maxDistance)
+        {
+            float inset = _config.focusBoundsInset;
+            float insetX = Mathf.Min(inset, area.width * 0.5f);
+            float insetZ = Mathf.Min(inset, area.height * 0.5f);
+            _focusBounds = Rect.MinMaxRect(area.xMin + insetX, area.yMin + insetZ, area.xMax - insetX, area.yMax - insetZ);
+            _maxDistance = Mathf.Max(_config.minDistance, maxDistance > 0f ? maxDistance : _config.maxDistance);
         }
 
         private void OnEnable()
@@ -77,7 +96,7 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            _distance = Mathf.Clamp(_distance / evt.Ratio, _config.minDistance, _config.maxDistance);
+            _distance = Mathf.Clamp(_distance / evt.Ratio, _config.minDistance, _maxDistance);
             ApplyPose();
         }
 

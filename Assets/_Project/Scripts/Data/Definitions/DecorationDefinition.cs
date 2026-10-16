@@ -15,7 +15,9 @@ namespace BeachTycoon.Data
         [Min(1)] public int maxCount = 4;
         public GameObject prefab;
 
-        [Tooltip("Ground area (x, z) it occupies; other objects cannot be placed on it.")]
-        public Vector2 footprint = new Vector2(1.4f, 1.4f);
+        [Tooltip("Ground area it occupies (x, z relative to its pivot); nothing else can be placed on it. " +
+                 "Measured from the prefab by Setup while Auto Footprint is on.")]
+        public Rect area = new Rect(-0.7f, -0.7f, 1.4f, 1.4f);
+        public bool autoFootprint = true;
     }
 }

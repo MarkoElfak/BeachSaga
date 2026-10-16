@@ -420,3 +420,31 @@ MonoBehaviour:
     texture: {fileID: 0}
     tiling: {x: 1, y: 1}
     material: {fileID: 2100000, guid: 3afaf67e9ce6b49efb1d65a24e9b5194, type: 2}
+  - key: placeValidEdge
+    color: {r: 0.105882354, g: 0.47843137, b: 0.20784314, a: 1}
+    smoothness: 0.3
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: beb0158c0eb474f369d8ded5dac35580, type: 2}
+  - key: placeInvalidEdge
+    color: {r: 0.6392157, g: 0.09019608, b: 0.05882353, a: 1}
+    smoothness: 0.3
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: ee4beeb9f99164df8ad242ff80f707ff, type: 2}
+  - key: fencePost
+    color: {r: 0.5411765, g: 0.41568628, b: 0.2784314, a: 1}
+    smoothness: 0.1
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: 6a1aefdb14b0e41c8b552a360e31c6b3, type: 2}
+  - key: fenceRope
+    color: {r: 0.9098039, g: 0.8509804, b: 0.70980394, a: 1}
+    smoothness: 0.1
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: c27a6305333624f0288e2be085edde90, type: 2}

@@ -13,7 +13,7 @@ namespace BeachTycoon.EditorTools
     /// Performance: resort with five stands and 60 visitors at 1x speed, measuring frame time, draw batches
     /// and managed allocations per frame (FrameAllocationProbe).
     /// </summary>
-    internal static class MovePlaytestSteps
+    internal static partial class MovePlaytestSteps
     {
         private const float TestTimeScale = 8f;
         private const long TestGrant = 5000000;
@@ -21,9 +21,11 @@ namespace BeachTycoon.EditorTools
         private const int WarmupFrames = 120;
         private const int MeasuredFrames = 300;
         private static readonly Vector2 DecorationTarget = new Vector2(-8f, -5f);
-        private static readonly Vector2 MainTarget = new Vector2(1f, -2f);
+        private static readonly Vector2 MainTarget = new Vector2(-1.5f, -2f);
+        private static readonly Vector2 StandTarget = new Vector2(4.5f, -6f);
 
         private static int _salesSinceMove;
+        private static float _zoomAtFirstTier;
         private static FrameAllocationProbe _probe;
 
         private static BuildingManager Buildings => ServiceLocator.Get<BuildingManager>();
@@ -69,6 +71,7 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 4:
                     MoveMainBuilding();
+                    MoveStand();
                     break;
                 case 5:
                     Check(true, $"visitors keep buying after the move ({_salesSinceMove} sale(s))");
@@ -81,18 +84,22 @@ namespace BeachTycoon.EditorTools
                     Time.timeScale = TestTimeScale;
                     Check(Placement.GetLotPosition(0) == MainTarget && Near(LotRoot(0).position, MainTarget), "moved building restored after restart");
                     Check(Placement.GetDecorationPosition(0) == DecorationTarget && Near(DecorationRoot(0).position, DecorationTarget), "moved decoration restored after restart");
+                    Check(Placement.GetStandPosition(0) == StandTarget && Near(PlaytestTools.Find<StandView>().transform.position, StandTarget), "moved stand restored after restart");
+                    _zoomAtFirstTier = CameraRig().MaxDistance;
                     Economy.Earn(TestGrant);
                     Check(Buildings.TryUpgrade(0), "cabin started");
                     break;
                 case 7:
                 case 8:
                 case 9:
+                    if (step == 7) CheckLandUnlocked();
                     PlaytestTools.ClickProduct(step - 6);
                     Check(Buildings.TryUpgrade(0), $"tier {step - 4} started");
                     break;
                 case 10:
                     PlaytestTools.ClickProduct(4);
                     Check(ServiceLocator.Get<StandService>().Count == 5, "resort with five stands");
+                    CaptureWholeBeach();
                     while (Visitors.ActiveCount < StressVisitors && Visitors.TrySpawn()) { }
                     Time.timeScale = 1f;
                     _probe = FrameAllocationProbe.Create();
@@ -107,48 +114,6 @@ namespace BeachTycoon.EditorTools
                     AutoTestRunner.Finish();
                     break;
             }
-        }
-
-        private static void MoveDecorationWithGestures()
-        {
-            Vector2 start = Placement.GetDecorationPosition(0);
-            EventBus.Publish(new HoldStarted(Screen(start)));
-            Check(Mover.IsMoving, "long-press picks up the decoration");
-            EventBus.Publish(new CapturedPointerMoved(Screen(DecorationTarget)));
-            Check(Mover.TargetIsValid && Mover.Target == DecorationTarget, $"free spot shows green ({Mover.Target})");
-            Check(DecorationRoot(0).position.y > 0.3f, "picked-up decoration floats while dragged");
-            PlaytestTools.FocusCamera(new Vector3(DecorationTarget.x, 0f, DecorationTarget.y), 22f);
-            PlaytestTools.CapturePortraitWithHud("m4_0_drag_decoration.png");
-            EventBus.Publish(new CapturedPointerReleased(Screen(DecorationTarget)));
-            Check(!Mover.IsMoving && Decorations.Get(0).placed, "release drops it");
-            Check(Placement.GetDecorationPosition(0) == DecorationTarget && Near(DecorationRoot(0).position, DecorationTarget), "decoration moved and saved in its model");
-        }
-
-        private static void DropOnTowelsSlidesBack()
-        {
-            Vector3 before = LotRoot(0).position;
-            Vector2 towels = ServiceLocator.Get<GameDatabase>().world.relaxArea.center;
-            Check(Mover.TryBegin(Screen(Placement.GetLotPosition(0))), "long-press picks up the main building");
-            Mover.DragTo(Screen(towels));
-            Check(!Mover.TargetIsValid, "the towel area shows red");
-            PlaytestTools.FocusCamera(new Vector3(towels.x, 0f, towels.y), 30f);
-            PlaytestTools.CapturePortraitWithHud("m4_1_invalid_drop.png");
-            Check(!Mover.Drop(), "dropping on a blocked spot does not move it");
-            Check(LotRoot(0).position == before && !Buildings.GetLot(0).placed, "building slid back to where it was");
-        }
-
-        private static void MoveMainBuilding()
-        {
-            Transform stand = PlaytestTools.Find<StandView>().transform;
-            float standX = stand.position.x;
-            Check(Mover.TryBegin(Screen(Placement.GetLotPosition(0))), "picked up the main building again");
-            Mover.DragTo(Screen(MainTarget));
-            Check(Mover.TargetIsValid, "a free spot next to it is green");
-            Check(Mover.Drop(), "building dropped on the free spot");
-            Check(Near(LotRoot(0).position, MainTarget) && Buildings.GetLot(0).placed, "building and save model moved");
-            Check(Mathf.Abs(stand.position.x - standX - (MainTarget.x - 0f)) < 0.01f, "its stands moved with it");
-            _salesSinceMove = 0;
-            EventBus.Subscribe<SaleCompleted>(OnSale);
         }
 
         private static void ReportPerformance()

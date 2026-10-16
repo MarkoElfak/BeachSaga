@@ -30,8 +30,7 @@ namespace BeachTycoon.Gameplay
         public void Begin(VisitorAgent agent)
         {
             agent.Position = _navigation.GetEntry(agent.EntryIndex);
-            agent.Path.Clear();
-            agent.Path.Add(_navigation.GetBeachAccess(agent.Position));
+            _navigation.BuildPath(agent.Position, _navigation.GetBeachAccess(agent.Position), agent.Path);
             agent.State = VisitorState.Arriving;
         }
 
@@ -163,10 +162,11 @@ namespace BeachTycoon.Gameplay
             _navigation.ReleaseSpot(agent.SpotIndex);
             agent.SpotIndex = -1;
             agent.StandIndex = -1;
-            // Back out in front of the stands, then down the footpath (keeps clear of the houses).
+            // Back to where the footpath meets the beach, then down the footpath.
             Vector3 entry = _navigation.GetEntry(agent.EntryIndex);
-            _navigation.BuildPath(agent.Position, _navigation.GetBeachAccess(entry), agent.Path);
-            agent.Path.Add(entry);
+            Vector3 access = _navigation.GetBeachAccess(entry);
+            _navigation.BuildPath(agent.Position, access, agent.Path);
+            _navigation.AppendPath(access, entry, agent.Path);
             agent.State = VisitorState.Leaving;
         }
 

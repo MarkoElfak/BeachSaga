@@ -123,10 +123,10 @@ namespace BeachTycoon.Gameplay
             EventBus.Publish(new VisitorDespawned(agent.Id));
         }
 
-        // A moved building moves its stand queues: visitors in line walk to their new place in it.
+        // A moved stand (or the stand row sliding with a growing building) moves its queue: visitors re-path.
         private void OnObjectMoved(ObjectMoved evt)
         {
-            if (!evt.IsLot) return;
+            if (evt.Kind == PlaceableKind.Decoration) return;
             for (int i = 0; i < _active.Count; i++) _active[i].QueueSlot = -1;
         }
 

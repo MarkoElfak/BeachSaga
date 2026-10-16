@@ -27,46 +27,23 @@ namespace BeachTycoon.EditorTools
             database.sounds = BuildSoundLibrary();
             database.placement = LoadOrCreate<PlacementConfig>(ProjectPaths.Config + "/PlacementConfig.asset", out _);
             database.world = BuildWorld();
-            database.terrain = BuildTerrain();
+            database.terrain = BuildTerrain(palette);
             database.palette = palette;
 
             ContentAssetBuilder.Fill(database);
             CommunityAssetBuilder.Fill(database);
+            FootprintMeasure.Bake(database);
 
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
             return database;
         }
 
-        // Version 2 only differs by the two decoration spots beside the footpath, which sat too close to the
-        // first house lots for movable placement. Keep any other tweaks and nudge just those two.
-        private const int EntranceSpotsVersion = 2;
-
-        private static void MoveEntranceSpots(WorldLayoutConfig world)
-        {
-            var defaults = ScriptableObject.CreateInstance<WorldLayoutConfig>();
-            Vector2[] spots = world.decorationSpots;
-            for (int i = 0; spots != null && i < spots.Length && i < defaults.decorationSpots.Length; i++)
-            {
-                if (Mathf.Approximately(Mathf.Abs(spots[i].x), OldEntranceSpotX)) spots[i] = defaults.decorationSpots[i];
-            }
-
-            Object.DestroyImmediate(defaults);
-            world.dataVersion = WorldLayoutConfig.CurrentDataVersion;
-            EditorUtility.SetDirty(world);
-        }
-
-        private const float OldEntranceSpotX = 3.6f;
-
-        // The layout changed between milestones, so older assets are reset to the current defaults.
+        // The layout changed between milestones (M4.1: a bigger island), so older assets are reset to the defaults.
         private static WorldLayoutConfig BuildWorld()
         {
             var world = LoadOrCreate<WorldLayoutConfig>(ProjectPaths.Config + "/WorldLayoutConfig.asset", out _);
-            if (world.dataVersion == EntranceSpotsVersion)
-            {
-                MoveEntranceSpots(world);
-            }
-            else if (world.dataVersion < WorldLayoutConfig.CurrentDataVersion)
+            if (world.dataVersion < WorldLayoutConfig.CurrentDataVersion)
             {
                 var defaults = ScriptableObject.CreateInstance<WorldLayoutConfig>();
                 EditorUtility.CopySerialized(defaults, world);
@@ -109,13 +86,27 @@ namespace BeachTycoon.EditorTools
             return library;
         }
 
-        private static TerrainConfig BuildTerrain()
+        private static TerrainConfig BuildTerrain(PaletteDefinition palette)
         {
             var terrain = LoadOrCreate<TerrainConfig>(ProjectPaths.Config + "/TerrainConfig.asset", out _);
+            if (terrain.dataVersion < TerrainConfig.CurrentDataVersion)
+            {
+                // The island grew: longer footpath and more scenery. Other terrain tuning is kept.
+                var defaults = ScriptableObject.CreateInstance<TerrainConfig>();
+                terrain.path = defaults.path;
+                terrain.rockCount = defaults.rockCount;
+                terrain.grassTuftCount = defaults.grassTuftCount;
+                Object.DestroyImmediate(defaults);
+                terrain.dataVersion = TerrainConfig.CurrentDataVersion;
+            }
+
             terrain.terrainMaterial = RenderingAssets.TerrainMaterial();
             terrain.waterMaterial = RenderingAssets.WaterMaterial();
             terrain.rockMaterial = RenderingAssets.RockMaterial();
             terrain.grassTuftMaterial = RenderingAssets.GrassTuftMaterial();
+            terrain.fenceMesh = LowPolyPrimitives.For(PrimitiveType.Cube);
+            terrain.fencePostMaterial = palette.GetMaterial("fencePost");
+            terrain.fenceRopeMaterial = palette.GetMaterial("fenceRope");
             EditorUtility.SetDirty(terrain);
             return terrain;
         }

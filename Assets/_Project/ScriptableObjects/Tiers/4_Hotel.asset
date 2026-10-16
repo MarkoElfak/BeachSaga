@@ -22,3 +22,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0e812ba1429004228a82b807365f570b, type: 2}
   neighbourSlots: 8
   popularityBonus: 1
+  footprint:
+    serializedVersion: 2
+    x: -2.25
+    y: -2.15
+    width: 4.5
+    height: 4.6000004
+  autoFootprint: 1
+  buildArea:
+    serializedVersion: 2
+    x: -17.6
+    y: -16.6
+    width: 35.2
+    height: 23.1
+  maxZoomDistance: 62

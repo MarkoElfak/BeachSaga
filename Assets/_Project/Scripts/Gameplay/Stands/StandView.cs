@@ -4,10 +4,10 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Shows a stand's serve progress and drops coins on sales. Tapping it opens the upgrade panel.
-    /// Tells WorldNavigation where its queue starts so visitors can line up.
+    /// Shows a stand's serve progress and drops coins on sales. Tapping it opens the upgrade panel; long-pressing
+    /// moves it on its own. Tells WorldNavigation where its queue starts so visitors can line up.
     /// </summary>
-    public sealed class StandView : MonoBehaviour, ITappable
+    public sealed class StandView : MonoBehaviour, ITappable, IMovable
     {
         [SerializeField] private Transform coinAnchor = null;
         [SerializeField] private ProgressBarView progressBar = null;
@@ -16,25 +16,23 @@ namespace BeachTycoon.Gameplay
         [SerializeField] private Transform queueAnchor = null;
 
         private CoinSpawner _coinSpawner;
+        private PlacementService _placement;
 
         public StandController Stand { get; private set; }
+
+        public PlaceableId Placeable => PlaceableId.Stand(Stand != null ? Stand.Index : -1);
+        public bool CanMoveNow => Stand != null;
+        public Transform MoveRoot => transform;
 
         public void Bind(StandController stand, CoinSpawner coinSpawner)
         {
             Stand = stand;
             _coinSpawner = coinSpawner;
+            _placement = ServiceLocator.Get<PlacementService>();
             progressBar.SetVisible(false);
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
-        }
-
-        /// <summary>Call after the stand is moved into place.</summary>
-        public void RegisterQueue()
-        {
-            if (Stand != null && queueAnchor != null && ServiceLocator.TryGet(out WorldNavigation navigation))
-            {
-                navigation.RegisterQueue(Stand.Index, queueAnchor.position, queueAnchor.forward);
-                navigation.RegisterStandPosition(Stand.Index, transform.position);
-            }
+            EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
+            SnapToPlacement();
         }
 
         public void OnTapped()
@@ -63,6 +61,32 @@ namespace BeachTycoon.Gameplay
         private void OnDestroy()
         {
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
+            EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
+        }
+
+        // Its own move, or its lot changing size (stands in the default row slide along).
+        private void OnObjectMoved(ObjectMoved evt)
+        {
+            bool mine = evt.Kind == PlaceableKind.Stand && evt.Index == Stand.Index;
+            bool myLot = evt.Kind == PlaceableKind.Lot && evt.Index == Stand.Model.lotIndex && !Stand.Model.placed;
+            if (mine || myLot) SnapToPlacement();
+        }
+
+        // Stands sit on levelled ground at height 0, facing the camera.
+        private void SnapToPlacement()
+        {
+            Vector2 position = _placement.GetStandPosition(Stand.Index);
+            transform.SetPositionAndRotation(new Vector3(position.x, 0f, position.y), Quaternion.identity);
+            RegisterQueue();
+        }
+
+        private void RegisterQueue()
+        {
+            if (queueAnchor != null && ServiceLocator.TryGet(out WorldNavigation navigation))
+            {
+                navigation.RegisterQueue(Stand.Index, queueAnchor.position, queueAnchor.forward);
+                navigation.RegisterStandPosition(Stand.Index, transform.position);
+            }
         }
 
         private void OnSaleCompleted(SaleCompleted evt)

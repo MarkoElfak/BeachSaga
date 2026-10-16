@@ -27,5 +27,13 @@ namespace BeachTycoon.Data
 
         [Tooltip("Prefab with a StandView component, spawned next to the building.")]
         public GameObject standPrefab;
+
+        [Header("Placement")]
+        [Tooltip("Ground area of the stand (x, z relative to its pivot). Measured from the prefab by Setup " +
+                 "while Auto Footprint is on.")]
+        public Rect standFootprint = new Rect(-1f, -0.75f, 2f, 1.5f);
+        [Tooltip("Where the queue starts (x, z relative to the pivot); it grows toward -z. Measured by Setup.")]
+        public Vector2 queueStart = new Vector2(0f, -1.7f);
+        public bool autoFootprint = true;
     }
 }

@@ -56,6 +56,8 @@ namespace BeachTycoon.EditorTools
             new Entry("shirtWhite", "#F2F2F2", 0.1f, Tex.Fabric), new Entry("shirtPink", "#E88AB4", 0.1f, Tex.Fabric),
             new Entry("hedge", "#4F8A3F", 0.05f, Tex.Leaf), new Entry("stone", "#B9B2A6", 0.2f, Tex.Plaster),
             new Entry("placeValid", "#4CD964", 0.3f), new Entry("placeInvalid", "#FF3B30", 0.3f),
+            new Entry("placeValidEdge", "#1B7A35", 0.3f), new Entry("placeInvalidEdge", "#A3170F", 0.3f),
+            new Entry("fencePost", "#8A6A47", 0.1f), new Entry("fenceRope", "#E8D9B5", 0.1f),
         };
 
         public static PaletteDefinition BuildOrSync()
