@@ -61,5 +61,20 @@ namespace BeachTycoon.Tests
             for (int i = 0; i < IslandSnapshotValidator.MaxDecorations + 50; i++) raw.decorations.Add(new SnapshotDecoration { decorationId = "umbrella" });
             Assert.AreEqual(IslandSnapshotValidator.MaxDecorations, IslandSnapshotValidator.Sanitize(raw, _data.Database).decorations.Count);
         }
+
+        [Test]
+        public void Turns_AreKeptWithinAFullCircle()
+        {
+            var raw = new IslandSnapshot { ownerId = "a" };
+            raw.buildings.Add(new SnapshotBuilding { lotIndex = 0, tier = 1, yaw = 450f });
+            raw.stands.Add(new SnapshotStand { productId = "donuts", yaw = float.NaN });
+            raw.decorations.Add(new SnapshotDecoration { decorationId = "umbrella", yaw = -45f });
+
+            IslandSnapshot clean = IslandSnapshotValidator.Sanitize(raw, _data.Database);
+
+            Assert.AreEqual(90f, clean.buildings[0].yaw);
+            Assert.AreEqual(0f, clean.stands[0].yaw, "broken turn faces the default way");
+            Assert.AreEqual(315f, clean.decorations[0].yaw);
+        }
     }
 }

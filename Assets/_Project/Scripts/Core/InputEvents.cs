@@ -71,4 +71,20 @@ namespace BeachTycoon.Core
             ScreenPosition = screenPosition;
         }
     }
+
+    /// <summary>A tap hit nothing tappable in the world (open ground or water).</summary>
+    public readonly struct GroundTapped
+    {
+    }
+
+    /// <summary>A full-screen window opened or closed. While any is open the map ignores pointer input.</summary>
+    public readonly struct ModalVisibilityChanged
+    {
+        public readonly bool Open;
+
+        public ModalVisibilityChanged(bool open)
+        {
+            Open = open;
+        }
+    }
 }

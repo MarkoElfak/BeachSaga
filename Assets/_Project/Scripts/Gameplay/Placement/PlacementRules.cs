@@ -17,6 +17,30 @@ namespace BeachTycoon.Gameplay
         /// <summary>Footprint rect relative to an origin (lot footprints are stored relative to the lot).</summary>
         public static Rect Offset(Rect relative, Vector2 origin) => new Rect(relative.position + origin, relative.size);
 
+        /// <summary>
+        /// Bounding box of a footprint (relative to its origin) turned by 'yaw' degrees around the origin, the
+        /// same way Quaternion.Euler(0, yaw, 0) turns the object on screen.
+        /// </summary>
+        public static Rect Rotate(Rect local, float yaw)
+        {
+            if (Mathf.Approximately(Mathf.Repeat(yaw, 360f), 0f)) return local;
+            float radians = yaw * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(radians), sin = Mathf.Sin(radians);
+            float xMin = float.MaxValue, xMax = float.MinValue, zMin = float.MaxValue, zMax = float.MinValue;
+            for (int corner = 0; corner < 4; corner++)
+            {
+                float x = (corner & 1) == 0 ? local.xMin : local.xMax;
+                float z = (corner & 2) == 0 ? local.yMin : local.yMax;
+                float rx = x * cos + z * sin, rz = -x * sin + z * cos;
+                xMin = Mathf.Min(xMin, rx);
+                xMax = Mathf.Max(xMax, rx);
+                zMin = Mathf.Min(zMin, rz);
+                zMax = Mathf.Max(zMax, rz);
+            }
+
+            return Rect.MinMaxRect(xMin, zMin, xMax, zMax);
+        }
+
         /// <summary>True when the rectangles overlap or are closer than 'gap'. Touching at exactly 'gap' is allowed.</summary>
         public static bool Overlaps(Rect a, Rect b, float gap)
         {

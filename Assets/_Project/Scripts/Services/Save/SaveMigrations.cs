@@ -14,6 +14,7 @@ namespace BeachTycoon.Services
             new AddDailyRewards(),
             new AddOnline(),
             new AddAchievements(),
+            new AddRotation(),
         };
 
         /// <summary>
@@ -70,6 +71,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 7;
             public string Migrate(string json) => json.Replace("\"version\":7", "\"version\":8");
+        }
+
+        /// <summary>v8 -> v9: lots, stands and decorations can be turned (yaw defaults to 0, as before).</summary>
+        private sealed class AddRotation : ISaveMigration
+        {
+            public int FromVersion => 8;
+            public string Migrate(string json) => json.Replace("\"version\":8", "\"version\":9");
         }
     }
 }

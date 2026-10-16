@@ -78,6 +78,7 @@ namespace BeachTycoon.EditorTools
             Button close = UiKit.AddButton(closeRect, new Color(0.85f, 0.35f, 0.3f), out _);
             UiKit.ChildText(closeRect, "Label", "X", 56f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
 
+            MetaUiBuilder.AddModalWindow(root, window);
             var view = host.gameObject.AddComponent<DecorPanelView>();
             PrimitiveKit.SetReference(view, "root", root.gameObject);
             PrimitiveKit.SetReference(view, "buttonPrefab", buttonPrefab);

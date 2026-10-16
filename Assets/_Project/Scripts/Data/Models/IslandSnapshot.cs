@@ -38,6 +38,7 @@ namespace BeachTycoon.Data
         public int variant;
         public float x;
         public float z;
+        public float yaw;
     }
 
     [Serializable]
@@ -47,6 +48,7 @@ namespace BeachTycoon.Data
         public int level;
         public float x;
         public float z;
+        public float yaw;
     }
 
     [Serializable]
@@ -55,5 +57,6 @@ namespace BeachTycoon.Data
         public string decorationId = string.Empty;
         public float x;
         public float z;
+        public float yaw;
     }
 }

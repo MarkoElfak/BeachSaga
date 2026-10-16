@@ -177,7 +177,14 @@ namespace BeachTycoon.EditorTools
             RectTransform closeRect = UiKit.Rect("CloseButton", window, Vector2.one, Vector2.one, Vector2.one, new Vector2(-24f, -24f), new Vector2(110f, 110f));
             close = UiKit.AddButton(closeRect, new Color(0.85f, 0.35f, 0.3f), out _);
             UiKit.ChildText(closeRect, "Label", "X", 56f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
+            AddModalWindow(root, window);
             return root;
+        }
+
+        /// <summary>Every full-screen window gets this: fits the screen and blocks map input while open.</summary>
+        internal static void AddModalWindow(RectTransform root, RectTransform window)
+        {
+            PrimitiveKit.SetReference(root.gameObject.AddComponent<ModalWindow>(), "window", window);
         }
 
         // Wide button in a vertical stack below the title (index 0 is the top row).

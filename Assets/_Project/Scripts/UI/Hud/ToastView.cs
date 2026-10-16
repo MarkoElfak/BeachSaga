@@ -31,6 +31,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
         }
 
         private void OnDestroy()
@@ -42,10 +43,13 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
         }
 
+        /// <summary>Queues a message; one already showing or waiting is not repeated.</summary>
         public void Show(string message)
         {
+            if ((_timer > 0f && label.text == message) || _queue.Contains(message)) return;
             _queue.Enqueue(message);
         }
 
@@ -85,6 +89,8 @@ namespace BeachTycoon.UI
             ProductDefinition product = _database.FindProduct(evt.ProductId);
             if (product != null) Show($"Now selling {product.displayName}");
         }
+
+        private void OnRotateBlocked(RotateBlocked evt) => Show("No room to turn it here");
 
         private void OnAreaUnlocked(AreaUnlocked evt) => Show("More beach unlocked! Zoom out to see it");
 

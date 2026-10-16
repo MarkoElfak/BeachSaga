@@ -141,7 +141,7 @@ namespace BeachTycoon.Gameplay
         private void MoveAwayFrom(Rect footprint, PlaceableId id)
         {
             Vector2 at = GetPosition(id);
-            Rect blocking = BlockingRect(id, GetFootprint(id, at), at);
+            Rect blocking = BlockingRect(id, at, GetYaw(id));
             if (PlacementRules.Overlaps(footprint, blocking, _config.gap) && TryFindFreeSpot(id, at, out Vector2 spot))
             {
                 SetPosition(id, spot);

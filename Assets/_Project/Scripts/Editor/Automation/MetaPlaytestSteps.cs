@@ -84,7 +84,7 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 5:
                     Economy.Earn(1000);
-                    PlaytestTools.TapWorld(PlaytestTools.Find<BuildingView>().transform.position + Vector3.up);
+                    PlaytestTools.TapAndUpgrade(PlaytestTools.Find<BuildingView>().transform.position + Vector3.up);
                     PlaytestTools.Click(PlaytestTools.Find<UpgradePanelView>(), "UpgradeButton");
                     break;
                 case 6:

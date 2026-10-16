@@ -41,6 +41,7 @@ namespace BeachTycoon.Gameplay
                 lot.placed = true;
                 lot.x = building.x;
                 lot.z = building.z;
+                lot.yaw = building.yaw;
             }
 
             var stands = new List<StandModel>(snapshot.stands.Count);
@@ -50,14 +51,14 @@ namespace BeachTycoon.Gameplay
                 stands.Add(new StandModel
                 {
                     productId = stand.productId, lotIndex = BuildingManager.MainLotIndex, slotIndex = i, level = stand.level,
-                    placed = true, x = stand.x, z = stand.z,
+                    placed = true, x = stand.x, z = stand.z, yaw = stand.yaw,
                 });
             }
 
             var decorations = new List<DecorationModel>(snapshot.decorations.Count);
             foreach (SnapshotDecoration decoration in snapshot.decorations)
             {
-                decorations.Add(new DecorationModel { decorationId = decoration.decorationId, placed = true, x = decoration.x, z = decoration.z });
+                decorations.Add(new DecorationModel { decorationId = decoration.decorationId, placed = true, x = decoration.x, z = decoration.z, yaw = decoration.yaw });
             }
 
             return new IslandLayout(database, lots, stands, decorations);

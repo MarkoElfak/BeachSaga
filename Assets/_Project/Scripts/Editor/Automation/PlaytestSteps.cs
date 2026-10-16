@@ -66,7 +66,7 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 3:
                     Economy.Earn(TestGrant);
-                    PlaytestTools.TapWorld(PlaytestTools.Find<BuildingView>().transform.position + Vector3.up);
+                    PlaytestTools.TapAndUpgrade(PlaytestTools.Find<BuildingView>().transform.position + Vector3.up);
                     PlaytestTools.Click(PlaytestTools.Find<UpgradePanelView>(), "UpgradeButton");
                     Check(Buildings.GetLot(0).state == LotState.Building, "cabin started from the upgrade panel");
                     break;

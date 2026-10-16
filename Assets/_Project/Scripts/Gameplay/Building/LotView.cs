@@ -7,7 +7,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Displays one lot: the empty marker (main lot only), the construction crate, the building or house and its
-    /// stands. Forwards taps (build, upgrade panel, house info) and drops rent coins. Long-press moves the building
+    /// stands. Forwards taps (build, select, house info) and drops rent coins. Long-press moves the building
     /// alone: stands are separate objects (StandView) next to it. Holds no game state.
     /// </summary>
     public sealed class LotView : MonoBehaviour, ITappable, IMovable
@@ -59,22 +59,20 @@ namespace BeachTycoon.Gameplay
             }
         }
 
+        // An empty main lot builds; a building or house is selected (rotate arrows, upgrade for the main one).
         public void OnTapped()
         {
             if (_lotIndex < 0) return;
             LotState state = _buildings.GetLot(_lotIndex).state;
-            if (IsHouse)
+            if (state == LotState.Empty)
             {
-                if (state == LotState.Built) EventBus.Publish(new HouseTapped(_lotIndex));
+                if (!IsHouse) _buildings.TryBuild(_lotIndex);
+                return;
             }
-            else if (state == LotState.Empty)
-            {
-                _buildings.TryBuild(_lotIndex);
-            }
-            else
-            {
-                EventBus.Publish(new UpgradePanelRequested(_lotIndex));
-            }
+
+            if (IsHouse) EventBus.Publish(new HouseTapped(_lotIndex));
+            float top = SelectionService.TopOf(state == LotState.Building ? constructionVisual : buildingRoot);
+            ServiceLocator.Get<SelectionService>().Select(Placeable, top, IsHouse ? -1 : _lotIndex);
         }
 
         private void Update()
@@ -102,11 +100,12 @@ namespace BeachTycoon.Gameplay
             if (evt.Kind == PlaceableKind.Lot && evt.Index == _lotIndex) SnapToPlacement();
         }
 
-        // Lots stand on levelled ground at height 0.
+        // Lots stand on levelled ground at height 0; only the building turns (the tap box follows its footprint).
         private void SnapToPlacement()
         {
             Vector2 position = _placement.GetLotPosition(_lotIndex);
             transform.position = new Vector3(position.x, 0f, position.y);
+            buildingRoot.localRotation = _placement.GetRotation(Placeable);
             FitCollider();
         }
 

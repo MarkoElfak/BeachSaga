@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 9;
 
         public int version = CurrentVersion;
 
@@ -31,6 +31,8 @@ namespace BeachTycoon.Data
 
         // Version 8 (achievements)
         public List<AchievementModel> achievements = new List<AchievementModel>();
+
+        // Version 9: lots, stands and decorations have a yaw (see LotModel.yaw).
 
         public static GameSaveData CreateNew(long startingCoins)
         {

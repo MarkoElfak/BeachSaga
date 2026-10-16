@@ -51,4 +51,20 @@ namespace BeachTycoon.Core
             Area = area;
         }
     }
+
+    /// <summary>The selected object changed (tap to select, tap the ground to clear). HasSelection false = cleared.</summary>
+    public readonly struct SelectionChanged
+    {
+        public readonly bool HasSelection;
+
+        public SelectionChanged(bool hasSelection)
+        {
+            HasSelection = hasSelection;
+        }
+    }
+
+    /// <summary>A rotate request was refused because the turned object would not fit.</summary>
+    public readonly struct RotateBlocked
+    {
+    }
 }

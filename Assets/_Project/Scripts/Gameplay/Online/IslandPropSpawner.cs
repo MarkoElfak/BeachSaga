@@ -19,13 +19,13 @@ namespace BeachTycoon.Gameplay
                 LotModel lot = layout.Buildings.GetLot(i);
                 if (lot.state != LotState.Built) continue;
                 Vector2 at = placement.GetLotPosition(i);
-                Add(BuildingManager.IsHouseLot(i) ? HousePrefab(database, lot.variant) : TierPrefab(database, lot.tier), at, 0f);
+                Add(BuildingManager.IsHouseLot(i) ? HousePrefab(database, lot.variant) : TierPrefab(database, lot.tier), at, 0f, lot.yaw);
             }
 
             for (int i = 0; i < layout.Stands.Count; i++)
             {
                 ProductDefinition product = database.FindProduct(layout.Stands[i].productId);
-                GameObject stand = Add(product != null ? product.standPrefab : null, placement.GetStandPosition(i), 0f);
+                GameObject stand = Add(product != null ? product.standPrefab : null, placement.GetStandPosition(i), 0f, layout.Stands[i].yaw);
                 if (stand != null) MakeStatic(stand);
             }
 
@@ -33,15 +33,15 @@ namespace BeachTycoon.Gameplay
             {
                 DecorationDefinition definition = database.FindDecoration(layout.Decorations[i].decorationId);
                 Vector2 at = placement.GetDecorationPosition(i);
-                Add(definition != null ? definition.prefab : null, at, ground.Ground(at.x, at.y).y);
+                Add(definition != null ? definition.prefab : null, at, ground.Ground(at.x, at.y).y, layout.Decorations[i].yaw);
             }
         }
 
         // Buildings and stands stand on levelled ground at height 0; decorations follow the terrain.
-        private GameObject Add(GameObject prefab, Vector2 at, float height)
+        private GameObject Add(GameObject prefab, Vector2 at, float height, float yaw)
         {
             if (prefab == null) return null;
-            GameObject instance = Instantiate(prefab, new Vector3(at.x, height, at.y), Quaternion.identity, transform);
+            GameObject instance = Instantiate(prefab, new Vector3(at.x, height, at.y), Quaternion.Euler(0f, yaw, 0f), transform);
             SpawnedCount++;
             return instance;
         }

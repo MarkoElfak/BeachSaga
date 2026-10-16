@@ -19,6 +19,8 @@ namespace BeachTycoon.Data
         public bool placed;
         public float x;
         public float z;
+        /// <summary>Turn around the vertical axis in degrees (v9; 0 = as built, facing the camera).</summary>
+        public float yaw;
 
         /// <summary>Upgrade level, 0 = not upgraded.</summary>
         public int level;

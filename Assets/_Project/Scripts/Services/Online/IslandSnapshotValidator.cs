@@ -42,7 +42,7 @@ namespace BeachTycoon.Services
                 int tier = main ? Mathf.Clamp(building.tier, 0, database.MaxTier) : 1;
                 clean.buildings.Add(new SnapshotBuilding
                 {
-                    lotIndex = building.lotIndex, tier = tier, variant = Mathf.Max(0, building.variant), x = building.x, z = building.z,
+                    lotIndex = building.lotIndex, tier = tier, variant = Mathf.Max(0, building.variant), x = building.x, z = building.z, yaw = Yaw(building.yaw),
                 });
                 if (main) clean.tier = tier;
             }
@@ -54,7 +54,7 @@ namespace BeachTycoon.Services
                 if (!products.Add(stand.productId)) continue;
                 clean.stands.Add(new SnapshotStand
                 {
-                    productId = stand.productId, level = Mathf.Clamp(stand.level, 0, MaxStandLevel), x = stand.x, z = stand.z,
+                    productId = stand.productId, level = Mathf.Clamp(stand.level, 0, MaxStandLevel), x = stand.x, z = stand.z, yaw = Yaw(stand.yaw),
                 });
             }
 
@@ -63,7 +63,7 @@ namespace BeachTycoon.Services
                 if (clean.decorations.Count >= MaxDecorations) break;
                 if (decoration == null || database.FindDecoration(decoration.decorationId) == null) continue;
                 if (!IsFinite(decoration.x, decoration.z)) continue;
-                clean.decorations.Add(new SnapshotDecoration { decorationId = decoration.decorationId, x = decoration.x, z = decoration.z });
+                clean.decorations.Add(new SnapshotDecoration { decorationId = decoration.decorationId, x = decoration.x, z = decoration.z, yaw = Yaw(decoration.yaw) });
             }
 
             return clean;
@@ -74,6 +74,8 @@ namespace BeachTycoon.Services
             string trimmed = (name ?? string.Empty).Trim();
             return trimmed.Length > MaxNameLength ? trimmed.Substring(0, MaxNameLength) : trimmed;
         }
+
+        private static float Yaw(float yaw) => IsFinite(yaw) ? Mathf.Repeat(yaw, 360f) : 0f;
 
         private static bool IsFinite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 

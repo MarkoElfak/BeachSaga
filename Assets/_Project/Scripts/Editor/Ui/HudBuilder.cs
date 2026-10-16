@@ -36,6 +36,7 @@ namespace BeachTycoon.EditorTools
             MetaUiBuilder.BuildBoostButton(safe);
             MetaUiBuilder.BuildTutorial(safe, worldCamera, coins, buildBar);
             PlacementSceneBuilder.BuildMoveHint(safe);
+            PlacementSceneBuilder.BuildSelectionArrows(safe, worldCamera);
             UpgradePanelBuilder.Build(safe);
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);

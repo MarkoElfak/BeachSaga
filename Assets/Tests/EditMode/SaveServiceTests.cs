@@ -152,6 +152,7 @@ namespace BeachTycoon.Tests
             Assert.IsEmpty(save.Data.meta.visitBonusOwners);
             Assert.IsNotNull(save.Data.achievements, "old saves start with no achievement progress");
             Assert.IsFalse(save.Data.lots[0].placed, "old lots keep their layout position");
+            Assert.AreEqual(0f, save.Data.lots[0].yaw, "old buildings face the way they were built");
             Assert.AreEqual(new DateTime(2026, 6, 30, 10, 0, 0, DateTimeKind.Utc), save.PreviousSessionUtc);
         }
 

@@ -3,11 +3,12 @@ using BeachTycoon.Gameplay;
 using BeachTycoon.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
     /// <summary>Scene pieces for moving objects: the MoveController with its footprint indicator (plate plus an
-    /// outline of the exact footprint), and the HUD hint.</summary>
+    /// outline of the exact footprint), the HUD hint and the rotate arrows.</summary>
     internal static class PlacementSceneBuilder
     {
         public static MoveController Build(GameDatabase database, Camera camera, PointerGestureSource gestures)
@@ -60,6 +61,32 @@ namespace BeachTycoon.EditorTools
             var view = host.gameObject.AddComponent<MoveHintView>();
             PrimitiveKit.SetReference(view, "banner", banner.gameObject);
             PrimitiveKit.SetReference(view, "label", label);
+        }
+
+        /// <summary>Rotate arrows (and Upgrade) that float above the selected object.</summary>
+        public static void BuildSelectionArrows(Transform parent, Camera worldCamera)
+        {
+            RectTransform host = UiKit.Stretch("SelectionArrows", parent);
+            RectTransform bar = UiKit.Rect("Bar", host, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(300f, 260f));
+            Button left = BarButton(bar, "RotateLeft", "<", new Vector2(-80f, 0f), new Vector2(130f, 130f), Color.white);
+            Button right = BarButton(bar, "RotateRight", ">", new Vector2(80f, 0f), new Vector2(130f, 130f), Color.white);
+            Button upgrade = BarButton(bar, "UpgradeButton", "Upgrade", new Vector2(0f, 150f), new Vector2(260f, 100f), UiKit.ButtonColor);
+
+            var view = host.gameObject.AddComponent<SelectionArrowsView>();
+            PrimitiveKit.SetReference(view, "worldCamera", worldCamera);
+            PrimitiveKit.SetReference(view, "area", host);
+            PrimitiveKit.SetReference(view, "bar", bar);
+            PrimitiveKit.SetReference(view, "leftButton", left);
+            PrimitiveKit.SetReference(view, "rightButton", right);
+            PrimitiveKit.SetReference(view, "upgradeButton", upgrade);
+        }
+
+        private static Button BarButton(RectTransform bar, string name, string text, Vector2 at, Vector2 size, Color color)
+        {
+            RectTransform rect = UiKit.Rect(name, bar, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), at, size);
+            Button button = UiKit.AddButton(rect, color, out _);
+            UiKit.ChildText(rect, "Label", text, text.Length == 1 ? 80f : 44f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            return button;
         }
     }
 }

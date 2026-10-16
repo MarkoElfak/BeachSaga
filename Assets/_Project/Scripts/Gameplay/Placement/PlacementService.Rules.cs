@@ -11,17 +11,22 @@ namespace BeachTycoon.Gameplay
     /// </summary>
     public sealed partial class PlacementService
     {
-        // A stand also keeps a strip in front of it free for its queue, which grows toward -z.
-        private Rect BlockingRect(PlaceableId id, Rect footprint, Vector2 at)
+        // A stand also keeps the area in front of it free for its queue lines (toward -z before turning).
+        private Rect BlockingRect(PlaceableId id, Vector2 at, float yaw)
         {
-            if (id.Kind != PlaceableKind.Stand) return footprint;
-            ProductDefinition product = Product(id.Index);
-            Vector2 queueStart = at + (product != null ? product.queueStart : Vector2.zero);
-            float length = _database.economy.maxStandQueue * _database.visitors.queueSpacing;
-            float halfWidth = _config.queueWidth * 0.5f;
-            var queue = Rect.MinMaxRect(queueStart.x - halfWidth, queueStart.y - length, queueStart.x + halfWidth, queueStart.y);
-            return Rect.MinMaxRect(Mathf.Min(footprint.xMin, queue.xMin), Mathf.Min(footprint.yMin, queue.yMin),
-                Mathf.Max(footprint.xMax, queue.xMax), Mathf.Max(footprint.yMax, queue.yMax));
+            Rect local = LocalFootprint(id);
+            if (id.Kind == PlaceableKind.Stand)
+            {
+                ProductDefinition product = Product(id.Index);
+                Vector2 start = product != null ? product.queueStart : Vector2.zero;
+                float length = QueueLayout.Length(_database.visitors);
+                float halfWidth = QueueLayout.Width(_database.visitors, _config.queueWidth) * 0.5f;
+                var queue = Rect.MinMaxRect(start.x - halfWidth, start.y - length, start.x + halfWidth, start.y);
+                local = Rect.MinMaxRect(Mathf.Min(local.xMin, queue.xMin), Mathf.Min(local.yMin, queue.yMin),
+                    Mathf.Max(local.xMax, queue.xMax), Mathf.Max(local.yMax, queue.yMax));
+            }
+
+            return PlacementRules.Offset(PlacementRules.Rotate(local, yaw), at);
         }
 
         private bool IsFree(Rect footprint, Rect blocking, PlaceableId self)
@@ -58,8 +63,7 @@ namespace BeachTycoon.Gameplay
 
         private bool Overlaps(Rect blocking, PlaceableId other)
         {
-            Vector2 at = GetPosition(other);
-            Rect otherBlocking = BlockingRect(other, GetFootprint(other, at), at);
+            Rect otherBlocking = BlockingRect(other, GetPosition(other), GetYaw(other));
             return PlacementRules.Overlaps(blocking, otherBlocking, _config.gap);
         }
 

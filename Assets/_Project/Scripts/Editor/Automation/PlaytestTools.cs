@@ -17,6 +17,13 @@ namespace BeachTycoon.EditorTools
             EventBus.Publish(new TapEvent(new Vector2(screen.x, screen.y)));
         }
 
+        /// <summary>Taps an object to select it, then the Upgrade button that floats above it.</summary>
+        public static void TapAndUpgrade(Vector3 world)
+        {
+            TapWorld(world);
+            Click(Find<SelectionArrowsView>(), "UpgradeButton");
+        }
+
         /// <summary>Invokes the named Button under a UI component (works on inactive children too).</summary>
         public static void Click(Component owner, string buttonName)
         {

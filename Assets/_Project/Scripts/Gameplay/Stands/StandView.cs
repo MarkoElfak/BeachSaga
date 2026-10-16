@@ -4,7 +4,7 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Shows a stand's serve progress and drops coins on sales. Tapping it opens the upgrade panel; long-pressing
+    /// Shows a stand's serve progress and drops coins on sales. Tapping selects it (rotate, upgrade); long-pressing
     /// moves it on its own. Tells WorldNavigation where its queue starts so visitors can line up.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
@@ -37,10 +37,9 @@ namespace BeachTycoon.Gameplay
 
         public void OnTapped()
         {
-            if (Stand != null)
-            {
-                EventBus.Publish(new UpgradePanelRequested(Stand.Model.lotIndex));
-            }
+            if (Stand == null) return;
+            float top = SelectionService.TopOf(transform);
+            ServiceLocator.Get<SelectionService>().Select(Placeable, top, Stand.Model.lotIndex);
         }
 
         private void Update()
@@ -72,11 +71,11 @@ namespace BeachTycoon.Gameplay
             if (mine || myLot) SnapToPlacement();
         }
 
-        // Stands sit on levelled ground at height 0, facing the camera.
+        // Stands sit on levelled ground at height 0, turned by their saved yaw (the queue anchor turns too).
         private void SnapToPlacement()
         {
             Vector2 position = _placement.GetStandPosition(Stand.Index);
-            transform.SetPositionAndRotation(new Vector3(position.x, 0f, position.y), Quaternion.identity);
+            transform.SetPositionAndRotation(new Vector3(position.x, 0f, position.y), _placement.GetRotation(Placeable));
             RegisterQueue();
         }
 

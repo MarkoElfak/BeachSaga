@@ -8,6 +8,9 @@ namespace BeachTycoon.EditorTools
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Polish (queues, rotation, windows)", priority = 36)]
+        private static void RequestPolish() => File.WriteAllText(RequestPath, SuitePolish);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 7 (achievements)", priority = 37)]
         private static void RequestAchievements() => File.WriteAllText(RequestPath, SuiteAchievements);
 
@@ -28,9 +31,10 @@ namespace BeachTycoon.EditorTools
         private const string SuiteMove = "m4";
         private const string SuiteOnline = "m6";
         private const string SuiteAchievements = "m7";
+        private const string SuitePolish = "polish";
 
         private static bool IsKnownSuite(string suite) =>
-            suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements;
+            suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -41,6 +45,7 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteIsland) return "M2 island";
                 if (Suite == SuiteOnline) return "M6 visiting";
                 if (Suite == SuiteAchievements) return "M7 achievements";
+                if (Suite == SuitePolish) return "Polish";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -50,6 +55,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteIsland) return PlaytestSteps.IsReady(step);
             if (Suite == SuiteOnline) return OnlinePlaytestSteps.IsReady(step);
             if (Suite == SuiteAchievements) return AchievementPlaytestSteps.IsReady(step);
+            if (Suite == SuitePolish) return PolishPlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -58,6 +64,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteIsland) PlaytestSteps.Run(step);
             else if (Suite == SuiteOnline) OnlinePlaytestSteps.Run(step);
             else if (Suite == SuiteAchievements) AchievementPlaytestSteps.Run(step);
+            else if (Suite == SuitePolish) PolishPlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
         }

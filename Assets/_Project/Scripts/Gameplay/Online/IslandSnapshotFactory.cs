@@ -27,20 +27,20 @@ namespace BeachTycoon.Gameplay
                 bool main = i == BuildingManager.MainLotIndex;
                 if (!main && lot.state != LotState.Built) continue;
                 var at = placement.GetLotPosition(i);
-                snapshot.buildings.Add(new SnapshotBuilding { lotIndex = i, tier = lot.tier, variant = lot.variant, x = at.x, z = at.y });
+                snapshot.buildings.Add(new SnapshotBuilding { lotIndex = i, tier = lot.tier, variant = lot.variant, x = at.x, z = at.y, yaw = lot.yaw });
                 if (main) snapshot.tier = lot.tier;
             }
 
             for (int i = 0; i < stands.Count; i++)
             {
                 var at = placement.GetStandPosition(i);
-                snapshot.stands.Add(new SnapshotStand { productId = stands[i].productId, level = stands[i].level, x = at.x, z = at.y });
+                snapshot.stands.Add(new SnapshotStand { productId = stands[i].productId, level = stands[i].level, x = at.x, z = at.y, yaw = stands[i].yaw });
             }
 
             for (int i = 0; i < decorations.Count; i++)
             {
                 var at = placement.GetDecorationPosition(i);
-                snapshot.decorations.Add(new SnapshotDecoration { decorationId = decorations[i].decorationId, x = at.x, z = at.y });
+                snapshot.decorations.Add(new SnapshotDecoration { decorationId = decorations[i].decorationId, x = at.x, z = at.y, yaw = decorations[i].yaw });
             }
 
             return snapshot;
