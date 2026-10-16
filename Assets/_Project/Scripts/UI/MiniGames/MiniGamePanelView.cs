@@ -110,9 +110,10 @@ namespace BeachTycoon.UI
             Draw();
         }
 
+        // A run can also end between frames, on the player's own tap; the result shows on the next frame either way.
         private void Update()
         {
-            if (!IsPlaying) return;
+            if (!IsOpen || !gamePage.activeSelf || Game == null) return;
             float left = Mathf.Min(Time.unscaledDeltaTime, MaxFrameSeconds) * Mathf.Max(0f, SpeedMultiplier);
             while (left > 0f && !Game.IsOver)
             {

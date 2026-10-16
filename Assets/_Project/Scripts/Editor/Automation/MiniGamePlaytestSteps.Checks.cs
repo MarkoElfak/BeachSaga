@@ -101,6 +101,7 @@ namespace BeachTycoon.EditorTools
             Check(Panel.Game.State == MiniGameState.Won && Panel.LastRunRewarded && Panel.LevelIndex == level - 1,
                 $"donut rush level {level} won ({Panel.Game.Score} of {Panel.Game.Target}, {Panel.Game.Elapsed:0.0} s)");
             Check(Games.LevelsPassed("donuts") == level && ViewFor("donuts").UpgradesShown == level, $"{level} levels passed, {level} decorations");
+            if (level == 5) MiniGamePanelView.Autopilot = false; // the replay is played by tapping, like a player
             Click("AgainButton");
         }
 
@@ -108,7 +109,7 @@ namespace BeachTycoon.EditorTools
         {
             StandController donuts = Stands.FindByProduct("donuts");
             Check(Panel.Game.State == MiniGameState.Won && !Panel.LastRunRewarded && Panel.LevelIndex == 4,
-                "replaying level 5 is just for fun: no extra reward");
+                "replaying level 5 by tapping the icings: won, the result shows, no extra reward");
             Check(Games.IsComplete(Panel.Definition) && Mathf.Approximately(Games.IncomeMultiplier(donuts.Product), 1.5f), "all 5 donut levels: donuts sell for +50%");
             Panel.Close();
             StandView view = ViewFor("donuts");
@@ -120,6 +121,14 @@ namespace BeachTycoon.EditorTools
             OpenFromStand("towels");
             Click("PlayButton");
             Check(Panel.IsPlaying && Panel.LevelIndex == 1, "towel run level 2 started, autopilot off");
+        }
+
+        // Clicks the icing button the customer wants, as a player would; ready once the result page shows.
+        private static bool TapWantedIcing()
+        {
+            if (Panel.ShowsResult) return true;
+            if (Panel.Game is DonutRushGame donut && Panel.IsPlaying) PlaytestTools.Click(Panel.ActiveView, $"Icing{donut.Wanted}");
+            return false;
         }
 
         private static void CheckLostRun()

@@ -42,6 +42,7 @@ namespace BeachTycoon.EditorTools
             }
 
             if (s == 0) return Panel.ShowsIntro;
+            if (s == 5) return TapWantedIcing();
             if (s >= 1 && s <= 6) return Panel.ShowsResult;
             if (s == 7) return _saleChecked;
             if (s == 8) return SceneManager.GetActiveScene().name == SceneNames.Beach && PlaytestTools.Find<StandView>() != null;
