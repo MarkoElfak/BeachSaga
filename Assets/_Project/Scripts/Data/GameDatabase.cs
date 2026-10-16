@@ -30,6 +30,7 @@ namespace BeachTycoon.Data
         public VisitorTypeDefinition[] visitorTypes;
         public QuestDefinition[] quests;
         public DecorationDefinition[] decorations;
+        public AchievementDefinition[] achievements;
 
         public int MaxTier => tiers != null ? tiers.Length : 0;
 

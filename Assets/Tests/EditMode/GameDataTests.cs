@@ -92,6 +92,22 @@ namespace BeachTycoon.Tests
         }
 
         [Test]
+        public void AchievementsHaveUniqueIdsTargetsAndProducts()
+        {
+            Assert.IsNotEmpty(_database.achievements);
+            var ids = new HashSet<string>();
+            foreach (AchievementDefinition achievement in _database.achievements)
+            {
+                Assert.IsNotNull(achievement);
+                Assert.IsTrue(ids.Add(achievement.id), $"duplicate achievement id {achievement.id}");
+                Assert.Greater(achievement.target, 0, achievement.id);
+                Assert.IsFalse(string.IsNullOrEmpty(achievement.title), achievement.id);
+                if (achievement.goal == AchievementGoal.SellProduct) Assert.IsNotNull(achievement.product, achievement.id);
+                if (achievement.goal == AchievementGoal.ReachTier) Assert.LessOrEqual(achievement.target, _database.MaxTier, achievement.id);
+            }
+        }
+
+        [Test]
         public void OfflineCapIsPositive()
         {
             Assert.Greater(_database.economy.offlineCapHours, 0f);

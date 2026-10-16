@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
 
         public int version = CurrentVersion;
 
@@ -28,6 +28,9 @@ namespace BeachTycoon.Data
 
         // Version 3 (Milestone 3)
         public MetaModel meta = new MetaModel();
+
+        // Version 8 (achievements)
+        public List<AchievementModel> achievements = new List<AchievementModel>();
 
         public static GameSaveData CreateNew(long startingCoins)
         {

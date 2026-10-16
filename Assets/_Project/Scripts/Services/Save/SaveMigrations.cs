@@ -13,6 +13,7 @@ namespace BeachTycoon.Services
             new AddStandPositions(),
             new AddDailyRewards(),
             new AddOnline(),
+            new AddAchievements(),
         };
 
         /// <summary>
@@ -62,6 +63,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 6;
             public string Migrate(string json) => json.Replace("\"version\":6", "\"version\":7");
+        }
+
+        /// <summary>v7 -> v8: achievement progress (an empty list; level goals catch up on load).</summary>
+        private sealed class AddAchievements : ISaveMigration
+        {
+            public int FromVersion => 7;
+            public string Migrate(string json) => json.Replace("\"version\":7", "\"version\":8");
         }
     }
 }

@@ -96,6 +96,7 @@ namespace BeachTycoon.Gameplay
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
                 boost, ads, analytics));
             AddOnline(data, placement, popularity, clock, estimator, economy, analytics);
+            Add(AchievementService.Create(database, data, buildings, stands, neighbours, economy, boost, analytics));
             Add(new AudioService(database.sounds, settings, gameObject));
             Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
 

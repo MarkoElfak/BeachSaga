@@ -61,3 +61,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a6f3d11578e6e4387abc0c080b7a0cff, type: 2}
   - {fileID: 11400000, guid: 0a682ae8775f741d2ab6f7229497f41a, type: 2}
   - {fileID: 11400000, guid: 585eb982f9d974e96a419adbee358205, type: 2}
+  achievements:
+  - {fileID: 11400000, guid: 9ab6989dee00e4379abe3da3f0450e50, type: 2}
+  - {fileID: 11400000, guid: d89c8cba8ad394e609d9ff6af55faf84, type: 2}
+  - {fileID: 11400000, guid: 183bec6557e6040e3ab4d448f4ff1cc8, type: 2}
+  - {fileID: 11400000, guid: 270dc6449071e48c0b735c6f42742680, type: 2}
+  - {fileID: 11400000, guid: 02b219daecb2f41a6a0700b7b63b673d, type: 2}
+  - {fileID: 11400000, guid: 35b19b977610d4e3caf6f2b754038838, type: 2}
+  - {fileID: 11400000, guid: 18823500afa6b4ad1ba8aaa4e38b52e6, type: 2}
+  - {fileID: 11400000, guid: ac63682443a9e40b2a200abc72901d86, type: 2}
+  - {fileID: 11400000, guid: b3c8189172f4b4a79afee2987f61ae81, type: 2}
+  - {fileID: 11400000, guid: 707e9d1a5e8484bd1b5d73cd6dc124ca, type: 2}
+  - {fileID: 11400000, guid: 0f0508e6769b44cbe81ab54b67710db4, type: 2}
+  - {fileID: 11400000, guid: 8e18c536c589a4b5c986df1fd5400700, type: 2}
+  - {fileID: 11400000, guid: 403ac76a30f4b40f79beada830382f6b, type: 2}

@@ -52,7 +52,7 @@ namespace BeachTycoon.EditorTools
         {
             RectTransform host = UiKit.Stretch("MoveHint", parent);
             // Top of the screen, below the HUD buttons, so it never covers the tutorial card or the build bar.
-            RectTransform banner = UiKit.Rect("Banner", host, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -450f), new Vector2(960f, 130f));
+            RectTransform banner = UiKit.Rect("Banner", host, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -510f), new Vector2(960f, 130f));
             UiKit.AddImage(banner, new Color(0.15f, 0.45f, 0.25f, 0.92f), false);
             TextMeshProUGUI label = UiKit.ChildText(banner, "Label", "Drag to a green spot and let go", 42f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
             label.margin = new Vector4(30f, 8f, 30f, 8f);

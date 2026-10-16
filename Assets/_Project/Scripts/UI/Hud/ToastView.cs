@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Short messages that slide in and fade: quest done, new neighbour, new building, new land, house info.</summary>
+    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, land, house info.</summary>
     public sealed class ToastView : MonoBehaviour
     {
         private const float ShowSeconds = 2.6f;
@@ -30,6 +30,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<HouseTapped>(OnHouseTapped);
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
         }
 
         private void OnDestroy()
@@ -40,6 +41,7 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<HouseTapped>(OnHouseTapped);
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
         }
 
         public void Show(string message)
@@ -85,6 +87,9 @@ namespace BeachTycoon.UI
         }
 
         private void OnAreaUnlocked(AreaUnlocked evt) => Show("More beach unlocked! Zoom out to see it");
+
+        private void OnAchievementCompleted(AchievementCompleted evt) =>
+            Show($"Trophy unlocked: {_database.achievements[evt.Index].title}!");
 
         private void OnHouseTapped(HouseTapped evt)
         {

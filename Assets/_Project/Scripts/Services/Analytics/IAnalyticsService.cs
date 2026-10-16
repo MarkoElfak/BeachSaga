@@ -11,6 +11,7 @@ namespace BeachTycoon.Services
         public const string IslandVisited = "island_visited";
         public const string IslandLiked = "island_liked";
         public const string GiftSent = "gift_sent";
+        public const string AchievementClaimed = "achievement_claimed";
     }
 
     /// <summary>Analytics seam. One optional parameter keeps call sites allocation-free.</summary>
