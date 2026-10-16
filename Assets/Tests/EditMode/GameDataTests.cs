@@ -57,6 +57,7 @@ namespace BeachTycoon.Tests
                 Assert.Greater(product.price, 0, product.id);
                 Assert.Greater(product.serveSeconds, 0f, product.id);
                 Assert.IsNotNull(product.standPrefab, product.id);
+                Assert.Greater(product.managerCost, 0, $"{product.id} manager cost");
             }
         }
 

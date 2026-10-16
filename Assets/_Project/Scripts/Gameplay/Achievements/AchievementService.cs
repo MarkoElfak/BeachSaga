@@ -41,6 +41,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<DecorationPlaced>(OnDecorationPlaced);
             EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
             EventBus.Subscribe<DailyRewardClaimed>(OnDailyClaimed);
+            EventBus.Subscribe<ManagerHired>(OnManagerHired);
         }
 
         public AchievementBook Book { get; }
@@ -68,6 +69,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<DecorationPlaced>(OnDecorationPlaced);
             EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
             EventBus.Unsubscribe<DailyRewardClaimed>(OnDailyClaimed);
+            EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
         }
 
         /// <summary>Pays a completed achievement's reward once. Returns false if it is not claimable.</summary>
@@ -92,6 +94,7 @@ namespace BeachTycoon.Gameplay
             Sync(AchievementGoal.OwnDecorations);
             Sync(AchievementGoal.StandLevel);
             Sync(AchievementGoal.DailyStreak);
+            Sync(AchievementGoal.HireManagers);
         }
 
         private void Sync(AchievementGoal goal) => Book.ReachLevel(goal, _readLevel(goal));
@@ -118,5 +121,6 @@ namespace BeachTycoon.Gameplay
         private void OnDecorationPlaced(DecorationPlaced evt) => Sync(AchievementGoal.OwnDecorations);
         private void OnStandUpgraded(StandUpgraded evt) => Sync(AchievementGoal.StandLevel);
         private void OnDailyClaimed(DailyRewardClaimed evt) => Sync(AchievementGoal.DailyStreak);
+        private void OnManagerHired(ManagerHired evt) => Sync(AchievementGoal.HireManagers);
     }
 }

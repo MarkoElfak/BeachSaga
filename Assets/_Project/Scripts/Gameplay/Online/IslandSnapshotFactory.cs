@@ -34,7 +34,7 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < stands.Count; i++)
             {
                 var at = placement.GetStandPosition(i);
-                snapshot.stands.Add(new SnapshotStand { productId = stands[i].productId, level = stands[i].level, x = at.x, z = at.y, yaw = stands[i].yaw });
+                snapshot.stands.Add(new SnapshotStand { productId = stands[i].productId, level = stands[i].level, x = at.x, z = at.y, yaw = stands[i].yaw, manager = stands[i].manager });
             }
 
             for (int i = 0; i < decorations.Count; i++)

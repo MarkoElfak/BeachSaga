@@ -55,6 +55,7 @@ namespace BeachTycoon.Services
                 clean.stands.Add(new SnapshotStand
                 {
                     productId = stand.productId, level = Mathf.Clamp(stand.level, 0, MaxStandLevel), x = stand.x, z = stand.z, yaw = Yaw(stand.yaw),
+                    manager = stand.manager,
                 });
             }
 

@@ -27,6 +27,7 @@ namespace BeachTycoon.Gameplay
                 case AchievementGoal.OwnDecorations: return _data.decorations.Count;
                 case AchievementGoal.StandLevel: return HighestStandLevel();
                 case AchievementGoal.DailyStreak: return _data.meta.dailyStreak;
+                case AchievementGoal.HireManagers: return _stands.ManagerCount;
                 default: return 0;
             }
         }

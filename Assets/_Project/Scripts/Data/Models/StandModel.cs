@@ -24,5 +24,8 @@ namespace BeachTycoon.Data
 
         /// <summary>Upgrade level, 0 = not upgraded.</summary>
         public int level;
+
+        /// <summary>A manager was hired (v10): sale coins collect themselves.</summary>
+        public bool manager;
     }
 }

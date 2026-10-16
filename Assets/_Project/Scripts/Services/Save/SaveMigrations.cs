@@ -15,6 +15,7 @@ namespace BeachTycoon.Services
             new AddOnline(),
             new AddAchievements(),
             new AddRotation(),
+            new AddManagers(),
         };
 
         /// <summary>
@@ -78,6 +79,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 8;
             public string Migrate(string json) => json.Replace("\"version\":8", "\"version\":9");
+        }
+
+        /// <summary>v9 -> v10: stands can have a manager (defaults to none, as before).</summary>
+        private sealed class AddManagers : ISaveMigration
+        {
+            public int FromVersion => 9;
+            public string Migrate(string json) => json.Replace("\"version\":9", "\"version\":10");
         }
     }
 }

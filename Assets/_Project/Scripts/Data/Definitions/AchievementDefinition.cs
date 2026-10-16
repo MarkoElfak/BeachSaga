@@ -4,7 +4,7 @@ namespace BeachTycoon.Data
 {
     /// <summary>
     /// What an achievement measures. Counters add up from events; levels (tier, neighbours, decorations,
-    /// stand level, login streak) track the best value reached, so old saves get credit right away.
+    /// stand level, login streak, managers) track the best value reached, so old saves get credit right away.
     /// </summary>
     public enum AchievementGoal
     {
@@ -18,6 +18,7 @@ namespace BeachTycoon.Data
         OwnDecorations = 12,
         StandLevel = 13,
         DailyStreak = 14,
+        HireManagers = 15,
     }
 
     /// <summary>A long-term goal with a one-time reward, e.g. "Sell 100 donuts".</summary>

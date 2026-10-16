@@ -16,6 +16,10 @@ namespace BeachTycoon.Data
 
         [Min(0.1f)] public float baseSpawnIntervalSeconds = 6f;
         [Range(0f, 1f)] public float offlineEfficiency = 0.5f;
+        [Tooltip("Offline efficiency added for each hired stand manager.")]
+        [Range(0f, 1f)] public float offlineEfficiencyPerManager = 0.05f;
+        [Tooltip("Offline efficiency never goes above this, however many managers are hired.")]
+        [Range(0f, 1f)] public float offlineEfficiencyMax = 0.75f;
         [Min(0f)] public float offlineCapHours = 8f;
         [Tooltip("Shorter absences pay nothing and show no popup.")]
         [Min(0f)] public float offlineMinSeconds = 60f;

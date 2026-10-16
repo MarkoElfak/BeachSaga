@@ -25,6 +25,7 @@ namespace BeachTycoon.EditorTools
                 Make("Quests10", "Helping hand", "Finish {0} neighbour requests", AchievementGoal.CompleteQuests, null, 10, 6000, 0f),
                 Make("Visits3", "Globetrotter", "Visit {0} friends' islands", AchievementGoal.VisitIslands, null, 3, 1500, 5f),
                 Make("Streak7", "Loyal local", "Log in {0} days in a row", AchievementGoal.DailyStreak, null, 7, 10000, 20f),
+                Make("Managers3", "Delegator", "Hire {0} stand managers", AchievementGoal.HireManagers, null, 3, 4000, 10f),
                 Make("Surf50", "Surf school", "Sell {0} {1}", AchievementGoal.SellProduct, surf, 50, 25000, 0f),
                 Make("Resort", "Resort mogul", "Open the Resort", AchievementGoal.ReachTier, null, 5, 150000, 30f),
                 Make("Coins1M", "Millionaire", "Earn {0} coins", AchievementGoal.EarnCoins, null, 1000000, 100000, 30f),

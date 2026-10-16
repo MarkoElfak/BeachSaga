@@ -19,6 +19,9 @@ namespace BeachTycoon.Data
         [Min(1)] public int coinRingSlots = 6;
         [Tooltip("Tapping a coin also collects every coin within this distance.")]
         [Min(0f)] public float coinCollectRadius = 3f;
+        [Tooltip("A managed stand's coin floats up for this long, then collects itself.")]
+        [Min(0.05f)] public float managerCollectSeconds = 0.8f;
+        [Min(0f)] public float managerCoinRise = 1.6f;
 
         [Header("Visitors")]
         [Min(0f)] public float visitorBobHeight = 0.05f;

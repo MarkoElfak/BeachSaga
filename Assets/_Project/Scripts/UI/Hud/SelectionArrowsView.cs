@@ -7,7 +7,7 @@ namespace BeachTycoon.UI
 {
     /// <summary>
     /// Floats over the selected object: left/right arrows turn it one step, and Upgrade (main building and
-    /// stands only) opens the upgrade panel. Hidden while nothing is selected.
+    /// stands only) opens the upgrade panel for it. Hidden while nothing is selected.
     /// </summary>
     public sealed class SelectionArrowsView : MonoBehaviour
     {
@@ -62,11 +62,14 @@ namespace BeachTycoon.UI
             if (bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
         }
 
+        // A selected stand opens its own panel (level up, manager); the main building opens the building's.
         private void OnUpgrade()
         {
             int lot = _selection.UpgradeLot;
+            PlaceableId selected = _selection.Selected;
+            int stand = selected.Kind == PlaceableKind.Stand ? selected.Index : -1;
             _selection.Clear();
-            if (lot >= 0) EventBus.Publish(new UpgradePanelRequested(lot));
+            if (lot >= 0) EventBus.Publish(new UpgradePanelRequested(lot, stand));
         }
     }
 }

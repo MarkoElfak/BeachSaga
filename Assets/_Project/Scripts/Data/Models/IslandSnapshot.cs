@@ -49,6 +49,7 @@ namespace BeachTycoon.Data
         public float x;
         public float z;
         public float yaw;
+        public bool manager;
     }
 
     [Serializable]

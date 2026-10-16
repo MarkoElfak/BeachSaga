@@ -99,7 +99,7 @@ namespace BeachTycoon.EditorTools
                     Time.timeScale = TestTimeScale;
                     EconomyConfig economy = ServiceLocator.Get<GameDatabase>().economy;
                     long expected = OfflineEarnings.Calculate(Offline.IncomePerSecond, System.TimeSpan.FromHours(AbsenceHours),
-                        economy.offlineEfficiency, economy.offlineCapHours, economy.offlineMinSeconds);
+                        Offline.Efficiency, economy.offlineCapHours, economy.offlineMinSeconds);
                     AutoTestRunner.Write($"Income estimate {Offline.IncomePerSecond:0.00}/s; offline reward {Offline.PendingCoins} for {Offline.PendingSeconds / 3600f:0.0} h");
                     Check(Offline.PendingCoins > 0 && Offline.PendingCoins == expected, $"offline earnings = rate x capped hours x efficiency ({expected})");
                     Check(Mathf.Approximately(Offline.PendingSeconds, economy.offlineCapHours * 3600f), "20 h away is capped at 8 h");

@@ -4,8 +4,9 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Shows a stand's serve progress and drops coins on sales. Tapping selects it (rotate, upgrade); long-pressing
-    /// moves it on its own. Tells WorldNavigation where its queue starts so visitors can line up.
+    /// Shows a stand's serve progress and drops coins on sales (they collect themselves once a manager is hired,
+    /// shown by a hat). Tapping selects it (rotate, upgrade); long-pressing moves it on its own. Tells
+    /// WorldNavigation where its queue starts so visitors can line up.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
     {
@@ -14,6 +15,9 @@ namespace BeachTycoon.Gameplay
 
         [Tooltip("First queue position; the line grows along this transform's forward axis.")]
         [SerializeField] private Transform queueAnchor = null;
+
+        [Tooltip("Shown while the stand has a manager.")]
+        [SerializeField] private GameObject managerHat = null;
 
         private CoinSpawner _coinSpawner;
         private PlacementService _placement;
@@ -32,6 +36,8 @@ namespace BeachTycoon.Gameplay
             progressBar.SetVisible(false);
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Subscribe<ManagerHired>(OnManagerHired);
+            ShowManager(stand.Model.manager);
             SnapToPlacement();
         }
 
@@ -61,6 +67,20 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
+        }
+
+        public void ShowManager(bool hired)
+        {
+            if (managerHat != null) managerHat.SetActive(hired);
+        }
+
+        // The new manager picks up whatever is already lying at the stand.
+        private void OnManagerHired(ManagerHired evt)
+        {
+            if (Stand == null || evt.StandIndex != Stand.Index) return;
+            ShowManager(true);
+            _coinSpawner.AutoCollectSource(Stand.Index);
         }
 
         // Its own move, or its lot changing size (stands in the default row slide along).
@@ -92,7 +112,7 @@ namespace BeachTycoon.Gameplay
         {
             if (Stand != null && evt.StandIndex == Stand.Index)
             {
-                _coinSpawner.Spawn(Stand.Index, coinAnchor.position, evt.Amount);
+                _coinSpawner.Spawn(Stand.Index, coinAnchor.position, evt.Amount, Stand.Model.manager);
             }
         }
     }

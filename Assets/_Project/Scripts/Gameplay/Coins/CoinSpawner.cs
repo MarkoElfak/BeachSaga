@@ -10,6 +10,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Pooled coin pickups. Each source (a stand or a house) shows at most coinRingSlots coins on a small ring;
     /// further income merges into its oldest coin. Tapping a coin collects every coin within coinCollectRadius.
+    /// Coins from a stand with a manager collect themselves.
     /// </summary>
     public sealed class CoinSpawner : MonoBehaviour
     {
@@ -45,7 +46,7 @@ namespace BeachTycoon.Gameplay
             return any;
         }
 
-        public void Spawn(int sourceId, Vector3 anchorPosition, long amount)
+        public void Spawn(int sourceId, Vector3 anchorPosition, long amount, bool autoCollect = false)
         {
             CoinPickupView oldest = null;
             int count = 0;
@@ -59,6 +60,7 @@ namespace BeachTycoon.Gameplay
             if (count >= _config.coinRingSlots && oldest != null)
             {
                 oldest.AddAmount(amount);
+                if (autoCollect) oldest.StartAutoCollect();
                 return;
             }
 
@@ -70,6 +72,28 @@ namespace BeachTycoon.Gameplay
             CoinPickupView coin = _pool.Get();
             coin.Show(sourceId, anchorPosition + offset, amount);
             _active.Add(coin);
+            if (autoCollect) coin.StartAutoCollect();
+        }
+
+        /// <summary>Sends every coin waiting at one source off to collect itself (a manager was just hired).</summary>
+        public void AutoCollectSource(int sourceId)
+        {
+            for (int i = 0; i < _active.Count; i++)
+            {
+                if (_active[i].SourceId == sourceId) _active[i].StartAutoCollect();
+            }
+        }
+
+        /// <summary>Coins lying on the beach waiting for a tap (managers' coins are not counted).</summary>
+        public int CountWaiting(int sourceId)
+        {
+            int count = 0;
+            for (int i = 0; i < _active.Count; i++)
+            {
+                if (_active[i].SourceId == sourceId && !_active[i].IsAutoCollecting) count++;
+            }
+
+            return count;
         }
 
         /// <summary>Collects the tapped coin and every other coin near it.</summary>

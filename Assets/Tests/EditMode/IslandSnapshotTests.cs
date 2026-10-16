@@ -11,7 +11,7 @@ namespace BeachTycoon.Tests
             var snapshot = new IslandSnapshot { ownerId = "owner-1", ownerName = "Ana", tier = 2, popularity = 1.25f, timestampUtc = "2026-10-16T12:00:00.0000000Z" };
             snapshot.buildings.Add(new SnapshotBuilding { lotIndex = 0, tier = 2, x = 1.5f, z = -2f });
             snapshot.buildings.Add(new SnapshotBuilding { lotIndex = 3, tier = 1, variant = 2, x = -8f, z = -10f });
-            snapshot.stands.Add(new SnapshotStand { productId = "donuts", level = 3, x = 4f, z = -1f, yaw = 90f });
+            snapshot.stands.Add(new SnapshotStand { productId = "donuts", level = 3, x = 4f, z = -1f, yaw = 90f, manager = true });
             snapshot.decorations.Add(new SnapshotDecoration { decorationId = "umbrella", x = -3.25f, z = -6.5f, yaw = 45f });
             return snapshot;
         }
@@ -34,6 +34,7 @@ namespace BeachTycoon.Tests
             Assert.AreEqual(3, copy.stands[0].level);
             Assert.AreEqual(-6.5f, copy.decorations[0].z);
             Assert.AreEqual(90f, copy.stands[0].yaw);
+            Assert.IsTrue(copy.stands[0].manager);
             Assert.AreEqual(45f, copy.decorations[0].yaw);
         }
 

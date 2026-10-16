@@ -22,6 +22,9 @@ namespace BeachTycoon.Data
         [Tooltip("Stand upgrade cost at level 0. Each level multiplies it by EconomyConfig.upgradeCostGrowth.")]
         [Min(0)] public long upgradeBaseCost = 25;
 
+        [Tooltip("Coins to hire this stand's manager, who collects its coins automatically. Setup fills in 0.")]
+        [Min(0)] public long managerCost;
+
         [Tooltip("Building tier (1 = Tent) required before the product can be sold.")]
         [Min(1)] public int requiredTier = 1;
 

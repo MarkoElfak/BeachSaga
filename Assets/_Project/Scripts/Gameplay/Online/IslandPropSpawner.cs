@@ -26,7 +26,7 @@ namespace BeachTycoon.Gameplay
             {
                 ProductDefinition product = database.FindProduct(layout.Stands[i].productId);
                 GameObject stand = Add(product != null ? product.standPrefab : null, placement.GetStandPosition(i), 0f, layout.Stands[i].yaw);
-                if (stand != null) MakeStatic(stand);
+                if (stand != null) MakeStatic(stand, layout.Stands[i].manager);
             }
 
             for (int i = 0; i < layout.Decorations.Count; i++)
@@ -46,11 +46,15 @@ namespace BeachTycoon.Gameplay
             return instance;
         }
 
-        // An unbound stand would only show an empty progress bar.
-        private static void MakeStatic(GameObject stand)
+        // An unbound stand would only show an empty progress bar. Its manager's hat still shows.
+        private static void MakeStatic(GameObject stand, bool manager)
         {
             foreach (ProgressBarView bar in stand.GetComponentsInChildren<ProgressBarView>(true)) bar.SetVisible(false);
-            foreach (StandView view in stand.GetComponentsInChildren<StandView>(true)) view.enabled = false;
+            foreach (StandView view in stand.GetComponentsInChildren<StandView>(true))
+            {
+                view.ShowManager(manager);
+                view.enabled = false;
+            }
         }
 
         private static GameObject TierPrefab(GameDatabase database, int tier)
