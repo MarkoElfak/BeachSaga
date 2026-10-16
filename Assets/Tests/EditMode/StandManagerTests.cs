@@ -37,7 +37,7 @@ namespace BeachTycoon.Tests
             var buildings = new BuildingManager(_database, _economy, new List<LotModel>());
             var boost = new IncomeBoost(Asset<MonetizationConfig>(), new MetaModel());
             _models = new List<StandModel> { new StandModel { productId = "donuts" } };
-            _stands = new StandService(_database, _economy, buildings, _models, boost);
+            _stands = new StandService(_database, _economy, buildings, _models, new SaleMultipliers(boost));
             _hired = 0;
             EventBus.Subscribe<ManagerHired>(evt =>
             {

@@ -129,6 +129,7 @@ namespace BeachTycoon.EditorTools
             float eventMultiplier = Events.PriceMultiplier(stand.Product);
             long plain = EconomyMath.ApplyMultiplier(EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level, bonus),
                 ServiceLocator.Get<IncomeBoost>().Multiplier);
+            plain = EconomyMath.ApplyMultiplier(plain, ServiceLocator.Get<SeasonService>().IncomeMultiplier);
             long expected = EconomyMath.ApplyMultiplier(plain, eventMultiplier);
             _saleOk = evt.Amount == expected && eventMultiplier > 1f;
             _saleText = $"{stand.Product.displayName} sell for {eventMultiplier:0.#}x during the event ({plain} -> {evt.Amount} coins)";

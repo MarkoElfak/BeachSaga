@@ -45,7 +45,20 @@ namespace BeachTycoon.EditorTools
             MetaUiBuilder.BuildDailyRewards(safe);
             OnlineUiBuilder.BuildVisitPanel(safe);
             AchievementUiBuilder.Build(safe);
+            SeasonUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
+            BringWindowsToFront(safe);
+        }
+
+        // A HUD button built after a window would draw (and take taps) over its backdrop, so windows go last.
+        private static void BringWindowsToFront(RectTransform safe)
+        {
+            foreach (ModalWindow window in safe.GetComponentsInChildren<ModalWindow>(true))
+            {
+                Transform host = window.transform;
+                while (host.parent != safe) host = host.parent;
+                host.SetAsLastSibling();
+            }
         }
 
         /// <summary>Portrait overlay canvas scaled from 1080x1920; returns its safe-area root.</summary>

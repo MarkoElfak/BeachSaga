@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
+using BeachTycoon.Services;
 
 namespace BeachTycoon.Gameplay
 {
@@ -17,12 +18,14 @@ namespace BeachTycoon.Gameplay
         private PlacementService _placement;
         private readonly List<NeighbourModel> _neighbours;
         private readonly System.Random _random;
+        private readonly SeasonService _season;
         private string _pendingName;
         private float _pendingTimer;
 
         public NeighbourService(GameDatabase database, BuildingManager buildings, ProgressionService progression,
-            List<NeighbourModel> neighbours)
+            List<NeighbourModel> neighbours, SeasonService season = null)
         {
+            _season = season;
             _database = database;
             _buildings = buildings;
             _progression = progression;
@@ -97,6 +100,7 @@ namespace BeachTycoon.Gameplay
 
                 neighbour.rentTimer -= config.rentIntervalSeconds;
                 long rent = (long)Math.Round(config.rentPerMinute * config.rentIntervalSeconds / 60.0);
+                if (_season != null) rent = EconomyMath.ApplyMultiplier(rent, _season.IncomeMultiplier);
                 EventBus.Publish(new RentDue(neighbour.lotIndex, rent));
             }
         }

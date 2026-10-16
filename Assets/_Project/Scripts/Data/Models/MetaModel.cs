@@ -39,6 +39,11 @@ namespace BeachTycoon.Data
         // Added with the day and night cycle; older saves start at dawn.
         /// <summary>Position in the day and night cycle (0 dawn, 0.25 midday, 0.5 sunset, 0.75 midnight).</summary>
         public float dayPhase = 0.1f;
+
+        // Version 11: seasons (prestige).
+        /// <summary>Seashells collected over all seasons; each one raises all income for good.</summary>
+        public long seashells;
+        public int seasonsCompleted;
     }
 
     [Serializable]

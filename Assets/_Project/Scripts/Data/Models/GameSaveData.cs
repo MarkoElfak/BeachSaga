@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 10;
+        public const int CurrentVersion = 11;
 
         public int version = CurrentVersion;
 
@@ -34,6 +34,7 @@ namespace BeachTycoon.Data
 
         // Version 9: lots, stands and decorations have a yaw (see LotModel.yaw).
         // Version 10: stands can have a manager (StandModel.manager).
+        // Version 11: seasons (MetaModel.seashells, seasonsCompleted; WalletModel.seasonEarned).
 
         public static GameSaveData CreateNew(long startingCoins)
         {

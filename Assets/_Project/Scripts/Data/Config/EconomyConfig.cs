@@ -29,5 +29,14 @@ namespace BeachTycoon.Data
         [Min(1)] public int maxStandQueue = 5;
 
         [Min(1)] public int maxStandLevel = 25;
+
+        [Header("New season (prestige)")]
+        [Tooltip("Main building tier needed before a new season can start (5 = Resort).")]
+        [Min(1)] public int seasonUnlockTier = 5;
+        [Tooltip("Seashells for a season = (coins earned this season / unit) ^ exponent, rounded down.")]
+        [Min(1)] public long seashellCoinUnit = 25000;
+        [Range(0.1f, 1f)] public float seashellExponent = 0.5f;
+        [Tooltip("Permanent extra income per seashell (0.10 = +10% each).")]
+        [Min(0f)] public float incomeBonusPerSeashell = 0.10f;
     }
 }

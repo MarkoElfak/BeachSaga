@@ -16,6 +16,7 @@ namespace BeachTycoon.Services
             new AddAchievements(),
             new AddRotation(),
             new AddManagers(),
+            new AddSeasons(),
         };
 
         /// <summary>
@@ -86,6 +87,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 9;
             public string Migrate(string json) => json.Replace("\"version\":9", "\"version\":10");
+        }
+
+        /// <summary>v10 -> v11: seasons. New fields start at zero (no seashells, first season, nothing earned yet).</summary>
+        private sealed class AddSeasons : ISaveMigration
+        {
+            public int FromVersion => 10;
+            public string Migrate(string json) => json.Replace("\"version\":10", "\"version\":11");
         }
     }
 }

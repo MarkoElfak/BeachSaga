@@ -46,7 +46,7 @@ namespace BeachTycoon.Tests
             _events = new BeachEventService(_config, buildings, new MockAnalyticsService(false));
             var models = new List<StandModel> { new StandModel { productId = "donuts" }, new StandModel { productId = "drinks" } };
             _stands = new StandService(database, economy, buildings, models,
-                new IncomeBoost(Asset<MonetizationConfig>(), new MetaModel()), _events);
+                new SaleMultipliers(new IncomeBoost(Asset<MonetizationConfig>(), new MetaModel()), null, _events));
             _events.AttachStands(_stands);
 
             _started = _ended = 0;
