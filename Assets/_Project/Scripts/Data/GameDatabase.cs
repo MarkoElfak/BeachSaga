@@ -22,6 +22,8 @@ namespace BeachTycoon.Data
         public PlacementConfig placement;
         public DailyRewardConfig dailyRewards;
         public OnlineConfig online;
+        public DayNightConfig dayNight;
+        public BeachEventConfig beachEvents;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]

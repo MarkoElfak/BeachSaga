@@ -41,7 +41,7 @@ namespace BeachTycoon.EditorTools
 
         public static void BuildToast(Transform parent)
         {
-            RectTransform rect = UiKit.Rect("Toast", parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -320f), new Vector2(900f, 110f));
+            RectTransform rect = UiKit.Rect("Toast", parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -445f), new Vector2(900f, 110f));
             UiKit.AddImage(rect, new Color(0.1f, 0.25f, 0.35f, 0.85f), false);
             var group = rect.gameObject.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;

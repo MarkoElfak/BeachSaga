@@ -35,6 +35,10 @@ namespace BeachTycoon.Data
         public string visitBonusDay = string.Empty;
         public List<string> visitBonusOwners = new List<string>();
         public SettingsModel settings = new SettingsModel();
+
+        // Added with the day and night cycle; older saves start at dawn.
+        /// <summary>Position in the day and night cycle (0 dawn, 0.25 midday, 0.5 sunset, 0.75 midnight).</summary>
+        public float dayPhase = 0.1f;
     }
 
     [Serializable]

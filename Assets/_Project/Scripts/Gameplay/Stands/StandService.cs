@@ -18,11 +18,13 @@ namespace BeachTycoon.Gameplay
         private readonly List<StandModel> _models;
         private readonly List<StandController> _stands = new List<StandController>();
         private readonly IncomeBoost _boost;
+        private readonly BeachEventService _events;
 
         public StandService(GameDatabase database, IEconomyService economy, BuildingManager buildings,
-            List<StandModel> savedStands, IncomeBoost boost)
+            List<StandModel> savedStands, IncomeBoost boost, BeachEventService events = null)
         {
             _boost = boost;
+            _events = events;
             _database = database;
             _economy = economy;
             _buildings = buildings;
@@ -160,7 +162,7 @@ namespace BeachTycoon.Gameplay
 
         private StandController AddController(StandModel model, ProductDefinition product)
         {
-            var stand = new StandController(_stands.Count, model, product, _database.economy, _boost);
+            var stand = new StandController(_stands.Count, model, product, _database.economy, _boost, _events);
             _stands.Add(stand);
             return stand;
         }

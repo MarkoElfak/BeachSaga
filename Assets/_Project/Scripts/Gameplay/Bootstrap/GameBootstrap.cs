@@ -80,11 +80,14 @@ namespace BeachTycoon.Gameplay
             var progression = Add(new ProgressionService(database, data.lots));
             var buildings = Add(new BuildingManager(database, economy, data.lots));
             var placement = Add(new PlacementService(database, buildings, data.stands, data.decorations));
-            var stands = Add(new StandService(database, economy, buildings, data.stands, boost));
+            var events = Add(new BeachEventService(database.beachEvents, buildings, analytics));
+            var stands = Add(new StandService(database, economy, buildings, data.stands, boost, events));
+            events.AttachStands(stands);
+            Add(new DayClock(database.dayNight, data.meta));
             var popularity = Add(new PopularityService(database, progression, stands));
             Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
             var navigation = Add(new WorldNavigation(database.world, database.visitors, placement));
-            Add(new VisitorService(database, buildings, stands, popularity, navigation));
+            Add(new VisitorService(database, buildings, stands, popularity, navigation, events));
             var neighbours = Add(new NeighbourService(database, buildings, progression, data.neighbours));
             neighbours.AttachPlacement(placement);
             Add(new QuestService(database, neighbours, stands, economy, progression));

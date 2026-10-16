@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b728d54f5454c58b816605e8e6ed4eb, type: 3}
+  m_Name: Heatwave
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.BeachEventDefinition
+  id: Heatwave
+  title: Heatwave
+  description: Everyone wants drinks, at 1.5x the price
+  bannerColor: {r: 1, g: 0.6, b: 0.4, a: 1}
+  durationSeconds: 150
+  weight: 1
+  minTier: 3
+  product: {fileID: 11400000, guid: eeef448bf489a41408a39f70dd0da66c, type: 2}
+  priceMultiplier: 1.5
+  demandChance: 0.6
+  spawnRateMultiplier: 1
+  burstVisitors: 0

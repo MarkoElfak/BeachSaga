@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b728d54f5454c58b816605e8e6ed4eb, type: 3}
+  m_Name: SurfContest
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.BeachEventDefinition
+  id: SurfContest
+  title: Surf contest
+  description: Surf lessons sell for 2x
+  bannerColor: {r: 0.45, g: 0.78, b: 0.98, a: 1}
+  durationSeconds: 120
+  weight: 1
+  minTier: 4
+  product: {fileID: 11400000, guid: 0e812ba1429004228a82b807365f570b, type: 2}
+  priceMultiplier: 2
+  demandChance: 0
+  spawnRateMultiplier: 1
+  burstVisitors: 0

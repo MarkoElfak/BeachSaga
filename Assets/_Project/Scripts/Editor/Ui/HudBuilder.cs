@@ -31,6 +31,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(floating, "worldCamera", worldCamera);
 
             CommunityUiBuilder.BuildQuestTracker(safe);
+            EventUiBuilder.BuildEventBanner(safe);
             CommunityUiBuilder.BuildNeighbourRequest(safe);
             CommunityUiBuilder.BuildToast(safe);
             MetaUiBuilder.BuildBoostButton(safe);
