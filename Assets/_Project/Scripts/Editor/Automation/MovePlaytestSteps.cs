@@ -2,6 +2,7 @@ using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Gameplay;
 using BeachTycoon.Services;
+using BeachTycoon.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -82,6 +83,7 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 6:
                     Time.timeScale = TestTimeScale;
+                    PlaytestTools.Find<DailyRewardPanelView>().Close(); // opened by itself after the restart; keep the HUD shots clear
                     Check(Placement.GetLotPosition(0) == MainTarget && Near(LotRoot(0).position, MainTarget), "moved building restored after restart");
                     Check(Placement.GetDecorationPosition(0) == DecorationTarget && Near(DecorationRoot(0).position, DecorationTarget), "moved decoration restored after restart");
                     Check(Placement.GetStandPosition(0) == StandTarget && Near(PlaytestTools.Find<StandView>().transform.position, StandTarget), "moved stand restored after restart");

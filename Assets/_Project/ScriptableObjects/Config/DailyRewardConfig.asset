@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2822a0077cf4d6a88c2d9459698f00d, type: 3}
+  m_Name: DailyRewardConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.DailyRewardConfig
+  days:
+  - incomeMinutes: 5
+    minimumCoins: 100
+    boostMinutes: 0
+  - incomeMinutes: 8
+    minimumCoins: 150
+    boostMinutes: 0
+  - incomeMinutes: 10
+    minimumCoins: 200
+    boostMinutes: 0
+  - incomeMinutes: 15
+    minimumCoins: 300
+    boostMinutes: 5
+  - incomeMinutes: 20
+    minimumCoins: 400
+    boostMinutes: 0
+  - incomeMinutes: 25
+    minimumCoins: 500
+    boostMinutes: 0
+  - incomeMinutes: 45
+    minimumCoins: 1000
+    boostMinutes: 15
+  adMultiplier: 2
+  openOnLaunch: 1

@@ -12,7 +12,8 @@ namespace BeachTycoon.EditorTools
     /// <summary>
     /// Milestone 3 playthrough: tutorial from an empty beach to the first donut sale (under 60 s of game time),
     /// tutorial upgrade step, rewarded 2x boost, settings, analytics, then a simulated 20 h absence to check
-    /// capped offline earnings, the popup and the ad-doubled claim. Runs at 5x speed.
+    /// capped offline earnings, the popup and the ad-doubled claim, then the daily reward calendar that
+    /// follows it. Runs at 5x speed.
     /// </summary>
     internal static class MetaPlaytestSteps
     {
@@ -26,6 +27,7 @@ namespace BeachTycoon.EditorTools
         private static TutorialService Tutorial => ServiceLocator.Get<TutorialService>();
         private static IncomeBoost Boost => ServiceLocator.Get<IncomeBoost>();
         private static OfflineEarningsService Offline => ServiceLocator.Get<OfflineEarningsService>();
+        private static DailyRewardService Daily => ServiceLocator.Get<DailyRewardService>();
         private static MockAnalyticsService Analytics => (MockAnalyticsService)ServiceLocator.Get<IAnalyticsService>();
 
         public static bool IsReady(int step)
@@ -114,7 +116,15 @@ namespace BeachTycoon.EditorTools
                     Check(!ServiceLocator.Get<SettingsService>().SoundOn, "sound-off setting survived the restart");
                     Check(!Tutorial.IsActive, "tutorial does not come back after a restart");
                     Check(Boost.IsActive, "boost time left survived the restart");
-                    PlaytestTools.CapturePortraitWithHud("m3_5_after_claim.png");
+                    DailyRewardPanelView calendar = PlaytestTools.Find<DailyRewardPanelView>();
+                    Check(calendar.IsOpen && Daily.CanClaim && Daily.TodayIndex == 0, "daily reward calendar opens after the offline popup, on day 1");
+                    PlaytestTools.CapturePortraitWithHud("m3_5_daily_rewards.png");
+                    long beforeDaily = Economy.Coins;
+                    long dailyCoins = Daily.TodayCoins;
+                    PlaytestTools.Click(calendar, "CollectButton");
+                    Check(Economy.Coins == beforeDaily + dailyCoins && !Daily.CanClaim && Daily.Streak == 1, $"daily reward collected once ({dailyCoins}), streak 1");
+                    Check(!calendar.IsOpen && Analytics.HasLogged(AnalyticsEvents.DailyRewardClaimed), "calendar closes and daily_reward_claimed is logged");
+                    PlaytestTools.CapturePortraitWithHud("m3_6_after_claim.png");
                     break;
                 default:
                     AutoTestRunner.Finish();

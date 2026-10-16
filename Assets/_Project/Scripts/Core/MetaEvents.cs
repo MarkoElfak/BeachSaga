@@ -27,6 +27,21 @@ namespace BeachTycoon.Core
     {
     }
 
+    /// <summary>The player claimed a daily login reward (Coins already includes any ad multiplier).</summary>
+    public readonly struct DailyRewardClaimed
+    {
+        public readonly int DayIndex;
+        public readonly long Coins;
+        public readonly float BoostMinutes;
+
+        public DailyRewardClaimed(int dayIndex, long coins, float boostMinutes)
+        {
+            DayIndex = dayIndex;
+            Coins = coins;
+            BoostMinutes = boostMinutes;
+        }
+    }
+
     /// <summary>The player claimed offline earnings (Amount already includes any ad multiplier).</summary>
     public readonly struct OfflineRewardClaimed
     {

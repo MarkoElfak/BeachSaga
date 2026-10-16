@@ -11,6 +11,7 @@ namespace BeachTycoon.Services
             new AddMeta(),
             new AddPositions(),
             new AddStandPositions(),
+            new AddDailyRewards(),
         };
 
         /// <summary>
@@ -46,6 +47,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 4;
             public string Migrate(string json) => json.Replace("\"version\":4", "\"version\":5");
+        }
+
+        /// <summary>v5 -> v6: daily login streak in MetaModel (defaults: never claimed).</summary>
+        private sealed class AddDailyRewards : ISaveMigration
+        {
+            public int FromVersion => 5;
+            public string Migrate(string json) => json.Replace("\"version\":5", "\"version\":6");
         }
     }
 }

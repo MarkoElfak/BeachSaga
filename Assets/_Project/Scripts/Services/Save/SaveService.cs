@@ -93,6 +93,7 @@ namespace BeachTycoon.Services
                 data.decorations ??= new System.Collections.Generic.List<DecorationModel>();
                 data.meta ??= new MetaModel();
                 data.meta.settings ??= new SettingsModel();
+                data.meta.dailyLastClaimDay ??= string.Empty;
                 PreviousSessionUtc = ParseUtc(data.lastSeenUtc);
                 LoadedFromDisk = true;
                 return data;

@@ -93,6 +93,8 @@ namespace BeachTycoon.Gameplay
             var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours));
             Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics));
             Add(new TutorialService(database.tutorial, data.meta, buildings));
+            Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
+                boost, ads, analytics));
             Add(new AudioService(database.sounds, settings, gameObject));
             Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
 

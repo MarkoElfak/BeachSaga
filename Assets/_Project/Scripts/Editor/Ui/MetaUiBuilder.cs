@@ -6,13 +6,15 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Milestone 3 HUD pieces: tutorial banner and arrow, 2x boost button, settings, offline popup.</summary>
+    /// <summary>Meta HUD pieces: tutorial banner and arrow, 2x boost button, settings, offline popup, daily rewards.</summary>
     internal static class MetaUiBuilder
     {
         private static readonly Color Window = new Color(1f, 0.97f, 0.9f);
         private static readonly Color Dim = new Color(0f, 0f, 0f, 0.55f);
         private static readonly Color Boost = new Color(1f, 0.55f, 0.25f);
         private static readonly Color Secondary = new Color(0.55f, 0.8f, 0.95f);
+        private static readonly Color Daily = new Color(0.98f, 0.75f, 0.85f);
+        private const int DailyTiles = 7;
 
         public static void BuildTutorial(Transform parent, Camera camera, CoinSpawner coins, BuildBarView buildBar)
         {
@@ -95,6 +97,72 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "doubleButton", doubled);
             PrimitiveKit.SetReference(view, "doubleLabel", doubleLabel);
             root.gameObject.SetActive(false);
+        }
+
+        public static void BuildDailyRewards(Transform parent)
+        {
+            RectTransform openRect = UiKit.Rect("DailyButton", parent, Vector2.one, Vector2.one, Vector2.one, new Vector2(-30f, -370f), new Vector2(200f, 90f));
+            Button open = UiKit.AddButton(openRect, Daily, out _);
+            UiKit.ChildText(openRect, "Label", "Daily", 36f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            RectTransform badgeRect = UiKit.Rect("Badge", openRect, Vector2.one, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(-8f, -8f), new Vector2(40f, 40f));
+            UiKit.AddImage(badgeRect, new Color(0.9f, 0.2f, 0.2f), false);
+            UiKit.ChildText(badgeRect, "Label", "!", 30f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
+
+            RectTransform host = UiKit.Stretch("DailyRewards", parent);
+            RectTransform root = Modal(host, "Daily rewards", new Vector2(960f, 1160f), out RectTransform window, out Button close);
+
+            // Days 1-4 on the first row, 5-6 plus a double-width jackpot day 7 on the second.
+            var days = new DailyRewardDayView[DailyTiles];
+            for (int i = 0; i < DailyTiles; i++)
+            {
+                bool jackpot = i == DailyTiles - 1;
+                int column = i < 4 ? i : i - 4;
+                float x = -330f + column * 220f + (jackpot ? 110f : 0f);
+                float y = i < 4 ? -170f : -410f;
+                days[i] = DayTile(window, i, new Vector2(x, y), new Vector2(jackpot ? 420f : 200f, 220f));
+            }
+
+            RectTransform bodyRect = UiKit.Rect("Body", window, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -660f), new Vector2(-100f, 140f));
+            TextMeshProUGUI body = UiKit.AddText(bodyRect, "Come back every day", 42f, TextAlignmentOptions.Center, UiKit.TextDark);
+            Button collect = WideButton(window, "CollectButton", -820f, Secondary, out TextMeshProUGUI collectLabel);
+            Button doubled = WideButton(window, "DoubleButton", -970f, UiKit.ButtonColor, out TextMeshProUGUI doubleLabel);
+
+            var view = host.gameObject.AddComponent<DailyRewardPanelView>();
+            PrimitiveKit.SetReference(view, "openButton", open);
+            PrimitiveKit.SetReference(view, "badge", badgeRect.gameObject);
+            PrimitiveKit.SetReference(view, "root", root.gameObject);
+            PrimitiveKit.SetReferences(view, "days", days);
+            PrimitiveKit.SetReference(view, "body", body);
+            PrimitiveKit.SetReference(view, "collectButton", collect);
+            PrimitiveKit.SetReference(view, "collectLabel", collectLabel);
+            PrimitiveKit.SetReference(view, "doubleButton", doubled);
+            PrimitiveKit.SetReference(view, "doubleLabel", doubleLabel);
+            PrimitiveKit.SetReference(view, "closeButton", close);
+            root.gameObject.SetActive(false);
+        }
+
+        private static DailyRewardDayView DayTile(RectTransform window, int index, Vector2 position, Vector2 size)
+        {
+            RectTransform rect = UiKit.Rect($"Day{index + 1}", window, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), position, size);
+            Image background = UiKit.AddImage(rect, Color.white, false);
+            RectTransform dayRect = UiKit.Rect("Day", rect, new Vector2(0f, 0.68f), Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-10f, 0f));
+            TextMeshProUGUI day = UiKit.AddText(dayRect, $"Day {index + 1}", 34f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            RectTransform rewardRect = UiKit.Rect("Reward", rect, Vector2.zero, new Vector2(1f, 0.68f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-10f, -10f));
+            TextMeshProUGUI reward = UiKit.AddText(rewardRect, "0", 34f, TextAlignmentOptions.Center, UiKit.TextDark);
+
+            var view = rect.gameObject.AddComponent<DailyRewardDayView>();
+            PrimitiveKit.SetReference(view, "background", background);
+            PrimitiveKit.SetReference(view, "dayLabel", day);
+            PrimitiveKit.SetReference(view, "rewardLabel", reward);
+            return view;
+        }
+
+        private static Button WideButton(RectTransform window, string name, float y, Color color, out TextMeshProUGUI label)
+        {
+            RectTransform rect = UiKit.Rect(name, window, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(640f, 120f));
+            Button button = UiKit.AddButton(rect, color, out _);
+            label = UiKit.ChildText(rect, "Label", name, 46f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            return button;
         }
 
         // Dimmed full-screen blocker plus a centred window with a title and a close button.

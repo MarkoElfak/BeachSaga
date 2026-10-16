@@ -72,6 +72,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<NeighbourMovedIn>(OnNeighbourMovedIn);
             EventBus.Unsubscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Unsubscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
+            EventBus.Unsubscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
             EventBus.Unsubscribe<SettingsChanged>(OnSettingsChanged);
         }
 
@@ -87,6 +88,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<NeighbourMovedIn>(OnNeighbourMovedIn);
             EventBus.Subscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Subscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
+            EventBus.Subscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
             EventBus.Subscribe<SettingsChanged>(OnSettingsChanged);
         }
 
@@ -99,6 +101,7 @@ namespace BeachTycoon.Gameplay
         private void OnNeighbourMovedIn(NeighbourMovedIn evt) => Play(SoundId.NeighbourMovedIn);
         private void OnQuestCompleted(QuestCompleted evt) => Play(SoundId.QuestComplete);
         private void OnOfflineRewardClaimed(OfflineRewardClaimed evt) => Play(SoundId.Reward);
+        private void OnDailyRewardClaimed(DailyRewardClaimed evt) => Play(SoundId.Reward);
         private void OnSettingsChanged(SettingsChanged evt) => ApplyMusic();
 
         private void OnLotStateChanged(LotStateChanged evt)

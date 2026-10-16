@@ -132,6 +132,7 @@ namespace BeachTycoon.EditorTools
                     Check(Buildings.MainTier == 5 && Stands.Count == 5, "resort and its stands restored");
                     Check(Neighbours.Count == 1 && Decorations.Count == 1, "neighbour and decoration restored");
                     Check(PlaytestTools.Find<DecorationLayer>().transform.childCount == 1, "decoration re-spawned on the beach");
+                    PlaytestTools.Find<DailyRewardPanelView>().Close(); // opened by itself after the restart; keep the HUD shots clear
                     break;
                 case 15:
                     AutoTestRunner.Write($"Busy beach: {Visitors.ActiveCount} visitors, frame time {Time.smoothDeltaTime / TestTimeScale * 1000f:0.0} ms");

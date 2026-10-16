@@ -17,6 +17,13 @@ namespace BeachTycoon.Data
         public float incomeBoostSeconds;
 
         public bool removeAdsOwned;
+
+        // Version 6: daily login rewards.
+        /// <summary>Consecutive days claimed; the calendar position is (streak - 1) % days.</summary>
+        public int dailyStreak;
+
+        /// <summary>Local calendar day of the last claim (yyyy-MM-dd), empty if never claimed.</summary>
+        public string dailyLastClaimDay = string.Empty;
         public SettingsModel settings = new SettingsModel();
     }
 

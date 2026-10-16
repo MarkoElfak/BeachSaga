@@ -25,6 +25,7 @@ MonoBehaviour:
   tutorial: {fileID: 11400000, guid: 84f1c57ace1a5429193081fd3d193dbf, type: 2}
   sounds: {fileID: 11400000, guid: 6c7ae5d6adc04486aa549624b485cff9, type: 2}
   placement: {fileID: 11400000, guid: d1f34cbe05dff41d8ad9de4daef0e615, type: 2}
+  dailyRewards: {fileID: 11400000, guid: 8122a3ecee4f44328277c84cc0095dde, type: 2}
   tiers:
   - {fileID: 11400000, guid: cfd40ba1c17d84fc7ae4a586c9117472, type: 2}
   - {fileID: 11400000, guid: 4a9d9966489394ce1ac48cf396d0270d, type: 2}

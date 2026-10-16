@@ -49,6 +49,7 @@ namespace BeachTycoon.EditorTools
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
             MetaUiBuilder.BuildSettings(safe);
+            MetaUiBuilder.BuildDailyRewards(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
         }
 
