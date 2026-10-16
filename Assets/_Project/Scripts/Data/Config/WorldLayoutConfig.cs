@@ -20,7 +20,7 @@ namespace BeachTycoon.Data
     public sealed class WorldLayoutConfig : ScriptableObject
     {
         /// <summary>Setup resets older assets to these defaults when the layout changes between milestones.</summary>
-        public const int CurrentDataVersion = 2;
+        public const int CurrentDataVersion = 3;
 
         [Tooltip("0 = never upgraded. Setup sets it to CurrentDataVersion.")]
         public int dataVersion;
@@ -50,6 +50,8 @@ namespace BeachTycoon.Data
         [Min(0f)] public float palmEdgeMargin = 0.8f;
         [Tooltip("Palms keep this far from lot centres and the footpath.")]
         [Min(0f)] public float palmClearance = 1.7f;
+        [Tooltip("Palms this far in front of (camera side of) a building or decoration are hidden too, so their crowns never cover it.")]
+        [Min(0f)] public float palmFrontClearance = 2.5f;
         public Vector2 palmScaleRange = new Vector2(0.85f, 1.3f);
 
         [Header("Lots (x, z). Lot 0 holds the main building; the rest are neighbour house lots.")]
@@ -83,7 +85,7 @@ namespace BeachTycoon.Data
         {
             new Vector2(-10.3f, 5f), new Vector2(10.3f, 5f), new Vector2(-10.3f, 2.6f), new Vector2(10.3f, 2.6f),
             new Vector2(-10.3f, 0.2f), new Vector2(10.3f, 0.2f), new Vector2(-10.2f, -2.6f), new Vector2(10.2f, -2.6f),
-            new Vector2(-3.6f, -8.9f), new Vector2(3.6f, -8.9f),
+            new Vector2(-3.4f, -8.9f), new Vector2(3.4f, -8.9f),
         };
     }
 }

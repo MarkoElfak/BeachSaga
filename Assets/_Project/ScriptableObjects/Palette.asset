@@ -406,3 +406,17 @@ MonoBehaviour:
     texture: {fileID: 2800000, guid: 563ec774ff20e40de9895bcdcb0423bb, type: 3}
     tiling: {x: 1, y: 1}
     material: {fileID: 2100000, guid: ee42771042ba542fab6f08279ba31975, type: 2}
+  - key: placeValid
+    color: {r: 0.29803923, g: 0.8509804, b: 0.39215687, a: 1}
+    smoothness: 0.3
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: 9bfcc433159c748d497981c477d49099, type: 2}
+  - key: placeInvalid
+    color: {r: 1, g: 0.23137255, b: 0.1882353, a: 1}
+    smoothness: 0.3
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: 3afaf67e9ce6b49efb1d65a24e9b5194, type: 2}

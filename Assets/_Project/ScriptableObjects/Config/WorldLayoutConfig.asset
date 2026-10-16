@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1d9e4bad9d684cd9af7e0668756e7ac, type: 3}
-  m_Name: 
+  m_Name: WorldLayoutConfig
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.WorldLayoutConfig
-  dataVersion: 2
+  dataVersion: 3
   width: 24
   landTopZ: 10
   bands:
@@ -43,6 +43,7 @@ MonoBehaviour:
   palmSeed: 7
   palmEdgeMargin: 0.8
   palmClearance: 1.7
+  palmFrontClearance: 2.5
   palmScaleRange: {x: 0.85, y: 1.3}
   lotPositions:
   - {x: 0, y: -2}
@@ -101,5 +102,5 @@ MonoBehaviour:
   - {x: 10.3, y: 0.2}
   - {x: -10.2, y: -2.6}
   - {x: 10.2, y: -2.6}
-  - {x: -3.6, y: -8.9}
-  - {x: 3.6, y: -8.9}
+  - {x: -3.4, y: -8.9}
+  - {x: 3.4, y: -8.9}

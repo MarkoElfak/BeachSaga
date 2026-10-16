@@ -14,5 +14,8 @@ namespace BeachTycoon.Data
         [Min(1)] public int requiredTier = 1;
         [Min(1)] public int maxCount = 4;
         public GameObject prefab;
+
+        [Tooltip("Ground area (x, z) it occupies; other objects cannot be placed on it.")]
+        public Vector2 footprint = new Vector2(1.4f, 1.4f);
     }
 }

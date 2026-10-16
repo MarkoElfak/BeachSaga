@@ -25,6 +25,11 @@ namespace BeachTycoon.Data
         /// <summary>House lots: which house prefab variant was built.</summary>
         public int variant;
 
+        /// <summary>True once the player moved this lot; x/z then override the layout's default position.</summary>
+        public bool placed;
+        public float x;
+        public float z;
+
         public float buildTotalSeconds;
         public float buildRemainingSeconds;
 

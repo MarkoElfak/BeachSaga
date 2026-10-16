@@ -52,6 +52,7 @@ namespace BeachTycoon.Gameplay
         }
 
         // Order follows the design doc: Save, Economy, Progression, Building, Visitors, Neighbours, UI.
+        // Platform seams (analytics, ads, IAP) come right after Save so every later service can use them.
         private void CreateServices()
         {
             ServiceLocator.Register(database);
@@ -62,19 +63,38 @@ namespace BeachTycoon.Gameplay
                 database.economy.startingCoins, clock);
             ServiceLocator.Register<ISaveService>(_save);
             GameSaveData data = _save.Data;
+            MonetizationConfig monetization = database.monetization;
+
+            var analytics = new MockAnalyticsService(monetization.logAnalyticsToConsole);
+            ServiceLocator.Register<IAnalyticsService>(analytics);
+            var ads = new MockAdsService(monetization.mockAdSeconds);
+            ServiceLocator.Register<IAdsService>(ads);
+            _tickables.Add(ads);
+            ServiceLocator.Register<IIapService>(new MockIapService(data.meta, monetization.removeAdsProductId));
 
             var economy = new EconomyService(data.wallet);
             ServiceLocator.Register<IEconomyService>(economy);
+            var settings = Add(new SettingsService(data.meta.settings));
+            var boost = Add(new IncomeBoost(monetization, data.meta));
 
             var progression = Add(new ProgressionService(database, data.lots));
             var buildings = Add(new BuildingManager(database, economy, data.lots));
-            var stands = Add(new StandService(database, economy, buildings, data.stands));
+            var placement = Add(new PlacementService(database, buildings, data.decorations));
+            var stands = Add(new StandService(database, economy, buildings, data.stands, boost));
             var popularity = Add(new PopularityService(database, progression, stands));
-            Add(new DecorationService(database, economy, progression, popularity, data.decorations));
-            var navigation = Add(new WorldNavigation(database.world, database.visitors, buildings));
+            Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
+            var navigation = Add(new WorldNavigation(database.world, database.visitors, buildings, placement));
             Add(new VisitorService(database, buildings, stands, popularity, navigation));
             var neighbours = Add(new NeighbourService(database, buildings, progression, data.neighbours));
+            neighbours.AttachPlacement(placement);
             Add(new QuestService(database, neighbours, stands, economy, progression));
+
+            // Meta systems read the restored island, so they come last.
+            var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours));
+            Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics));
+            Add(new TutorialService(database.tutorial, data.meta, buildings));
+            Add(new AudioService(database.sounds, settings, gameObject));
+            Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
 
             // UI lives in the Beach scene and resolves services from the locator.
 

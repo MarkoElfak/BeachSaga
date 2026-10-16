@@ -22,6 +22,8 @@ namespace BeachTycoon.EditorTools
             GameObject go = GameObject.CreatePrimitive(type);
             go.name = name;
             Object.DestroyImmediate(go.GetComponent<Collider>());
+            Mesh lowPoly = LowPolyPrimitives.For(type);
+            if (lowPoly != null) go.GetComponent<MeshFilter>().sharedMesh = lowPoly;
             go.transform.SetParent(parent, false);
             go.transform.SetLocalPositionAndRotation(localPosition, Quaternion.Euler(localEuler));
             go.transform.localScale = localScale;

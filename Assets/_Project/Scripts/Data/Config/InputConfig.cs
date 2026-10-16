@@ -19,5 +19,8 @@ namespace BeachTycoon.Data
         [Min(0f)] public float scrollZoomStep = 0.12f;
 
         [Min(1f)] public float raycastMaxDistance = 500f;
+
+        [Tooltip("Press and hold this long on a building or decoration to pick it up and move it.")]
+        [Min(0.1f)] public float holdToMoveSeconds = 0.45f;
     }
 }

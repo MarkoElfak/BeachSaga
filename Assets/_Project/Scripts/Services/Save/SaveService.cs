@@ -91,6 +91,8 @@ namespace BeachTycoon.Services
                 data.stands ??= new System.Collections.Generic.List<StandModel>();
                 data.neighbours ??= new System.Collections.Generic.List<NeighbourModel>();
                 data.decorations ??= new System.Collections.Generic.List<DecorationModel>();
+                data.meta ??= new MetaModel();
+                data.meta.settings ??= new SettingsModel();
                 PreviousSessionUtc = ParseUtc(data.lastSeenUtc);
                 LoadedFromDisk = true;
                 return data;

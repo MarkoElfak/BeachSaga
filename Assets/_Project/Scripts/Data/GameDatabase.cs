@@ -16,6 +16,10 @@ namespace BeachTycoon.Data
         public VisitorConfig visitors;
         public TerrainConfig terrain;
         public NeighbourConfig neighbours;
+        public MonetizationConfig monetization;
+        public TutorialConfig tutorial;
+        public SoundLibrary sounds;
+        public PlacementConfig placement;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]

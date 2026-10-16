@@ -7,7 +7,8 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Height function of the island, shared by the terrain mesh, the water shore mask, scatter placement and
     /// anything that needs to stand on the ground. Heights blend between band centre elevations, then a noisy
-    /// coast drops into the sea, dunes ripple the sand and lots are flattened to height 0.
+    /// coast drops into the sea, dunes ripple the sand and occupied lots are flattened to height 0.
+    /// The flat areas follow the buildings: SetFlatRects is called again whenever one is moved.
     /// </summary>
     public sealed class TerrainShape
     {
@@ -18,7 +19,8 @@ namespace BeachTycoon.Gameplay
         private readonly float _noiseOffset;
         private readonly float _shoreStartZ;
 
-        public TerrainShape(WorldLayoutConfig layout, TerrainConfig config)
+        /// <param name="lotFlats">Footprints (XZ) to flatten, normally from PlacementService.GetFlatRects.</param>
+        public TerrainShape(WorldLayoutConfig layout, TerrainConfig config, IReadOnlyList<Rect> lotFlats)
         {
             _layout = layout;
             _config = config;
@@ -45,7 +47,7 @@ namespace BeachTycoon.Gameplay
             LandRect = Rect.MinMaxRect(-halfWidth, BottomZ, halfWidth, top);
             TerrainRect = Rect.MinMaxRect(-halfWidth - config.sideMargin, BottomZ - config.backMargin,
                 halfWidth + config.sideMargin, top + config.seaMargin);
-            CreateFlatRects();
+            SetFlatRects(lotFlats);
         }
 
         /// <summary>The playable island (bands) in XZ.</summary>
@@ -116,16 +118,16 @@ namespace BeachTycoon.Gameplay
             return _profile[_profile.Count - 1].y;
         }
 
-        private void CreateFlatRects()
+        /// <summary>Replaces the flattened lot areas; the footpath always stays flat and walkable.</summary>
+        public void SetFlatRects(IReadOnlyList<Rect> lotFlats)
         {
-            Vector2[] lots = _layout.lotPositions ?? new Vector2[0];
-            for (int i = 0; i < lots.Length; i++)
+            _flatRects.Clear();
+            if (lotFlats != null)
             {
-                Rect footprint = i == BuildingManager.MainLotIndex ? _layout.mainFootprint : _layout.houseFootprint;
-                _flatRects.Add(new Rect(lots[i] + footprint.position, footprint.size));
+                for (int i = 0; i < lotFlats.Count; i++) _flatRects.Add(lotFlats[i]);
             }
 
-            _flatRects.Add(_config.path); // the footpath stays walkable and above water
+            _flatRects.Add(_config.path);
         }
 
         private static float Smooth(float edge0, float edge1, float value)

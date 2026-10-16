@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
@@ -11,8 +9,10 @@ using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Reads touches (or the mouse in the editor) through the new Input System and publishes
-    /// Tap, Drag and Pinch events. Gestures that start on UI are ignored.
+    /// Reads touches (or the mouse in the editor) through the new Input System and publishes Tap, Drag, Pinch
+    /// and HoldStarted (long press). A listener may capture the pointer after a hold (e.g. to move a building):
+    /// the camera then stops panning and CapturedPointerMoved / CapturedPointerReleased are sent instead.
+    /// Gestures that start on UI are ignored.
     /// </summary>
     [DefaultExecutionOrder(100)]
     public sealed class PointerGestureSource : MonoBehaviour
@@ -20,9 +20,7 @@ namespace BeachTycoon.Gameplay
         private const float MinPinchDistancePixels = 1f;
         private const float ScrollDeadZone = 0.01f;
 
-        private readonly List<RaycastResult> _uiHits = new List<RaycastResult>();
-        private PointerEventData _uiPointerData;
-        private EventSystem _uiPointerOwner;
+        private readonly UiPointerProbe _ui = new UiPointerProbe();
         private InputConfig _config;
 
         private int _previousCount;
@@ -34,11 +32,18 @@ namespace BeachTycoon.Gameplay
         private bool _dragging;
         private bool _multiTouch;
         private bool _startedOverUi;
+        private bool _holdFired;
+        private bool _captured;
 
         public void Initialize(InputConfig config)
         {
             _config = config;
         }
+
+        /// <summary>Call from a HoldStarted handler to take over the rest of this press.</summary>
+        public void CapturePointer() => _captured = _previousCount > 0;
+
+        public bool IsCaptured => _captured;
 
         private void OnEnable()
         {
@@ -62,7 +67,7 @@ namespace BeachTycoon.Gameplay
             if (count > 0 && _previousCount == 0) BeginGesture(p0);
             else if (count == 0 && _previousCount > 0) EndGesture();
             else if (count == 1 && _previousCount == 1) MoveSingle(p0);
-            else if (count >= 2 && _previousCount >= 2) Pinch(p0, p1);
+            else if (count >= 2 && _previousCount >= 2 && !_captured) Pinch(p0, p1);
             // A finger count change (1 <-> 2) only re-bases positions, so the view does not jump.
 
             if (count >= 2) _multiTouch = true;
@@ -70,6 +75,7 @@ namespace BeachTycoon.Gameplay
             if (count > 1) _previous1 = p1;
             _previousCount = count;
 
+            if (count == 1) CheckHold(p0);
             ReadScrollZoom();
         }
 
@@ -110,15 +116,34 @@ namespace BeachTycoon.Gameplay
             _startTime = Time.unscaledTime;
             _dragging = false;
             _multiTouch = false;
-            _startedOverUi = IsOverUi(position);
+            _holdFired = false;
+            _captured = false;
+            _startedOverUi = _ui.IsOverUi(position);
 
             float dpi = Screen.dpi > 0f ? Screen.dpi : _config.fallbackDpi;
             float threshold = _config.tapMaxMoveInches * dpi;
             _dragThresholdSqr = threshold * threshold;
         }
 
+        // A press that stays still long enough becomes a long press (only once per gesture).
+        private void CheckHold(Vector2 position)
+        {
+            bool eligible = !_holdFired && !_dragging && !_multiTouch && !_startedOverUi;
+            if (eligible && Time.unscaledTime - _startTime >= _config.holdToMoveSeconds)
+            {
+                _holdFired = true;
+                EventBus.Publish(new HoldStarted(position));
+            }
+        }
+
         private void MoveSingle(Vector2 position)
         {
+            if (_captured)
+            {
+                EventBus.Publish(new CapturedPointerMoved(position));
+                return;
+            }
+
             if (_startedOverUi || _multiTouch)
             {
                 return;
@@ -154,6 +179,13 @@ namespace BeachTycoon.Gameplay
 
         private void EndGesture()
         {
+            if (_captured)
+            {
+                _captured = false;
+                EventBus.Publish(new CapturedPointerReleased(_previous0));
+                return;
+            }
+
             bool quick = Time.unscaledTime - _startTime <= _config.tapMaxSeconds;
             if (quick && !_dragging && !_multiTouch && !_startedOverUi)
             {
@@ -178,26 +210,6 @@ namespace BeachTycoon.Gameplay
             float step = 1f + _config.scrollZoomStep;
             float ratio = scroll > 0f ? step : 1f / step;
             EventBus.Publish(new PinchEvent(ratio, mouse.position.ReadValue()));
-        }
-
-        private bool IsOverUi(Vector2 screenPosition)
-        {
-            EventSystem eventSystem = EventSystem.current;
-            if (eventSystem == null)
-            {
-                return false;
-            }
-
-            if (_uiPointerData == null || _uiPointerOwner != eventSystem)
-            {
-                _uiPointerData = new PointerEventData(eventSystem);
-                _uiPointerOwner = eventSystem;
-            }
-
-            _uiPointerData.position = screenPosition;
-            _uiHits.Clear();
-            eventSystem.RaycastAll(_uiPointerData, _uiHits);
-            return _uiHits.Count > 0;
         }
     }
 }

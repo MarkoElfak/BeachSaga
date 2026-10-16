@@ -38,4 +38,37 @@ namespace BeachTycoon.Core
             ScreenCenter = screenCenter;
         }
     }
+
+    /// <summary>A press stayed still for InputConfig.holdToMoveSeconds (long press).</summary>
+    public readonly struct HoldStarted
+    {
+        public readonly Vector2 ScreenPosition;
+
+        public HoldStarted(Vector2 screenPosition)
+        {
+            ScreenPosition = screenPosition;
+        }
+    }
+
+    /// <summary>The pointer moved while captured by a long-press interaction (camera does not pan).</summary>
+    public readonly struct CapturedPointerMoved
+    {
+        public readonly Vector2 ScreenPosition;
+
+        public CapturedPointerMoved(Vector2 screenPosition)
+        {
+            ScreenPosition = screenPosition;
+        }
+    }
+
+    /// <summary>The captured pointer was released.</summary>
+    public readonly struct CapturedPointerReleased
+    {
+        public readonly Vector2 ScreenPosition;
+
+        public CapturedPointerReleased(Vector2 screenPosition)
+        {
+            ScreenPosition = screenPosition;
+        }
+    }
 }

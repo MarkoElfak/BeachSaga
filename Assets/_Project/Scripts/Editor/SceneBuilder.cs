@@ -43,9 +43,10 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(tapRouter, "worldCamera", camera);
 
             var visitorViews = new GameObject("Visitors").AddComponent<VisitorViewPool>();
+            MoveController mover = PlacementSceneBuilder.Build(database, camera, gestures);
 
             CreateEventSystem();
-            HudBuilder.Build(camera);
+            HudBuilder.Build(camera, coins);
 
             var root = new GameObject("BeachSceneRoot").AddComponent<BeachSceneRoot>();
             PrimitiveKit.SetReference(root, "worldBuilder", world);
@@ -58,6 +59,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(root, "lotPrefab",
                 AssetDatabase.LoadAssetAtPath<LotView>(PlaceholderPrefabBuilder.LotPath));
             PrimitiveKit.SetReference(root, "lotsRoot", lotsRoot);
+            PrimitiveKit.SetReference(root, "moveController", mover);
 
             EditorSceneManager.SaveScene(scene, ProjectPaths.BeachScene);
         }

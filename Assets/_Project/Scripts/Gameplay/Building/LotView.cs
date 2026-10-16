@@ -7,9 +7,10 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Displays one lot: the empty marker (main lot only), the construction crate, the building or house and its
-    /// stands. Forwards taps (build, upgrade panel, house info) and drops rent coins. Holds no game state.
+    /// stands. Forwards taps (build, upgrade panel, house info) and drops rent coins. Long-press moves the whole
+    /// lot (building plus its stands). Holds no game state.
     /// </summary>
-    public sealed class LotView : MonoBehaviour, ITappable
+    public sealed class LotView : MonoBehaviour, ITappable, IMovable
     {
         private const int RentSourceOffset = 1000;
 
@@ -28,7 +29,13 @@ namespace BeachTycoon.Gameplay
         private BuildingView _buildingView;
         private int _shownTier;
 
+        private PlacementService _placement;
+
         private bool IsHouse => BuildingManager.IsHouseLot(_lotIndex);
+
+        public PlaceableId Placeable => PlaceableId.Lot(_lotIndex);
+        public bool CanMoveNow => _lotIndex >= 0 && _placement != null && _placement.IsPresent(Placeable);
+        public Transform MoveRoot => transform;
 
         public void Bind(int lotIndex, CoinSpawner coinSpawner)
         {
@@ -37,7 +44,10 @@ namespace BeachTycoon.Gameplay
             _buildings = ServiceLocator.Get<BuildingManager>();
             _stands = ServiceLocator.Get<StandService>();
             _database = ServiceLocator.Get<GameDatabase>();
+            _placement = ServiceLocator.Get<PlacementService>();
+            SnapToPlacement();
 
+            EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
             EventBus.Subscribe<RentDue>(OnRentDue);
@@ -81,9 +91,23 @@ namespace BeachTycoon.Gameplay
 
         private void OnDestroy()
         {
+            EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Unsubscribe<StandCreated>(OnStandCreated);
             EventBus.Unsubscribe<RentDue>(OnRentDue);
+        }
+
+        private void OnObjectMoved(ObjectMoved evt)
+        {
+            if (evt.IsLot && evt.Index == _lotIndex) SnapToPlacement();
+        }
+
+        // Lots stand on flattened ground at height 0; stands move with the lot and re-register their queues.
+        private void SnapToPlacement()
+        {
+            Vector2 position = _placement.GetLotPosition(_lotIndex);
+            transform.position = new Vector3(position.x, 0f, position.y);
+            for (int i = 0; i < _standViews.Count; i++) PlaceStand(_standViews[i]);
         }
 
         private void OnLotStateChanged(LotStateChanged evt)

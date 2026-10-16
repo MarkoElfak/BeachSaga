@@ -12,6 +12,12 @@ namespace BeachTycoon.Services
             return Math.Max(0L, (long)Math.Round(value, MidpointRounding.AwayFromZero));
         }
 
+        /// <summary>Scales an amount (e.g. by the rewarded 2x income boost), rounding to whole coins.</summary>
+        public static long ApplyMultiplier(long amount, float multiplier)
+        {
+            return Math.Max(0L, (long)Math.Round(amount * (double)multiplier, MidpointRounding.AwayFromZero));
+        }
+
         /// <summary>Upgrade cost = base * growth ^ level.</summary>
         public static long UpgradeCost(long baseCost, float growth, int level)
         {

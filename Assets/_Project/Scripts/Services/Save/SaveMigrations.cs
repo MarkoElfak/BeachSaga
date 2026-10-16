@@ -8,6 +8,8 @@ namespace BeachTycoon.Services
         public static IEnumerable<ISaveMigration> All => new ISaveMigration[]
         {
             new AddNeighboursAndDecorations(),
+            new AddMeta(),
+            new AddPositions(),
         };
 
         /// <summary>
@@ -19,6 +21,20 @@ namespace BeachTycoon.Services
             public int FromVersion => 1;
 
             public string Migrate(string json) => json.Replace("\"version\":1", "\"version\":2");
+        }
+
+        /// <summary>v2 -> v3: tutorial, settings, offline reward and monetization state (MetaModel defaults).</summary>
+        private sealed class AddMeta : ISaveMigration
+        {
+            public int FromVersion => 2;
+            public string Migrate(string json) => json.Replace("\"version\":2", "\"version\":3");
+        }
+
+        /// <summary>v3 -> v4: lots and decorations can be moved (placed/x/z default to "use the layout").</summary>
+        private sealed class AddPositions : ISaveMigration
+        {
+            public int FromVersion => 3;
+            public string Migrate(string json) => json.Replace("\"version\":3", "\"version\":4");
         }
     }
 }

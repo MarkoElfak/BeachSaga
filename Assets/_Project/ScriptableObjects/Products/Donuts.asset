@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Donuts
   icon: {fileID: 0}
   unlockCost: 0
-  price: 5
+  price: 500
   serveSeconds: 3
   upgradeBaseCost: 25
   requiredTier: 1

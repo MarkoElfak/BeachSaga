@@ -20,6 +20,8 @@ namespace BeachTycoon.Data
         public Vector2Int purchasesRange = new Vector2Int(1, 4);
         [Tooltip("Relax time before trying again when every stand queue is full.")]
         [Min(0.1f)] public float retryQueueSeconds = 3f;
+        [Tooltip("Average length of one visit (arrive to leave). Used only to estimate offline income.")]
+        [Min(1f)] public float estimatedVisitSeconds = 80f;
         public int randomSeed = 1234;
 
         [Header("Pool")]

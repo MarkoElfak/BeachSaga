@@ -19,6 +19,13 @@ namespace BeachTycoon.Data
     public sealed class DecorationModel
     {
         public string decorationId;
+
+        /// <summary>Default decoration spot it was bought onto (also sets its facing).</summary>
         public int spotIndex;
+
+        /// <summary>True once it has an explicit position (moved, or the default spot was blocked).</summary>
+        public bool placed;
+        public float x;
+        public float z;
     }
 }

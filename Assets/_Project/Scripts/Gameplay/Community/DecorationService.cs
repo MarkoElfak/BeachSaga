@@ -2,10 +2,14 @@ using System.Collections.Generic;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Services;
+using UnityEngine;
 
 namespace BeachTycoon.Gameplay
 {
-    /// <summary>Buys decorations, places them on the next free decoration spot and feeds their popularity bonus.</summary>
+    /// <summary>
+    /// Buys decorations, places them on the first free default spot (or the nearest free ground when the
+    /// player has built over the spots) and feeds their popularity bonus.
+    /// </summary>
     public sealed class DecorationService
     {
         private readonly GameDatabase _database;
@@ -13,6 +17,7 @@ namespace BeachTycoon.Gameplay
         private readonly ProgressionService _progression;
         private readonly PopularityService _popularity;
         private readonly List<DecorationModel> _placed;
+        private PlacementService _placement;
 
         public DecorationService(GameDatabase database, IEconomyService economy, ProgressionService progression,
             PopularityService popularity, List<DecorationModel> placed)
@@ -26,6 +31,9 @@ namespace BeachTycoon.Gameplay
         }
 
         public int Count => _placed.Count;
+
+        /// <summary>Placement is created after this service (it needs the decoration list), so it is attached later.</summary>
+        public void AttachPlacement(PlacementService placement) => _placement = placement;
         public DecorationModel Get(int index) => _placed[index];
 
         public int CountOf(DecorationDefinition definition)
@@ -41,36 +49,43 @@ namespace BeachTycoon.Gameplay
 
         public bool IsUnlocked(DecorationDefinition definition) => _progression.IsReached(definition.requiredTier);
 
-        public bool IsSoldOut(DecorationDefinition definition) => CountOf(definition) >= definition.maxCount || FreeSpot() < 0;
+        public bool IsSoldOut(DecorationDefinition definition) => CountOf(definition) >= definition.maxCount;
 
         public bool CanBuy(DecorationDefinition definition) =>
             IsUnlocked(definition) && !IsSoldOut(definition) && _economy.CanAfford(definition.cost);
 
         public bool TryBuy(DecorationDefinition definition)
         {
-            int spot = FreeSpot();
-            if (!IsUnlocked(definition) || IsSoldOut(definition) || !_economy.TrySpend(definition.cost))
+            if (!IsUnlocked(definition) || IsSoldOut(definition) || !_economy.CanAfford(definition.cost)
+                || !TryChoosePosition(definition, out int spot, out Vector2 position))
             {
                 return false;
             }
 
-            _placed.Add(new DecorationModel { decorationId = definition.id, spotIndex = spot });
+            _economy.TrySpend(definition.cost);
+            _placed.Add(new DecorationModel
+            {
+                decorationId = definition.id, spotIndex = spot, placed = true, x = position.x, z = position.y,
+            });
             UpdatePopularity();
             EventBus.Publish(new DecorationPlaced(_placed.Count - 1));
             return true;
         }
 
-        private int FreeSpot()
+        private bool TryChoosePosition(DecorationDefinition definition, out int spot, out Vector2 position)
         {
-            int spots = _database.world.decorationSpots != null ? _database.world.decorationSpots.Length : 0;
-            for (int spot = 0; spot < spots; spot++)
+            Vector2[] spots = _database.world.decorationSpots ?? new Vector2[0];
+            for (spot = 0; spot < spots.Length; spot++)
             {
-                bool taken = false;
-                for (int i = 0; i < _placed.Count && !taken; i++) taken = _placed[i].spotIndex == spot;
-                if (!taken) return spot;
+                position = spots[spot];
+                if (_placement == null || _placement.CanPlaceNewDecoration(definition, position)) return true;
             }
 
-            return -1;
+            spot = 0;
+            Vector2 near = spots.Length > 0 ? spots[0] : Vector2.zero;
+            if (_placement != null && _placement.TryFindFreeSpotForNewDecoration(definition, near, out position)) return true;
+            position = near;
+            return false;
         }
 
         private void UpdatePopularity()

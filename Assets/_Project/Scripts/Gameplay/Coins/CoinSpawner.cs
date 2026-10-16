@@ -35,6 +35,14 @@ namespace BeachTycoon.Gameplay
             Prewarm(config.coinPoolPrewarm);
         }
 
+        /// <summary>Position of a coin still waiting to be collected (tutorial arrow, tests).</summary>
+        public bool TryGetWaitingCoin(out Vector3 position)
+        {
+            bool any = _active.Count > 0;
+            position = any ? _active[0].transform.position : default;
+            return any;
+        }
+
         public void Spawn(int sourceId, Vector3 anchorPosition, long amount)
         {
             CoinPickupView oldest = null;

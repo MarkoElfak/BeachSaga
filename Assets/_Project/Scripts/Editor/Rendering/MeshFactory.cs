@@ -19,7 +19,7 @@ namespace BeachTycoon.EditorTools
         public static Mesh Cone => Save("M_Cone", BuildCone(10, 1f, 1f, false));
         public static Mesh Surfboard => Save("M_Surfboard", BuildSurfboard());
 
-        private static Mesh Save(string name, Mesh built)
+        internal static Mesh Save(string name, Mesh built)
         {
             ProjectPaths.EnsureFolder(Folder);
             string path = $"{Folder}/{name}.asset";

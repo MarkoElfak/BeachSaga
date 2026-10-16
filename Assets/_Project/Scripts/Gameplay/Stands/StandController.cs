@@ -14,11 +14,14 @@ namespace BeachTycoon.Gameplay
         private const int NoVisitor = -1;
 
         private readonly EconomyConfig _economy;
+        private readonly IncomeBoost _boost;
         private readonly List<Order> _orders;
         private float _serveRemaining;
 
-        public StandController(int index, StandModel model, ProductDefinition product, EconomyConfig economy)
+        public StandController(int index, StandModel model, ProductDefinition product, EconomyConfig economy,
+            IncomeBoost boost)
         {
+            _boost = boost;
             Index = index;
             Model = model;
             Product = product;
@@ -102,6 +105,7 @@ namespace BeachTycoon.Gameplay
 
             long amount = EconomyMath.SaleValue(
                 Product.price, served.SpendMultiplier, Model.level, _economy.standLevelIncomeBonus);
+            amount = EconomyMath.ApplyMultiplier(amount, _boost.Multiplier);
             EventBus.Publish(new SaleCompleted(Index, amount, served.VisitorId));
         }
 

@@ -14,7 +14,7 @@ namespace BeachTycoon.EditorTools
         private const string FloatingTextPath = UiPrefabs + "/FloatingText.prefab";
         private static readonly Vector2 ReferenceResolution = new Vector2(1080f, 1920f);
 
-        public static void Build(Camera worldCamera)
+        public static void Build(Camera worldCamera, BeachTycoon.Gameplay.CoinSpawner coins)
         {
             ProjectPaths.EnsureFolder(UiPrefabs);
             var buttonPrefab = BuildProductButtonPrefab();
@@ -42,9 +42,14 @@ namespace BeachTycoon.EditorTools
             CommunityUiBuilder.BuildQuestTracker(safe);
             CommunityUiBuilder.BuildNeighbourRequest(safe);
             CommunityUiBuilder.BuildToast(safe);
+            MetaUiBuilder.BuildBoostButton(safe);
+            MetaUiBuilder.BuildTutorial(safe, worldCamera, coins, buildBar);
+            PlacementSceneBuilder.BuildMoveHint(safe);
             UpgradePanelBuilder.Build(safe);
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
+            MetaUiBuilder.BuildSettings(safe);
+            MetaUiBuilder.BuildOfflinePopup(safe);
         }
 
         private static void BuildTopBar(Transform parent)

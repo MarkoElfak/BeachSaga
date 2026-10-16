@@ -14,6 +14,7 @@ namespace BeachTycoon.Gameplay
         private readonly GameDatabase _database;
         private readonly BuildingManager _buildings;
         private readonly ProgressionService _progression;
+        private PlacementService _placement;
         private readonly List<NeighbourModel> _neighbours;
         private readonly System.Random _random;
         private string _pendingName;
@@ -31,6 +32,8 @@ namespace BeachTycoon.Gameplay
         }
 
         public int Count => _neighbours.Count;
+
+        public void AttachPlacement(PlacementService placement) => _placement = placement;
         public bool HasPendingRequest => _pendingName != null;
         public string PendingName => _pendingName;
 
@@ -59,6 +62,13 @@ namespace BeachTycoon.Gameplay
 
             NeighbourConfig config = _database.neighbours;
             int lot = _buildings.FindFreeHouseLot();
+            // The player may have moved something onto this lot's default spot: shift the lot if needed.
+            if (lot < 0 || (_placement != null && !_placement.EnsureLotIsFree(lot)))
+            {
+                Close(false);
+                return false;
+            }
+
             int variants = config.housePrefabs != null ? config.housePrefabs.Length : 1;
             _buildings.TryBuildHouse(lot, _random.Next(Math.Max(1, variants)));
             _neighbours.Add(new NeighbourModel { name = _pendingName, lotIndex = lot });
@@ -99,7 +109,7 @@ namespace BeachTycoon.Gameplay
         private void OnVisitorPurchased(VisitorPurchased evt)
         {
             NeighbourConfig config = _database.neighbours;
-            bool eligible = evt.Purchases == config.minPurchasesToAsk && !HasPendingRequest && HasRoom;
+            bool eligible = evt.Purchases >= config.minPurchasesToAsk && !HasPendingRequest && HasRoom;
             if (!eligible || _random.NextDouble() >= config.askChance)
             {
                 return;

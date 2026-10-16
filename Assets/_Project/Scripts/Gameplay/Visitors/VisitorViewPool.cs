@@ -86,7 +86,7 @@ namespace BeachTycoon.Gameplay
             }
 
             var pool = new ObjectPool<VisitorView>(
-                () => Instantiate(prefab, transform, false),
+                () => CreateView(prefab),
                 view => view.gameObject.SetActive(true),
                 view => view.gameObject.SetActive(false),
                 view => Destroy(view.gameObject),
@@ -96,6 +96,13 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < prewarm; i++) warm[i] = pool.Get();
             for (int i = 0; i < prewarm; i++) pool.Release(warm[i]);
             return pool;
+        }
+
+        private VisitorView CreateView(VisitorView prefab)
+        {
+            VisitorView view = Instantiate(prefab, transform, false);
+            GpuInstancing.Enable(view.gameObject);
+            return view;
         }
     }
 }

@@ -33,6 +33,7 @@ namespace BeachTycoon.Gameplay
             if (Stand != null && queueAnchor != null && ServiceLocator.TryGet(out WorldNavigation navigation))
             {
                 navigation.RegisterQueue(Stand.Index, queueAnchor.position, queueAnchor.forward);
+                navigation.RegisterStandPosition(Stand.Index, transform.position);
             }
         }
 

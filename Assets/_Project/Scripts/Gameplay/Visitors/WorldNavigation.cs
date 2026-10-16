@@ -12,15 +12,19 @@ namespace BeachTycoon.Gameplay
     {
         private readonly WorldLayoutConfig _layout;
         private readonly BuildingManager _buildings;
+        private readonly PlacementService _placement;
         private readonly List<Vector3> _spots = new List<Vector3>();
         private readonly List<bool> _spotTaken = new List<bool>();
         private readonly Dictionary<int, Pose> _queueAnchors = new Dictionary<int, Pose>();
+        private readonly Dictionary<int, Vector3> _standPositions = new Dictionary<int, Vector3>();
         private readonly float _queueSpacing;
 
-        public WorldNavigation(WorldLayoutConfig layout, VisitorConfig visitors, BuildingManager buildings)
+        public WorldNavigation(WorldLayoutConfig layout, VisitorConfig visitors, BuildingManager buildings,
+            PlacementService placement)
         {
             _layout = layout;
             _buildings = buildings;
+            _placement = placement;
             _queueSpacing = visitors.queueSpacing;
             CreateRelaxSpots(layout, visitors.randomSeed);
         }
@@ -71,6 +75,12 @@ namespace BeachTycoon.Gameplay
             _queueAnchors[standIndex] = new Pose(anchor, Quaternion.LookRotation(direction.normalized));
         }
 
+        /// <summary>Where a stand stands in the world (UI pointers such as the tutorial arrow use it).</summary>
+        public void RegisterStandPosition(int standIndex, Vector3 position) => _standPositions[standIndex] = position;
+
+        public bool TryGetStandPosition(int standIndex, out Vector3 position) =>
+            _standPositions.TryGetValue(standIndex, out position);
+
         public bool TryGetQueueSlot(int standIndex, int slot, out Vector3 position)
         {
             if (_queueAnchors.TryGetValue(standIndex, out Pose anchor))
@@ -112,16 +122,10 @@ namespace BeachTycoon.Gameplay
 
         private bool TryGetObstacle(int lotIndex, out Rect rect)
         {
-            rect = default;
-            if (_layout.lotPositions == null || lotIndex >= _layout.lotPositions.Length)
-            {
-                return false;
-            }
-
-            Rect footprint = BuildingManager.IsHouseLot(lotIndex) ? _layout.houseFootprint : _layout.mainFootprint;
+            // Footprints follow the buildings wherever the player has moved them.
+            Rect footprint = _placement.GetFootprint(PlaceableId.Lot(lotIndex), _placement.GetLotPosition(lotIndex));
             float clearance = _layout.pathClearance;
-            Vector2 min = _layout.lotPositions[lotIndex] + footprint.position - Vector2.one * clearance;
-            rect = new Rect(min, footprint.size + Vector2.one * (clearance * 2f));
+            rect = new Rect(footprint.position - Vector2.one * clearance, footprint.size + Vector2.one * (clearance * 2f));
             return true;
         }
 

@@ -12,6 +12,9 @@ namespace BeachTycoon.Services
 
         string FilePath { get; }
 
+        /// <summary>When the loaded save was last written (start of the absence), or null for a new game.</summary>
+        System.DateTime? PreviousSessionUtc { get; }
+
         void Save();
     }
 

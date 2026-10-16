@@ -21,6 +21,10 @@ MonoBehaviour:
   visitors: {fileID: 11400000, guid: 65ea19ad19737441d98a95f7f7b72da3, type: 2}
   terrain: {fileID: 11400000, guid: c459f18692f384978be3fe5733f15a13, type: 2}
   neighbours: {fileID: 11400000, guid: a405e743b1a5e44648117c35977a13fc, type: 2}
+  monetization: {fileID: 11400000, guid: baa24efc0e22149b8a300a2ccb93d8dd, type: 2}
+  tutorial: {fileID: 11400000, guid: 84f1c57ace1a5429193081fd3d193dbf, type: 2}
+  sounds: {fileID: 11400000, guid: 6c7ae5d6adc04486aa549624b485cff9, type: 2}
+  placement: {fileID: 11400000, guid: d1f34cbe05dff41d8ad9de4daef0e615, type: 2}
   tiers:
   - {fileID: 11400000, guid: cfd40ba1c17d84fc7ae4a586c9117472, type: 2}
   - {fileID: 11400000, guid: 4a9d9966489394ce1ac48cf396d0270d, type: 2}

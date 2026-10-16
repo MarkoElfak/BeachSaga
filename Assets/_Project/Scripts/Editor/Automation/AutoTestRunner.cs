@@ -14,9 +14,12 @@ namespace BeachTycoon.EditorTools
     /// test save/load. Writes Logs/BeachTycoonAutoRun.log and screenshots. State survives domain reloads.
     /// </summary>
     [InitializeOnLoad]
-    internal static class AutoTestRunner
+    internal static partial class AutoTestRunner
     {
         private const string RequestPath = "Temp/BeachTycoonAutoRun.request";
+
+        // A run queued for "after the next script compile", so it never starts on stale code.
+        private const string AfterCompilePath = "Logs/BeachTycoonAutoRun.after-compile";
         private const string ReportPath = "Logs/BeachTycoonAutoRun.log";
         private const string KeyPrefix = "BeachTycoon.AutoRun.";
         private const double BootTimeoutSeconds = 30.0;
@@ -34,6 +37,12 @@ namespace BeachTycoon.EditorTools
             EditorApplication.update += Update;
             Application.logMessageReceived -= OnLog;
             Application.logMessageReceived += OnLog;
+
+            if (File.Exists(AfterCompilePath) && !File.Exists(RequestPath))
+            {
+                File.Copy(AfterCompilePath, RequestPath);
+                File.Delete(AfterCompilePath);
+            }
         }
 
         private static Stage CurrentStage
@@ -51,9 +60,6 @@ namespace BeachTycoon.EditorTools
         private static double Now => EditorApplication.timeSinceStartup;
 
         private static string SavePath => Path.Combine(Application.persistentDataPath, SaveService.FileName);
-
-        [MenuItem("Beach Tycoon/Run Automated Playtest", priority = 40)]
-        private static void RequestFromMenu() => File.WriteAllText(RequestPath, "menu");
 
         public static void Write(string line)
         {
@@ -92,7 +98,10 @@ namespace BeachTycoon.EditorTools
                     if (File.Exists(RequestPath) && !EditorApplication.isCompiling && !EditorApplication.isUpdating
                         && !EditorApplication.isPlayingOrWillChangePlaymode)
                     {
+                        string suite = File.ReadAllText(RequestPath).Trim();
                         File.Delete(RequestPath);
+                        bool known = suite == SuiteIsland || suite == SuiteMove;
+                        SessionState.SetString(KeyPrefix + "Suite", known ? suite : SuiteMeta);
                         Begin();
                     }
                     break;
@@ -103,7 +112,11 @@ namespace BeachTycoon.EditorTools
                     TickSteps();
                     break;
                 case Stage.Restarting:
-                    if (!EditorApplication.isPlayingOrWillChangePlaymode) EnterPlay();
+                    if (!EditorApplication.isPlayingOrWillChangePlaymode)
+                    {
+                        ApplySimulatedAbsence();
+                        EnterPlay();
+                    }
                     break;
                 case Stage.Cleanup:
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
@@ -121,7 +134,7 @@ namespace BeachTycoon.EditorTools
             SessionState.SetInt(KeyPrefix + "Failures", 0);
             CurrentStep = 0;
             CurrentStage = Stage.WaitingForPlay; // marks the run active so setup logs are captured
-            Write("Automated playtest started " + System.DateTime.UtcNow.ToString("u"));
+            Write($"Automated playtest ({SuiteTitle}) started " + System.DateTime.UtcNow.ToString("u"));
             File.Delete(SavePath);
 
             bool setupOk;
@@ -183,12 +196,12 @@ namespace BeachTycoon.EditorTools
             double waited = Now - _stageStartTime;
             int step = CurrentStep;
             bool timedOut = waited >= StepTimeoutSeconds;
-            if (waited < StepMinDelaySeconds || (!PlaytestSteps.IsReady(step) && !timedOut)) return;
+            if (waited < StepMinDelaySeconds || (!IsStepReady(step) && !timedOut)) return;
 
             if (timedOut) Fail($"step {step} timed out waiting for its condition");
             _stageStartTime = Now;
             CurrentStep = step + 1;
-            PlaytestSteps.Run(step);
+            RunStep(step);
         }
 
         private static void OnLog(string message, string stackTrace, LogType type)

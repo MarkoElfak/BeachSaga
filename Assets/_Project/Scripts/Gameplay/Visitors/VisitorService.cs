@@ -45,6 +45,7 @@ namespace BeachTycoon.Gameplay
 
             _spawnTimer = SpawnInterval;
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
+            EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
         }
 
         public int ActiveCount => _active.Count;
@@ -85,14 +86,16 @@ namespace BeachTycoon.Gameplay
         public void Dispose()
         {
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
+            EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
         }
 
-        private void TrySpawn()
+        /// <summary>Spawns one visitor right away if the pool allows (stress tests); false when it cannot.</summary>
+        public bool TrySpawn()
         {
             int typeIndex = PickTypeIndex(_buildings.MainTier);
-            if (typeIndex < 0 || _free.Count == 0)
+            if (typeIndex < 0 || _free.Count == 0 || _navigation.EntryCount == 0)
             {
-                return;
+                return false;
             }
 
             VisitorAgent agent = _agents[_free.Pop()];
@@ -105,6 +108,7 @@ namespace BeachTycoon.Gameplay
             _machine.Begin(agent);
             _active.Add(agent);
             EventBus.Publish(new VisitorSpawned(agent.Id));
+            return true;
         }
 
         private void Despawn(VisitorAgent agent)
@@ -117,6 +121,13 @@ namespace BeachTycoon.Gameplay
             agent.Reset();
             _free.Push(agent.Id);
             EventBus.Publish(new VisitorDespawned(agent.Id));
+        }
+
+        // A moved building moves its stand queues: visitors in line walk to their new place in it.
+        private void OnObjectMoved(ObjectMoved evt)
+        {
+            if (!evt.IsLot) return;
+            for (int i = 0; i < _active.Count; i++) _active[i].QueueSlot = -1;
         }
 
         private void OnSaleCompleted(SaleCompleted evt)
