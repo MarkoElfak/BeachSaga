@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Services;
 using UnityEngine;
@@ -33,6 +34,7 @@ namespace BeachTycoon.Gameplay
                 defaultCapacity: config.coinPoolPrewarm,
                 maxSize: config.coinPoolMaxSize);
             Prewarm(config.coinPoolPrewarm);
+            EventBus.Subscribe<LeavingHome>(OnLeavingHome);
         }
 
         /// <summary>Position of a coin still waiting to be collected (tutorial arrow, tests).</summary>
@@ -110,8 +112,15 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < count; i++) _pool.Release(warm[i]);
         }
 
+        // Leaving for a visit: coins still lying on the beach are collected rather than lost with the scene.
+        private void OnLeavingHome(LeavingHome evt)
+        {
+            for (int i = _active.Count - 1; i >= 0; i--) _active[i].Collect();
+        }
+
         private void OnDestroy()
         {
+            EventBus.Unsubscribe<LeavingHome>(OnLeavingHome);
             _pool?.Dispose();
         }
     }

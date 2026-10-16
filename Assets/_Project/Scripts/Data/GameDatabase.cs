@@ -21,6 +21,7 @@ namespace BeachTycoon.Data
         public SoundLibrary sounds;
         public PlacementConfig placement;
         public DailyRewardConfig dailyRewards;
+        public OnlineConfig online;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]

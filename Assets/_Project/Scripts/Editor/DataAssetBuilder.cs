@@ -27,6 +27,7 @@ namespace BeachTycoon.EditorTools
             database.sounds = BuildSoundLibrary();
             database.placement = LoadOrCreate<PlacementConfig>(ProjectPaths.Config + "/PlacementConfig.asset", out _);
             database.dailyRewards = LoadOrCreate<DailyRewardConfig>(ProjectPaths.Config + "/DailyRewardConfig.asset", out _);
+            database.online = LoadOrCreate<OnlineConfig>(ProjectPaths.Config + "/OnlineConfig.asset", out _);
             database.world = BuildWorld();
             database.terrain = BuildTerrain(palette);
             database.palette = palette;

@@ -22,14 +22,16 @@ namespace BeachTycoon.Gameplay
         private readonly PlacementConfig _config;
         private TerrainShape _terrain;
 
+        /// <param name="followEvents">False for a read-only island (a visit): it ignores the home island's events.</param>
         public PlacementService(GameDatabase database, BuildingManager buildings, List<StandModel> stands,
-            List<DecorationModel> decorations)
+            List<DecorationModel> decorations, bool followEvents = true)
         {
             _database = database;
             _buildings = buildings;
             _stands = stands;
             _decorations = decorations;
             _config = database.placement;
+            if (!followEvents) return;
             EventBus.Subscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);

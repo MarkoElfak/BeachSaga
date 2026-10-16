@@ -95,6 +95,7 @@ namespace BeachTycoon.Gameplay
             Add(new TutorialService(database.tutorial, data.meta, buildings));
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
                 boost, ads, analytics));
+            AddOnline(data, placement, popularity, clock, estimator, economy, analytics);
             Add(new AudioService(database.sounds, settings, gameObject));
             Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
 
@@ -102,6 +103,25 @@ namespace BeachTycoon.Gameplay
 
             // Saving is ticked last so an autosave captures this frame's changes.
             _tickables.Add(_save);
+        }
+
+        // Online seams with local mocks: identity, snapshot storage (demo friends seeded) and visiting.
+        private void AddOnline(GameSaveData data, PlacementService placement, PopularityService popularity,
+            ITimeProvider clock, IncomeEstimator estimator, IEconomyService economy, IAnalyticsService analytics)
+        {
+            var auth = new LocalAuthService(data.meta, database.online.defaultPlayerName);
+            ServiceLocator.Register<IAuthService>(auth);
+            var islands = new LocalIslandRepository(Application.persistentDataPath);
+            ServiceLocator.Register<IIslandRepository>(islands);
+            var social = new MockSocialService(DemoIslands.Friends(database.online));
+            ServiceLocator.Register<ISocialService>(social);
+            DemoIslands.Seed(database, islands, clock.UtcNow);
+
+            IslandSnapshot CaptureHome() => IslandSnapshotFactory.Capture(auth.PlayerId, auth.DisplayName, data.lots,
+                data.stands, data.decorations, placement, popularity.Value, clock.UtcNow);
+            var ledger = new VisitBonusLedger(data.meta, database.online.maxBonusesPerDay);
+            Add(new VisitService(database, auth, islands, social, CaptureHome, ledger, clock, estimator.IncomePerSecond,
+                economy, analytics));
         }
 
         private T Add<T>(T service) where T : class

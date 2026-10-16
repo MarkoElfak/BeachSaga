@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed9d41c3a9df463da7935bdeb95aaa1c, type: 3}
+  m_Name: OnlineConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.OnlineConfig
+  defaultPlayerName: You
+  bonusIncomeMinutes: 2
+  bonusMinimumCoins: 50
+  maxBonusesPerDay: 5
+  maxVisitors: 18
+  visitorSpawnSeconds: 1.2
+  activitySecondsRange: {x: 3, y: 9}
+  activitiesRange: {x: 2, y: 4}
+  demoFriends:
+  - ownerId: demo-coral
+    displayName: Coral
+    tier: 2
+    houses: 1
+    decorations: 3
+    popularity: 0.6
+  - ownerId: demo-kai
+    displayName: Kai
+    tier: 3
+    houses: 3
+    decorations: 6
+    popularity: 1.2
+  - ownerId: demo-marina
+    displayName: Marina
+    tier: 5
+    houses: 5
+    decorations: 10
+    popularity: 2.1

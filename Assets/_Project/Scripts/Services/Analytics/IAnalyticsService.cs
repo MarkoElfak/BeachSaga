@@ -8,6 +8,9 @@ namespace BeachTycoon.Services
         public const string ProductUnlocked = "product_unlocked";
         public const string OfflineRewardClaimed = "offline_reward_claimed";
         public const string DailyRewardClaimed = "daily_reward_claimed";
+        public const string IslandVisited = "island_visited";
+        public const string IslandLiked = "island_liked";
+        public const string GiftSent = "gift_sent";
     }
 
     /// <summary>Analytics seam. One optional parameter keeps call sites allocation-free.</summary>

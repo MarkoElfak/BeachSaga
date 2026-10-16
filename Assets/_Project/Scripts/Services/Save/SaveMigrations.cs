@@ -12,6 +12,7 @@ namespace BeachTycoon.Services
             new AddPositions(),
             new AddStandPositions(),
             new AddDailyRewards(),
+            new AddOnline(),
         };
 
         /// <summary>
@@ -54,6 +55,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 5;
             public string Migrate(string json) => json.Replace("\"version\":5", "\"version\":6");
+        }
+
+        /// <summary>v6 -> v7: player id and visit-bonus bookkeeping in MetaModel (an id is created on load).</summary>
+        private sealed class AddOnline : ISaveMigration
+        {
+            public int FromVersion => 6;
+            public string Migrate(string json) => json.Replace("\"version\":6", "\"version\":7");
         }
     }
 }

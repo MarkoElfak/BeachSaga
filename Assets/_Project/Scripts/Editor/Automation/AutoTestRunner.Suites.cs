@@ -1,12 +1,16 @@
 using System.IO;
 using UnityEditor;
+using BeachTycoon.Services;
 using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>The playtest suites AutoTestRunner can run, their menu items, and the simulated absence.</summary>
+    /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 6 (visiting)", priority = 38)]
+        private static void RequestOnline() => File.WriteAllText(RequestPath, SuiteOnline);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 4 (move + performance)", priority = 39)]
         private static void RequestMove() => File.WriteAllText(RequestPath, SuiteMove);
 
@@ -19,22 +23,42 @@ namespace BeachTycoon.EditorTools
         private const string SuiteIsland = "m2";
         private const string SuiteMeta = "m3";
         private const string SuiteMove = "m4";
+        private const string SuiteOnline = "m6";
+
+        private static bool IsKnownSuite(string suite) => suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
-        private static string SuiteTitle => Suite == SuiteIsland ? "M2 island" : Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
+        private static string SuiteTitle
+        {
+            get
+            {
+                if (Suite == SuiteIsland) return "M2 island";
+                if (Suite == SuiteOnline) return "M6 visiting";
+                return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
+            }
+        }
 
         private static bool IsStepReady(int step)
         {
             if (Suite == SuiteIsland) return PlaytestSteps.IsReady(step);
+            if (Suite == SuiteOnline) return OnlinePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
         private static void RunStep(int step)
         {
             if (Suite == SuiteIsland) PlaytestSteps.Run(step);
+            else if (Suite == SuiteOnline) OnlinePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
+        }
+
+        // Snapshots written by earlier runs (own island, demo friends) start over with the save.
+        private static void DeleteIslandSnapshots()
+        {
+            string folder = Path.Combine(Application.persistentDataPath, LocalIslandRepository.FolderName);
+            if (Directory.Exists(folder)) Directory.Delete(folder, true);
         }
 
         /// <summary>Shifts the save's last-seen time back before the next Play mode starts (offline earnings test).</summary>

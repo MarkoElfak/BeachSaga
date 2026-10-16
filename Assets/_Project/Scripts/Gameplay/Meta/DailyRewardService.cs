@@ -35,6 +35,9 @@ namespace BeachTycoon.Gameplay
             _analytics = analytics;
         }
 
+        /// <summary>The calendar opens by itself at most once per session (not again after a visit).</summary>
+        public bool AutoOpenedThisSession { get; set; }
+
         public int CycleLength => _config != null && _config.days != null ? _config.days.Length : 0;
         public bool OpenOnLaunch => _config != null && _config.openOnLaunch;
         public bool CanClaim => CycleLength > 0 && DailyRewardCalendar.CanClaim(LastClaimDay, Today);

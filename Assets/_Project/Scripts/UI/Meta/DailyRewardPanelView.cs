@@ -34,7 +34,6 @@ namespace BeachTycoon.UI
         private OfflineEarningsService _offline;
         private TutorialService _tutorial;
         private IAdsService _ads;
-        private bool _autoOpened;
         private float _refreshTimer;
 
         public bool IsOpen => root.activeSelf;
@@ -101,12 +100,12 @@ namespace BeachTycoon.UI
         // The tutorial and the offline popup come first; the calendar waits for them.
         private void TryAutoOpen()
         {
-            if (_autoOpened || !_daily.OpenOnLaunch || !_daily.CanClaim || _tutorial.IsActive || _offline.HasPending)
+            if (_daily.AutoOpenedThisSession || !_daily.OpenOnLaunch || !_daily.CanClaim || _tutorial.IsActive || _offline.HasPending)
             {
                 return;
             }
 
-            _autoOpened = true;
+            _daily.AutoOpenedThisSession = true;
             root.SetActive(true);
             Refresh();
         }

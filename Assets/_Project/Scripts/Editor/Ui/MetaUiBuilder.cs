@@ -166,7 +166,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // Dimmed full-screen blocker plus a centred window with a title and a close button.
-        private static RectTransform Modal(Transform host, string title, Vector2 size, out RectTransform window, out Button close)
+        internal static RectTransform Modal(Transform host, string title, Vector2 size, out RectTransform window, out Button close)
         {
             RectTransform root = UiKit.Stretch("Root", host);
             UiKit.AddImage(UiKit.Stretch("Backdrop", root), Dim);
