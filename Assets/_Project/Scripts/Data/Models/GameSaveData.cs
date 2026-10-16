@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 12;
 
         public int version = CurrentVersion;
 
@@ -28,6 +28,17 @@ namespace BeachTycoon.Data
 
         // Version 3 (Milestone 3)
         public MetaModel meta = new MetaModel();
+
+        // Version 8 (achievements)
+        public List<AchievementModel> achievements = new List<AchievementModel>();
+
+        // Version 12: mini-game levels passed, per game.
+        public List<MiniGameProgress> miniGames = new List<MiniGameProgress>();
+
+        // Version 9: lots, stands and decorations have a yaw (see LotModel.yaw).
+        // Version 10: stands can have a manager (StandModel.manager).
+        // Version 11: seasons (MetaModel.seashells, seasonsCompleted; WalletModel.seasonEarned).
+        // Version 12: mini-games (miniGames).
 
         public static GameSaveData CreateNew(long startingCoins)
         {

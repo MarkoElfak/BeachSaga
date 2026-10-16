@@ -18,6 +18,7 @@ namespace BeachTycoon.EditorTools
 
         public const string BootScene = Scenes + "/Boot.unity";
         public const string BeachScene = Scenes + "/Beach.unity";
+        public const string IslandScene = Scenes + "/Island.unity";
 
         /// <summary>Creates a folder (and its parents) through the AssetDatabase if it is missing.</summary>
         public static void EnsureFolder(string path)

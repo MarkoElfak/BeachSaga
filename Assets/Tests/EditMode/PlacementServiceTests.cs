@@ -9,7 +9,7 @@ using UnityEngine;
 namespace BeachTycoon.Tests
 {
     /// <summary>Placement rules on the default layout, with a two-tier test database (no terrain).</summary>
-    public sealed class PlacementServiceTests
+    public sealed partial class PlacementServiceTests
     {
         private const string DecorationId = "test_deco";
         private static readonly Rect TentFootprint = new Rect(-1.6f, -1.55f, 3.2f, 3.1f);
@@ -37,7 +37,7 @@ namespace BeachTycoon.Tests
             _database.economy = Asset<EconomyConfig>();
             _database.visitors = Asset<VisitorConfig>();
             _database.tiers = new[] { Tier(TentFootprint, FirstArea), Tier(ResortFootprint, LastArea) };
-            _database.products = new[] { Product("donuts"), Product("towels") };
+            _database.products = new[] { Product("donuts"), Product("towels"), Product("surf_lessons") };
             var decoration = Asset<DecorationDefinition>();
             decoration.id = DecorationId;
             decoration.area = new Rect(-0.7f, -0.7f, 1.4f, 1.4f);
@@ -179,7 +179,9 @@ namespace BeachTycoon.Tests
             PlaceableId decoration = PlaceableId.Decoration(AddDecoration(0));
             Assert.IsFalse(_placement.CanPlace(decoration, standAt + new Vector2(0f, -3.5f)), "in the queue");
             Rect blocking = _placement.GetBlockingArea(PlaceableId.Stand(stand), standAt);
-            Assert.Less(blocking.yMin, standAt.y - 5f, "queue strip reaches the end of a full line");
+            float queueEnd = standAt.y - 1.7f - QueueLayout.Length(_database.visitors);
+            Assert.AreEqual(queueEnd, blocking.yMin, 1e-4f, "two short lines, not one long one");
+            Assert.GreaterOrEqual(blocking.width, QueueLayout.Width(_database.visitors, _database.placement.queueWidth) - 1e-4f, "both lines fit");
         }
 
         [Test]

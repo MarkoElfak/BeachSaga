@@ -90,6 +90,11 @@ namespace BeachTycoon.EditorTools
                     SceneBuilder.BuildBeachScene();
                 }
 
+                if (overwritePlaceholders || !SceneExists(ProjectPaths.IslandScene))
+                {
+                    SceneBuilder.BuildIslandScene();
+                }
+
                 SceneBuilder.RegisterBuildScenes();
                 PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
                 AssetDatabase.SaveAssets();

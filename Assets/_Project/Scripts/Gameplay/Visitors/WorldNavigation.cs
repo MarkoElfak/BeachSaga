@@ -20,7 +20,7 @@ namespace BeachTycoon.Gameplay
         private readonly List<bool> _spotTaken = new List<bool>();
         private readonly Dictionary<int, Pose> _queueAnchors = new Dictionary<int, Pose>();
         private readonly Dictionary<int, Vector3> _standPositions = new Dictionary<int, Vector3>();
-        private readonly float _queueSpacing;
+        private readonly VisitorConfig _visitors;
         private readonly List<Rect> _obstacles = new List<Rect>();
         private bool _obstaclesDirty = true;
 
@@ -28,7 +28,7 @@ namespace BeachTycoon.Gameplay
         {
             _layout = layout;
             _placement = placement;
-            _queueSpacing = visitors.queueSpacing;
+            _visitors = visitors;
             CreateRelaxSpots(layout, visitors.randomSeed);
             EventBus.Subscribe<ObjectMoved>(OnPlacementChanged);
             EventBus.Subscribe<DecorationPlaced>(OnDecorationPlaced);
@@ -100,7 +100,8 @@ namespace BeachTycoon.Gameplay
         {
             if (_queueAnchors.TryGetValue(standIndex, out Pose anchor))
             {
-                position = anchor.position + anchor.forward * (slot * _queueSpacing);
+                Vector2 offset = QueueLayout.Slot(slot, _visitors);
+                position = anchor.position + anchor.right * offset.x + anchor.forward * offset.y;
                 position.y = 0f;
                 return true;
             }

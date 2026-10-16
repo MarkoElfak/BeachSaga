@@ -22,14 +22,16 @@ namespace BeachTycoon.Gameplay
         private readonly PlacementConfig _config;
         private TerrainShape _terrain;
 
+        /// <param name="followEvents">False for a read-only island (a visit): it ignores the home island's events.</param>
         public PlacementService(GameDatabase database, BuildingManager buildings, List<StandModel> stands,
-            List<DecorationModel> decorations)
+            List<DecorationModel> decorations, bool followEvents = true)
         {
             _database = database;
             _buildings = buildings;
             _stands = stands;
             _decorations = decorations;
             _config = database.placement;
+            if (!followEvents) return;
             EventBus.Subscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
@@ -75,28 +77,32 @@ namespace BeachTycoon.Gameplay
             return spots != null && model.spotIndex < spots.Length ? spots[model.spotIndex] : Vector2.zero;
         }
 
-        /// <summary>The ground the object covers at 'at' (what visitors walk around; no queue space).</summary>
-        public Rect GetFootprint(PlaceableId id, Vector2 at)
+        /// <summary>The ground the object covers at 'at', turned by its yaw (what visitors walk around; no queue).</summary>
+        public Rect GetFootprint(PlaceableId id, Vector2 at) => Footprint(id, at, GetYaw(id));
+
+        /// <summary>Footprint plus anything else the object keeps free (a stand's queue).</summary>
+        public Rect GetBlockingArea(PlaceableId id, Vector2 at) => BlockingRect(id, at, GetYaw(id));
+
+        public bool CanPlace(PlaceableId id, Vector2 at) => CanPlace(id, at, GetYaw(id));
+
+        private bool CanPlace(PlaceableId id, Vector2 at, float yaw) =>
+            IsFree(Footprint(id, at, yaw), BlockingRect(id, at, yaw), id);
+
+        private Rect Footprint(PlaceableId id, Vector2 at, float yaw) =>
+            PlacementRules.Offset(PlacementRules.Rotate(LocalFootprint(id), yaw), at);
+
+        // Unturned footprint relative to the object's origin, as measured from its prefab.
+        private Rect LocalFootprint(PlaceableId id)
         {
             switch (id.Kind)
             {
                 case PlaceableKind.Lot:
-                    Rect lot = BuildingManager.IsHouseLot(id.Index) ? _database.world.houseFootprint : MainFootprint();
-                    return PlacementRules.Offset(lot, at);
+                    return BuildingManager.IsHouseLot(id.Index) ? _database.world.houseFootprint : MainFootprint();
                 case PlaceableKind.Stand:
-                    return PlacementRules.Offset(StandFootprint(id.Index), at);
+                    return StandFootprint(id.Index);
                 default:
-                    return PlacementRules.Offset(DecorationArea(_decorations[id.Index].decorationId), at);
+                    return DecorationArea(_decorations[id.Index].decorationId);
             }
-        }
-
-        /// <summary>Footprint plus anything else the object keeps free (a stand's queue).</summary>
-        public Rect GetBlockingArea(PlaceableId id, Vector2 at) => BlockingRect(id, GetFootprint(id, at), at);
-
-        public bool CanPlace(PlaceableId id, Vector2 at)
-        {
-            Rect footprint = GetFootprint(id, at);
-            return IsFree(footprint, BlockingRect(id, footprint, at), id);
         }
 
         public bool CanPlaceNewDecoration(DecorationDefinition definition, Vector2 at)

@@ -1,12 +1,34 @@
 using System.IO;
 using UnityEditor;
+using BeachTycoon.Services;
 using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>The playtest suites AutoTestRunner can run, their menu items, and the simulated absence.</summary>
+    /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Mini-games", priority = 32)]
+        private static void RequestMiniGames() => File.WriteAllText(RequestPath, SuiteMiniGames);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 10 (new season)", priority = 33)]
+        private static void RequestSeason() => File.WriteAllText(RequestPath, SuiteSeason);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 9 (day/night + events)", priority = 34)]
+        private static void RequestEvents() => File.WriteAllText(RequestPath, SuiteEvents);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 8 (managers)", priority = 35)]
+        private static void RequestManagers() => File.WriteAllText(RequestPath, SuiteManagers);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Polish (queues, rotation, windows)", priority = 36)]
+        private static void RequestPolish() => File.WriteAllText(RequestPath, SuitePolish);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 7 (achievements)", priority = 37)]
+        private static void RequestAchievements() => File.WriteAllText(RequestPath, SuiteAchievements);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 6 (visiting)", priority = 38)]
+        private static void RequestOnline() => File.WriteAllText(RequestPath, SuiteOnline);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 4 (move + performance)", priority = 39)]
         private static void RequestMove() => File.WriteAllText(RequestPath, SuiteMove);
 
@@ -19,22 +41,68 @@ namespace BeachTycoon.EditorTools
         private const string SuiteIsland = "m2";
         private const string SuiteMeta = "m3";
         private const string SuiteMove = "m4";
+        private const string SuiteOnline = "m6";
+        private const string SuiteAchievements = "m7";
+        private const string SuitePolish = "polish";
+        private const string SuiteManagers = "m8";
+        private const string SuiteEvents = "m9";
+        private const string SuiteSeason = "m10";
+        private const string SuiteMiniGames = "games";
+
+        private static bool IsKnownSuite(string suite) =>
+            suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
+            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
-        private static string SuiteTitle => Suite == SuiteIsland ? "M2 island" : Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
+        private static string SuiteTitle
+        {
+            get
+            {
+                if (Suite == SuiteIsland) return "M2 island";
+                if (Suite == SuiteOnline) return "M6 visiting";
+                if (Suite == SuiteAchievements) return "M7 achievements";
+                if (Suite == SuitePolish) return "Polish";
+                if (Suite == SuiteManagers) return "M8 managers";
+                if (Suite == SuiteEvents) return "M9 day/night + events";
+                if (Suite == SuiteSeason) return "M10 new season";
+                if (Suite == SuiteMiniGames) return "Mini-games";
+                return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
+            }
+        }
 
         private static bool IsStepReady(int step)
         {
             if (Suite == SuiteIsland) return PlaytestSteps.IsReady(step);
+            if (Suite == SuiteOnline) return OnlinePlaytestSteps.IsReady(step);
+            if (Suite == SuiteAchievements) return AchievementPlaytestSteps.IsReady(step);
+            if (Suite == SuitePolish) return PolishPlaytestSteps.IsReady(step);
+            if (Suite == SuiteManagers) return ManagerPlaytestSteps.IsReady(step);
+            if (Suite == SuiteEvents) return EventPlaytestSteps.IsReady(step);
+            if (Suite == SuiteSeason) return SeasonPlaytestSteps.IsReady(step);
+            if (Suite == SuiteMiniGames) return MiniGamePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
         private static void RunStep(int step)
         {
             if (Suite == SuiteIsland) PlaytestSteps.Run(step);
+            else if (Suite == SuiteOnline) OnlinePlaytestSteps.Run(step);
+            else if (Suite == SuiteAchievements) AchievementPlaytestSteps.Run(step);
+            else if (Suite == SuitePolish) PolishPlaytestSteps.Run(step);
+            else if (Suite == SuiteManagers) ManagerPlaytestSteps.Run(step);
+            else if (Suite == SuiteEvents) EventPlaytestSteps.Run(step);
+            else if (Suite == SuiteSeason) SeasonPlaytestSteps.Run(step);
+            else if (Suite == SuiteMiniGames) MiniGamePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
+        }
+
+        // Snapshots written by earlier runs (own island, demo friends) start over with the save.
+        private static void DeleteIslandSnapshots()
+        {
+            string folder = Path.Combine(Application.persistentDataPath, LocalIslandRepository.FolderName);
+            if (Directory.Exists(folder)) Directory.Delete(folder, true);
         }
 
         /// <summary>Shifts the save's last-seen time back before the next Play mode starts (offline earnings test).</summary>

@@ -25,5 +25,12 @@ namespace BeachTycoon.Services
             double coins = Math.Max(0.0, incomePerSecond) * seconds * efficiency;
             return (long)Math.Floor(coins);
         }
+
+        /// <summary>Base efficiency plus a bonus per hired manager, capped (never below the base).</summary>
+        public static float Efficiency(float baseEfficiency, float perManager, int managers, float max)
+        {
+            float boosted = Math.Min(max, baseEfficiency + perManager * Math.Max(0, managers));
+            return Math.Max(baseEfficiency, boosted);
+        }
     }
 }

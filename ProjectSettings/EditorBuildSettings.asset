@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Beach.unity
     guid: 05b84a14ad4634f2895010a227e09d9a
+  - enabled: 1
+    path: Assets/_Project/Scenes/Island.unity
+    guid: b2b63c934f891411a96d0b3dfd65f9c9
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -16,15 +16,17 @@ namespace BeachTycoon.Gameplay
         private readonly VisitorConfig _config;
         private readonly System.Random _random;
         private readonly Action<VisitorAgent> _despawn;
+        private readonly StandPicker _picker;
 
         public VisitorStateMachine(WorldNavigation navigation, StandService stands, VisitorConfig config,
-            System.Random random, Action<VisitorAgent> despawn)
+            System.Random random, Action<VisitorAgent> despawn, BeachEventService events = null)
         {
             _navigation = navigation;
             _stands = stands;
             _config = config;
             _random = random;
             _despawn = despawn;
+            _picker = new StandPicker(stands, random, events);
         }
 
         public void Begin(VisitorAgent agent)
@@ -111,7 +113,7 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            StandController stand = PickStand(agent.Type);
+            StandController stand = _picker.Pick(agent.Type);
             if (stand == null || !stand.TryEnqueueOrder(agent.Id, agent.Type.spendMultiplier))
             {
                 StartRelaxing(agent, _config.retryQueueSeconds);
@@ -168,28 +170,6 @@ namespace BeachTycoon.Gameplay
             _navigation.BuildPath(agent.Position, access, agent.Path);
             _navigation.AppendPath(access, entry, agent.Path);
             agent.State = VisitorState.Leaving;
-        }
-
-        private StandController PickStand(VisitorTypeDefinition type)
-        {
-            if (type.preferredProducts != null)
-            {
-                foreach (ProductDefinition product in type.preferredProducts)
-                {
-                    StandController preferred = product != null ? _stands.FindByProduct(product.id) : null;
-                    if (preferred != null && !preferred.IsFull) return preferred;
-                }
-            }
-
-            int count = _stands.Count;
-            int start = count > 0 ? _random.Next(count) : 0;
-            for (int i = 0; i < count; i++)
-            {
-                StandController stand = _stands.Get((start + i) % count);
-                if (!stand.IsFull) return stand;
-            }
-
-            return null;
         }
 
         private float RandomRelaxSeconds()

@@ -7,6 +7,9 @@ namespace BeachTycoon.EditorTools
     /// <summary>Product stands. Each has a counter, a coin anchor, a progress bar and a queue anchor.</summary>
     internal static class StandPrefabs
     {
+        /// <summary>The hat shown while a manager runs the stand; left out of the placement footprint.</summary>
+        public const string ManagerHatName = "ManagerHat";
+
         public static GameObject BuildDonutStand(PaletteDefinition p)
         {
             GameObject root = Counter("DonutStand", p, p.GetMaterial("awning"));
@@ -116,12 +119,28 @@ namespace BeachTycoon.EditorTools
             // Faces the camera (-Z): visitors line up from here toward the bottom of the screen.
             GameObject queueAnchor = PrimitiveKit.Empty("QueueAnchor", t, new Vector3(0f, 0f, -1.7f), new Vector3(0f, 180f, 0f));
             ProgressBarView bar = PrimitiveKit.ProgressBar(t, new Vector3(0f, 2.9f, 0f), 1.4f, p.GetMaterial("barBack"), p.GetMaterial("barFill"));
+            GameObject hat = ManagerHat(t, p);
+            GameObject[] upgrades = StandUpgradePrefabs.Build(t, p);
 
             var view = root.AddComponent<StandView>();
             PrimitiveKit.SetReference(view, "coinAnchor", coinAnchor.transform);
             PrimitiveKit.SetReference(view, "progressBar", bar);
             PrimitiveKit.SetReference(view, "queueAnchor", queueAnchor.transform);
+            PrimitiveKit.SetReference(view, "managerHat", hat);
+            PrimitiveKit.SetReferences(view, "upgradePieces", upgrades);
             return root;
+        }
+
+        // A navy cap with a gold band above the stand's corner: the stand has a manager. Hidden until hired.
+        private static GameObject ManagerHat(Transform parent, PaletteDefinition p)
+        {
+            GameObject hat = PrimitiveKit.Empty(ManagerHatName, parent, new Vector3(0.95f, 2.45f, -0.35f), new Vector3(-15f, 0f, 0f));
+            Material navy = p.GetMaterial("shorts");
+            PrimitiveKit.Part(hat.transform, PrimitiveType.Cylinder, "Brim", Vector3.zero, new Vector3(0.75f, 0.03f, 0.75f), navy);
+            PrimitiveKit.Part(hat.transform, PrimitiveType.Cylinder, "Crown", new Vector3(0f, 0.2f, 0f), new Vector3(0.5f, 0.18f, 0.5f), navy);
+            PrimitiveKit.Part(hat.transform, PrimitiveType.Cylinder, "Band", new Vector3(0f, 0.08f, 0f), new Vector3(0.52f, 0.05f, 0.52f), p.GetMaterial("coin"));
+            hat.SetActive(false);
+            return hat;
         }
 
         // Dough disc, icing disc and a dark centre dot standing in for the hole.

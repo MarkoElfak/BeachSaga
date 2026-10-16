@@ -104,14 +104,32 @@ namespace BeachTycoon.Core
         }
     }
 
-    /// <summary>The player tapped a building or stand: show the upgrade panel for this lot.</summary>
+    /// <summary>
+    /// Show the upgrade panel for this lot's building, or for one stand (level up, hire a manager) when
+    /// StandIndex is set.
+    /// </summary>
     public readonly struct UpgradePanelRequested
     {
         public readonly int LotIndex;
+        public readonly int StandIndex;
 
-        public UpgradePanelRequested(int lotIndex)
+        public UpgradePanelRequested(int lotIndex, int standIndex = -1)
         {
             LotIndex = lotIndex;
+            StandIndex = standIndex;
+        }
+    }
+
+    /// <summary>A manager was hired for a stand: its coins now collect themselves.</summary>
+    public readonly struct ManagerHired
+    {
+        public readonly int StandIndex;
+        public readonly string ProductId;
+
+        public ManagerHired(int standIndex, string productId)
+        {
+            StandIndex = standIndex;
+            ProductId = productId;
         }
     }
 

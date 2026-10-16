@@ -27,6 +27,7 @@ namespace BeachTycoon.Gameplay
         private readonly List<Rect> _flats = new List<Rect>();
         private readonly List<Rect> _occupied = new List<Rect>();
         private PlacementService _placement;
+        private SelectionService _selection;
 
         private void Awake()
         {
@@ -34,7 +35,12 @@ namespace BeachTycoon.Gameplay
             {
                 // Started from the Beach scene in the editor: boot properly, Boot loads Beach again.
                 SceneManager.LoadScene(SceneNames.Boot);
+                return;
             }
+
+            // Created before any view's Start so lots, stands and the HUD can all find it.
+            _selection = new SelectionService(ServiceLocator.Get<PlacementService>());
+            ServiceLocator.Register(_selection);
         }
 
         private void Start()
@@ -73,6 +79,7 @@ namespace BeachTycoon.Gameplay
 
         private void OnDestroy()
         {
+            _selection?.Dispose();
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
         }

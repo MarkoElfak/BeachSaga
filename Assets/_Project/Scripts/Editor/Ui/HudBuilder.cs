@@ -20,16 +20,7 @@ namespace BeachTycoon.EditorTools
             var buttonPrefab = BuildProductButtonPrefab();
             var floatingPrefab = BuildFloatingTextPrefab();
 
-            var canvasGo = new GameObject("HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvasGo.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = ReferenceResolution;
-            scaler.matchWidthOrHeight = 0.5f;
-
-            RectTransform safe = UiKit.Stretch("SafeArea", canvasGo.transform);
-            safe.gameObject.AddComponent<SafeAreaFitter>();
-
+            RectTransform safe = CreateCanvas("HUD");
             BuildTopBar(safe);
             BuildBarView buildBar = BuildBuildBar(safe, buttonPrefab);
 
@@ -40,19 +31,59 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(floating, "worldCamera", worldCamera);
 
             CommunityUiBuilder.BuildQuestTracker(safe);
+            EventUiBuilder.BuildEventBanner(safe);
             CommunityUiBuilder.BuildNeighbourRequest(safe);
             CommunityUiBuilder.BuildToast(safe);
             MetaUiBuilder.BuildBoostButton(safe);
             MetaUiBuilder.BuildTutorial(safe, worldCamera, coins, buildBar);
             PlacementSceneBuilder.BuildMoveHint(safe);
+            PlacementSceneBuilder.BuildSelectionArrows(safe, worldCamera);
             UpgradePanelBuilder.Build(safe);
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
             MetaUiBuilder.BuildSettings(safe);
+            MetaUiBuilder.BuildDailyRewards(safe);
+            OnlineUiBuilder.BuildVisitPanel(safe);
+            AchievementUiBuilder.Build(safe);
+            SeasonUiBuilder.Build(safe);
+            MiniGameUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
+            BringWindowsToFront(safe);
+        }
+
+        // A HUD button built after a window would draw (and take taps) over its backdrop, so windows go last.
+        private static void BringWindowsToFront(RectTransform safe)
+        {
+            foreach (ModalWindow window in safe.GetComponentsInChildren<ModalWindow>(true))
+            {
+                Transform host = window.transform;
+                while (host.parent != safe) host = host.parent;
+                host.SetAsLastSibling();
+            }
+        }
+
+        /// <summary>Portrait overlay canvas scaled from 1080x1920; returns its safe-area root.</summary>
+        public static RectTransform CreateCanvas(string name)
+        {
+            var canvasGo = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGo.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = ReferenceResolution;
+            scaler.matchWidthOrHeight = 0.5f;
+
+            RectTransform safe = UiKit.Stretch("SafeArea", canvasGo.transform);
+            safe.gameObject.AddComponent<SafeAreaFitter>();
+            return safe;
         }
 
         private static void BuildTopBar(Transform parent)
+        {
+            BuildCoinCounter(parent);
+            BuildPopularity(parent);
+        }
+
+        public static void BuildCoinCounter(Transform parent)
         {
             RectTransform coins = UiKit.Rect("CoinPanel", parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -24f), new Vector2(420f, 110f));
             UiKit.AddImage(coins, UiKit.PanelColor);
@@ -61,7 +92,10 @@ namespace BeachTycoon.EditorTools
             RectTransform coinLabelRect = UiKit.Rect("Label", coins, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(110f, 0f), new Vector2(-130f, 0f));
             TextMeshProUGUI coinLabel = UiKit.AddText(coinLabelRect, "0", 60f, TextAlignmentOptions.MidlineLeft, Color.white, FontStyles.Bold);
             PrimitiveKit.SetReference(coins.gameObject.AddComponent<CoinCounterView>(), "label", coinLabel);
+        }
 
+        private static void BuildPopularity(Transform parent)
+        {
             RectTransform pop = UiKit.Rect("PopularityPanel", parent, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-30f, -24f), new Vector2(460f, 110f));
             UiKit.AddImage(pop, UiKit.PanelColor);
             RectTransform popIcon = UiKit.Rect("Icon", pop, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(56f, 0f), new Vector2(52f, 52f));

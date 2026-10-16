@@ -8,7 +8,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Owns every stand: restores them from the save, creates free products when a tier is reached,
-    /// unlocks paid products, upgrades stand levels and ticks serving.
+    /// unlocks paid products, upgrades stand levels, hires managers and ticks serving.
     /// </summary>
     public sealed class StandService : ITickable, IDisposable
     {
@@ -17,12 +17,12 @@ namespace BeachTycoon.Gameplay
         private readonly BuildingManager _buildings;
         private readonly List<StandModel> _models;
         private readonly List<StandController> _stands = new List<StandController>();
-        private readonly IncomeBoost _boost;
+        private readonly SaleMultipliers _multipliers;
 
         public StandService(GameDatabase database, IEconomyService economy, BuildingManager buildings,
-            List<StandModel> savedStands, IncomeBoost boost)
+            List<StandModel> savedStands, SaleMultipliers multipliers)
         {
-            _boost = boost;
+            _multipliers = multipliers;
             _database = database;
             _economy = economy;
             _buildings = buildings;
@@ -90,6 +90,29 @@ namespace BeachTycoon.Gameplay
             return true;
         }
 
+        /// <summary>Stands with a hired manager.</summary>
+        public int ManagerCount
+        {
+            get
+            {
+                int count = 0;
+                for (int i = 0; i < _stands.Count; i++) if (_stands[i].Model.manager) count++;
+                return count;
+            }
+        }
+
+        public bool CanHireManager(StandController stand) =>
+            !stand.Model.manager && _economy.CanAfford(stand.Product.managerCost);
+
+        /// <summary>Pays the product's manager cost once; from then on the stand's coins collect themselves.</summary>
+        public bool TryHireManager(StandController stand)
+        {
+            if (stand.Model.manager || !_economy.TrySpend(stand.Product.managerCost)) return false;
+            stand.Model.manager = true;
+            EventBus.Publish(new ManagerHired(stand.Index, stand.Product.id));
+            return true;
+        }
+
         public void Tick(float deltaTime)
         {
             for (int i = 0; i < _stands.Count; i++)
@@ -137,7 +160,7 @@ namespace BeachTycoon.Gameplay
 
         private StandController AddController(StandModel model, ProductDefinition product)
         {
-            var stand = new StandController(_stands.Count, model, product, _database.economy, _boost);
+            var stand = new StandController(_stands.Count, model, product, _database.economy, _multipliers);
             _stands.Add(stand);
             return stand;
         }

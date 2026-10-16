@@ -12,7 +12,7 @@ namespace BeachTycoon.Gameplay
     /// Reads touches (or the mouse in the editor) through the new Input System and publishes Tap, Drag, Pinch
     /// and HoldStarted (long press). A listener may capture the pointer after a hold (e.g. to move a building):
     /// the camera then stops panning and CapturedPointerMoved / CapturedPointerReleased are sent instead.
-    /// Gestures that start on UI are ignored.
+    /// Gestures that start on UI are ignored, and nothing reaches the map while a full-screen window is open.
     /// </summary>
     [DefaultExecutionOrder(100)]
     public sealed class PointerGestureSource : MonoBehaviour
@@ -34,6 +34,7 @@ namespace BeachTycoon.Gameplay
         private bool _startedOverUi;
         private bool _holdFired;
         private bool _captured;
+        private int _openModals;
 
         public void Initialize(InputConfig config)
         {
@@ -45,22 +46,31 @@ namespace BeachTycoon.Gameplay
 
         public bool IsCaptured => _captured;
 
+        /// <summary>True while a window covers the map.</summary>
+        public bool IsBlocked => _openModals > 0;
+
         private void OnEnable()
         {
             EnhancedTouchSupport.Enable();
+            EventBus.Subscribe<ModalVisibilityChanged>(OnModal);
         }
 
         private void OnDisable()
         {
             EnhancedTouchSupport.Disable();
+            EventBus.Unsubscribe<ModalVisibilityChanged>(OnModal);
+        }
+
+        // A window opening mid-gesture turns the rest of that gesture into a UI gesture (no tap, drag or hold).
+        private void OnModal(ModalVisibilityChanged evt)
+        {
+            _openModals = Mathf.Max(0, _openModals + (evt.Open ? 1 : -1));
+            if (evt.Open) _startedOverUi = true;
         }
 
         private void Update()
         {
-            if (_config == null)
-            {
-                return;
-            }
+            if (_config == null) return;
 
             int count = ReadPointers(out Vector2 p0, out Vector2 p1);
 
@@ -118,7 +128,7 @@ namespace BeachTycoon.Gameplay
             _multiTouch = false;
             _holdFired = false;
             _captured = false;
-            _startedOverUi = _ui.IsOverUi(position);
+            _startedOverUi = IsBlocked || _ui.IsOverUi(position);
 
             float dpi = Screen.dpi > 0f ? Screen.dpi : _config.fallbackDpi;
             float threshold = _config.tapMaxMoveInches * dpi;
@@ -144,10 +154,7 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            if (_startedOverUi || _multiTouch)
-            {
-                return;
-            }
+            if (_startedOverUi || _multiTouch) return;
 
             if (!_dragging && (position - _start).sqrMagnitude > _dragThresholdSqr)
             {
@@ -162,16 +169,10 @@ namespace BeachTycoon.Gameplay
 
         private void Pinch(Vector2 p0, Vector2 p1)
         {
-            if (_startedOverUi)
-            {
-                return;
-            }
+            if (_startedOverUi) return;
 
             float previousDistance = Vector2.Distance(_previous0, _previous1);
-            if (previousDistance < MinPinchDistancePixels)
-            {
-                return;
-            }
+            if (previousDistance < MinPinchDistancePixels) return;
 
             float ratio = Vector2.Distance(p0, p1) / previousDistance;
             EventBus.Publish(new PinchEvent(ratio, (p0 + p1) * 0.5f));
@@ -196,16 +197,10 @@ namespace BeachTycoon.Gameplay
         private void ReadScrollZoom()
         {
             Mouse mouse = Mouse.current;
-            if (mouse == null)
-            {
-                return;
-            }
+            if (mouse == null) return;
 
             float scroll = mouse.scroll.ReadValue().y;
-            if (Mathf.Abs(scroll) < ScrollDeadZone)
-            {
-                return;
-            }
+            if (Mathf.Abs(scroll) < ScrollDeadZone || IsBlocked || _ui.IsOverUi(mouse.position.ReadValue())) return;
 
             float step = 1f + _config.scrollZoomStep;
             float ratio = scroll > 0f ? step : 1f / step;

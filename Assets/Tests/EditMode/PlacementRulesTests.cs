@@ -67,5 +67,40 @@ namespace BeachTycoon.Tests
                 lastRing = ring;
             }
         }
+
+        [Test]
+        public void Rotate_QuarterTurnSwapsTheSides()
+        {
+            var local = new Rect(-1.6f, -1.55f, 3.2f, 3.1f);
+            Assert.AreEqual(local, PlacementRules.Rotate(local, 0f), "no turn");
+            Assert.AreEqual(local, PlacementRules.Rotate(local, 360f), "full circle");
+            AssertRect(Rect.MinMaxRect(-1.55f, -1.6f, 1.55f, 1.6f), PlacementRules.Rotate(local, 90f));
+        }
+
+        [Test]
+        public void Rotate_FollowsUnityYaw()
+        {
+            // A strip in front of the object (towards -z) ends up on its -x side after a clockwise quarter turn,
+            // just like Quaternion.Euler(0, 90, 0) turns (0, 0, -1) into (-1, 0, 0).
+            Rect turned = PlacementRules.Rotate(Rect.MinMaxRect(-0.5f, -3f, 0.5f, 0f), 90f);
+            AssertRect(Rect.MinMaxRect(-3f, -0.5f, 0f, 0.5f), turned);
+            Vector3 unity = Quaternion.Euler(0f, 90f, 0f) * new Vector3(0f, 0f, -3f);
+            Assert.AreEqual(unity.x, turned.xMin, 1e-4f);
+        }
+
+        [Test]
+        public void Rotate_DiagonalTurnUsesTheBoundingBox()
+        {
+            Rect turned = PlacementRules.Rotate(new Rect(-1f, -1f, 2f, 2f), 45f);
+            AssertRect(Rect.MinMaxRect(-Mathf.Sqrt(2f), -Mathf.Sqrt(2f), Mathf.Sqrt(2f), Mathf.Sqrt(2f)), turned);
+        }
+
+        private static void AssertRect(Rect expected, Rect actual)
+        {
+            Assert.AreEqual(expected.xMin, actual.xMin, 1e-4f, "xMin");
+            Assert.AreEqual(expected.xMax, actual.xMax, 1e-4f, "xMax");
+            Assert.AreEqual(expected.yMin, actual.yMin, 1e-4f, "zMin");
+            Assert.AreEqual(expected.yMax, actual.yMax, 1e-4f, "zMax");
+        }
     }
 }

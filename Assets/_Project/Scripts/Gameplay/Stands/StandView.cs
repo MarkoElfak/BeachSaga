@@ -4,8 +4,9 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Shows a stand's serve progress and drops coins on sales. Tapping it opens the upgrade panel; long-pressing
-    /// moves it on its own. Tells WorldNavigation where its queue starts so visitors can line up.
+    /// Shows a stand's serve progress and drops coins on sales (they collect themselves once a manager is hired,
+    /// shown by a hat) and wears one more decoration per mini-game level passed. Tapping selects it (rotate,
+    /// upgrade, play); long-pressing moves it on its own. Tells WorldNavigation where its queue starts.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
     {
@@ -14,6 +15,12 @@ namespace BeachTycoon.Gameplay
 
         [Tooltip("First queue position; the line grows along this transform's forward axis.")]
         [SerializeField] private Transform queueAnchor = null;
+
+        [Tooltip("Shown while the stand has a manager.")]
+        [SerializeField] private GameObject managerHat = null;
+
+        [Tooltip("Shown one by one as the stand's mini-game levels are passed.")]
+        [SerializeField] private GameObject[] upgradePieces = new GameObject[0];
 
         private CoinSpawner _coinSpawner;
         private PlacementService _placement;
@@ -32,15 +39,18 @@ namespace BeachTycoon.Gameplay
             progressBar.SetVisible(false);
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Subscribe<ManagerHired>(OnManagerHired);
+            EventBus.Subscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
+            ShowManager(stand.Model.manager);
+            ShowUpgrades(ServiceLocator.TryGet(out MiniGameService games) ? games.LevelsPassed(stand.Model.productId) : 0);
             SnapToPlacement();
         }
 
         public void OnTapped()
         {
-            if (Stand != null)
-            {
-                EventBus.Publish(new UpgradePanelRequested(Stand.Model.lotIndex));
-            }
+            if (Stand == null) return;
+            float top = SelectionService.TopOf(transform);
+            ServiceLocator.Get<SelectionService>().Select(Placeable, top, Stand.Model.lotIndex);
         }
 
         private void Update()
@@ -62,6 +72,40 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
+            EventBus.Unsubscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
+        }
+
+        public void ShowManager(bool hired)
+        {
+            if (managerHat != null) managerHat.SetActive(hired);
+        }
+
+        /// <summary>Pieces shown so far (one per level passed).</summary>
+        public int UpgradesShown { get; private set; }
+
+        public void ShowUpgrades(int levelsPassed)
+        {
+            UpgradesShown = 0;
+            for (int i = 0; i < upgradePieces.Length; i++)
+            {
+                bool show = i < levelsPassed;
+                if (upgradePieces[i] != null) upgradePieces[i].SetActive(show);
+                if (show) UpgradesShown++;
+            }
+        }
+
+        private void OnMiniGameLevelPassed(MiniGameLevelPassed evt)
+        {
+            if (Stand != null && evt.ProductId == Stand.Model.productId) ShowUpgrades(evt.LevelsPassed);
+        }
+
+        // The new manager picks up whatever is already lying at the stand.
+        private void OnManagerHired(ManagerHired evt)
+        {
+            if (Stand == null || evt.StandIndex != Stand.Index) return;
+            ShowManager(true);
+            _coinSpawner.AutoCollectSource(Stand.Index);
         }
 
         // Its own move, or its lot changing size (stands in the default row slide along).
@@ -72,11 +116,11 @@ namespace BeachTycoon.Gameplay
             if (mine || myLot) SnapToPlacement();
         }
 
-        // Stands sit on levelled ground at height 0, facing the camera.
+        // Stands sit on levelled ground at height 0, turned by their saved yaw (the queue anchor turns too).
         private void SnapToPlacement()
         {
             Vector2 position = _placement.GetStandPosition(Stand.Index);
-            transform.SetPositionAndRotation(new Vector3(position.x, 0f, position.y), Quaternion.identity);
+            transform.SetPositionAndRotation(new Vector3(position.x, 0f, position.y), _placement.GetRotation(Placeable));
             RegisterQueue();
         }
 
@@ -93,7 +137,7 @@ namespace BeachTycoon.Gameplay
         {
             if (Stand != null && evt.StandIndex == Stand.Index)
             {
-                _coinSpawner.Spawn(Stand.Index, coinAnchor.position, evt.Amount);
+                _coinSpawner.Spawn(Stand.Index, coinAnchor.position, evt.Amount, Stand.Model.manager);
             }
         }
     }

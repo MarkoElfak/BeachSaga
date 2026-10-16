@@ -8,6 +8,9 @@ namespace BeachTycoon.Data
     {
         public long coins;
 
+        /// <summary>Coins earned since the season started (version 11); sets the seashells a new season pays.</summary>
+        public long seasonEarned;
+
         public WalletModel()
         {
         }

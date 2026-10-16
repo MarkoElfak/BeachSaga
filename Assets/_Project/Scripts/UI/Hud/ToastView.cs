@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Short messages that slide in and fade: quest done, new neighbour, new building, new land, house info.</summary>
+    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, land, house info.</summary>
     public sealed class ToastView : MonoBehaviour
     {
         private const float ShowSeconds = 2.6f;
@@ -30,6 +30,8 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<HouseTapped>(OnHouseTapped);
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
         }
 
         private void OnDestroy()
@@ -40,10 +42,14 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<HouseTapped>(OnHouseTapped);
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
         }
 
+        /// <summary>Queues a message; one already showing or waiting is not repeated.</summary>
         public void Show(string message)
         {
+            if ((_timer > 0f && label.text == message) || _queue.Contains(message)) return;
             _queue.Enqueue(message);
         }
 
@@ -84,7 +90,12 @@ namespace BeachTycoon.UI
             if (product != null) Show($"Now selling {product.displayName}");
         }
 
+        private void OnRotateBlocked(RotateBlocked evt) => Show("No room to turn it here");
+
         private void OnAreaUnlocked(AreaUnlocked evt) => Show("More beach unlocked! Zoom out to see it");
+
+        private void OnAchievementCompleted(AchievementCompleted evt) =>
+            Show($"Trophy unlocked: {_database.achievements[evt.Index].title}!");
 
         private void OnHouseTapped(HouseTapped evt)
         {

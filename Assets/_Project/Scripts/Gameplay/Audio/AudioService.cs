@@ -69,9 +69,11 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
+            EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
             EventBus.Unsubscribe<NeighbourMovedIn>(OnNeighbourMovedIn);
             EventBus.Unsubscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Unsubscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
+            EventBus.Unsubscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
             EventBus.Unsubscribe<SettingsChanged>(OnSettingsChanged);
         }
 
@@ -84,9 +86,11 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
             EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
+            EventBus.Subscribe<ManagerHired>(OnManagerHired);
             EventBus.Subscribe<NeighbourMovedIn>(OnNeighbourMovedIn);
             EventBus.Subscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Subscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
+            EventBus.Subscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
             EventBus.Subscribe<SettingsChanged>(OnSettingsChanged);
         }
 
@@ -96,9 +100,11 @@ namespace BeachTycoon.Gameplay
         private void OnTierUpgraded(TierUpgraded evt) => Play(SoundId.TierUpgrade);
         private void OnProductUnlocked(ProductUnlocked evt) => Play(SoundId.ProductUnlock);
         private void OnStandUpgraded(StandUpgraded evt) => Play(SoundId.StandUpgrade);
+        private void OnManagerHired(ManagerHired evt) => Play(SoundId.Reward);
         private void OnNeighbourMovedIn(NeighbourMovedIn evt) => Play(SoundId.NeighbourMovedIn);
         private void OnQuestCompleted(QuestCompleted evt) => Play(SoundId.QuestComplete);
         private void OnOfflineRewardClaimed(OfflineRewardClaimed evt) => Play(SoundId.Reward);
+        private void OnDailyRewardClaimed(DailyRewardClaimed evt) => Play(SoundId.Reward);
         private void OnSettingsChanged(SettingsChanged evt) => ApplyMusic();
 
         private void OnLotStateChanged(LotStateChanged evt)

@@ -79,7 +79,9 @@ namespace BeachTycoon.Gameplay
         {
             PlaceableId stand = PlaceableId.Stand(evt.StandIndex);
             Vector2 slot = GetStandPosition(evt.StandIndex);
-            if (!CanPlace(stand, slot) && TryFindFreeSpot(stand, slot, out Vector2 spot)) SetPosition(stand, spot);
+            bool shore = IsShoreOnlyStand(stand); // goes straight to the water
+            Vector2 near = shore ? ShoreStart(evt.StandIndex, slot) : slot;
+            if ((shore || !CanPlace(stand, slot)) && TryFindFreeSpot(stand, near, out Vector2 spot)) SetPosition(stand, spot);
         }
 
         private void OnLotStateChanged(LotStateChanged evt)
@@ -141,7 +143,7 @@ namespace BeachTycoon.Gameplay
         private void MoveAwayFrom(Rect footprint, PlaceableId id)
         {
             Vector2 at = GetPosition(id);
-            Rect blocking = BlockingRect(id, GetFootprint(id, at), at);
+            Rect blocking = BlockingRect(id, at, GetYaw(id));
             if (PlacementRules.Overlaps(footprint, blocking, _config.gap) && TryFindFreeSpot(id, at, out Vector2 spot))
             {
                 SetPosition(id, spot);

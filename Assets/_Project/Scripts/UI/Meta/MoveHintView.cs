@@ -12,7 +12,7 @@ namespace BeachTycoon.UI
     public sealed class MoveHintView : MonoBehaviour
     {
         private const string MovingText = "Drag to a green spot and let go";
-        private const string TipText = "Tip: press and hold any building or decoration to move it";
+        private const string TipText = "Tip: tap a building to turn it, press and hold to move it";
         private const float TipSeconds = 5f;
 
         [SerializeField] private GameObject banner = null;

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d589fca0da4de1943db84122ef105d, type: 3}
+  m_Name: Managers3
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.AchievementDefinition
+  id: Managers3
+  title: Delegator
+  description: Hire {0} stand managers
+  goal: 15
+  product: {fileID: 0}
+  target: 3
+  rewardCoins: 4000
+  rewardBoostMinutes: 10

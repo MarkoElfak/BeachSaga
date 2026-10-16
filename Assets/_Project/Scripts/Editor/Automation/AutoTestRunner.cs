@@ -100,8 +100,7 @@ namespace BeachTycoon.EditorTools
                     {
                         string suite = File.ReadAllText(RequestPath).Trim();
                         File.Delete(RequestPath);
-                        bool known = suite == SuiteIsland || suite == SuiteMove;
-                        SessionState.SetString(KeyPrefix + "Suite", known ? suite : SuiteMeta);
+                        SessionState.SetString(KeyPrefix + "Suite", IsKnownSuite(suite) ? suite : SuiteMeta);
                         Begin();
                     }
                     break;
@@ -122,6 +121,7 @@ namespace BeachTycoon.EditorTools
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
                     {
                         File.Delete(SavePath); // leave the user a fresh game
+                        DeleteIslandSnapshots();
                         CurrentStage = Stage.Idle;
                     }
                     break;
@@ -136,6 +136,7 @@ namespace BeachTycoon.EditorTools
             CurrentStage = Stage.WaitingForPlay; // marks the run active so setup logs are captured
             Write($"Automated playtest ({SuiteTitle}) started " + System.DateTime.UtcNow.ToString("u"));
             File.Delete(SavePath);
+            DeleteIslandSnapshots();
 
             bool setupOk;
             try

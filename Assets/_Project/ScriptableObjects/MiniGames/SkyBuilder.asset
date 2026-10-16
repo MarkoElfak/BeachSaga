@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c815e6387b84e46b6e3f98f98a5e52e, type: 3}
+  m_Name: SkyBuilder
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.MiniGameDefinition
+  id: SkyBuilder
+  kind: 4
+  product: {fileID: 11400000, guid: 974661c15b950407d9d2de950a4ab6c3, type: 2}
+  title: Sky builder
+  howToPlay: A new floor slides from side to side. Tap to drop it between the marks,
+    right on top of the tower.
+  incomeBonusPerLevel: 0.1
+  levels:
+  - target: 5
+    timeLimit: 0
+    lives: 3
+    speed: 0.5
+    pace: 1
+    patience: 3
+    tolerance: 0.3
+    choices: 3
+  - target: 6
+    timeLimit: 0
+    lives: 3
+    speed: 0.65
+    pace: 1
+    patience: 3
+    tolerance: 0.25
+    choices: 3
+  - target: 8
+    timeLimit: 0
+    lives: 3
+    speed: 0.8
+    pace: 1
+    patience: 3
+    tolerance: 0.2
+    choices: 3
+  - target: 10
+    timeLimit: 0
+    lives: 2
+    speed: 1
+    pace: 1
+    patience: 3
+    tolerance: 0.16
+    choices: 3
+  - target: 12
+    timeLimit: 0
+    lives: 2
+    speed: 1.2
+    pace: 1
+    patience: 3
+    tolerance: 0.12
+    choices: 3

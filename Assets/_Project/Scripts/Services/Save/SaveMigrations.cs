@@ -11,6 +11,13 @@ namespace BeachTycoon.Services
             new AddMeta(),
             new AddPositions(),
             new AddStandPositions(),
+            new AddDailyRewards(),
+            new AddOnline(),
+            new AddAchievements(),
+            new AddRotation(),
+            new AddManagers(),
+            new AddSeasons(),
+            new AddMiniGames(),
         };
 
         /// <summary>
@@ -46,6 +53,55 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 4;
             public string Migrate(string json) => json.Replace("\"version\":4", "\"version\":5");
+        }
+
+        /// <summary>v5 -> v6: daily login streak in MetaModel (defaults: never claimed).</summary>
+        private sealed class AddDailyRewards : ISaveMigration
+        {
+            public int FromVersion => 5;
+            public string Migrate(string json) => json.Replace("\"version\":5", "\"version\":6");
+        }
+
+        /// <summary>v6 -> v7: player id and visit-bonus bookkeeping in MetaModel (an id is created on load).</summary>
+        private sealed class AddOnline : ISaveMigration
+        {
+            public int FromVersion => 6;
+            public string Migrate(string json) => json.Replace("\"version\":6", "\"version\":7");
+        }
+
+        /// <summary>v7 -> v8: achievement progress (an empty list; level goals catch up on load).</summary>
+        private sealed class AddAchievements : ISaveMigration
+        {
+            public int FromVersion => 7;
+            public string Migrate(string json) => json.Replace("\"version\":7", "\"version\":8");
+        }
+
+        /// <summary>v8 -> v9: lots, stands and decorations can be turned (yaw defaults to 0, as before).</summary>
+        private sealed class AddRotation : ISaveMigration
+        {
+            public int FromVersion => 8;
+            public string Migrate(string json) => json.Replace("\"version\":8", "\"version\":9");
+        }
+
+        /// <summary>v9 -> v10: stands can have a manager (defaults to none, as before).</summary>
+        private sealed class AddManagers : ISaveMigration
+        {
+            public int FromVersion => 9;
+            public string Migrate(string json) => json.Replace("\"version\":9", "\"version\":10");
+        }
+
+        /// <summary>v10 -> v11: seasons. New fields start at zero (no seashells, first season, nothing earned yet).</summary>
+        private sealed class AddSeasons : ISaveMigration
+        {
+            public int FromVersion => 10;
+            public string Migrate(string json) => json.Replace("\"version\":10", "\"version\":11");
+        }
+
+        /// <summary>v11 -> v12: mini-games. The new list starts empty (no levels passed).</summary>
+        private sealed class AddMiniGames : ISaveMigration
+        {
+            public int FromVersion => 11;
+            public string Migrate(string json) => json.Replace("\"version\":11", "\"version\":12");
         }
     }
 }

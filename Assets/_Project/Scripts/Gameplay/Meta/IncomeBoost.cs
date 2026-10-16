@@ -31,6 +31,18 @@ namespace BeachTycoon.Gameplay
             EventBus.Publish(new IncomeBoostChanged(true));
         }
 
+        /// <summary>Adds boost time on top of whatever is left (daily rewards).</summary>
+        public void Extend(float seconds)
+        {
+            if (seconds <= 0f)
+            {
+                return;
+            }
+
+            _meta.incomeBoostSeconds += seconds;
+            EventBus.Publish(new IncomeBoostChanged(true));
+        }
+
         public void Tick(float deltaTime)
         {
             if (!IsActive)
