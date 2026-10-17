@@ -1,6 +1,7 @@
 using System;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
+using BeachTycoon.Services;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
@@ -17,47 +18,69 @@ namespace BeachTycoon.Gameplay
     }
 
     /// <summary>
-    /// Audio hooks: maps gameplay events to SoundIds and plays whatever clip the SoundLibrary assigns
-    /// (silence when none). A small round-robin pool of 2D AudioSources avoids per-sound allocations.
+    /// Sound and vibration hooks: maps gameplay events to SoundIds, plays the SoundLibrary's clip for each (with
+    /// its volume, pitch variation and repeat limit, scaled by the sound volume setting) and pulses the phone as
+    /// the slot says when vibration is on. A small round-robin pool of 2D AudioSources avoids allocations.
     /// </summary>
     public sealed class AudioService : IDisposable
     {
         private readonly SoundLibrary _library;
         private readonly SettingsService _settings;
+        private readonly IHapticsService _haptics;
         private readonly AudioSource[] _voices;
-        private readonly AudioSource _music;
+        private readonly float[] _lastPlayed;
+        private readonly int[] _played;
         private int _nextVoice;
 
-        public AudioService(SoundLibrary library, SettingsService settings, GameObject host)
+        public AudioService(SoundLibrary library, SettingsService settings, GameObject host, IHapticsService haptics = null)
         {
             _library = library;
             _settings = settings;
+            _haptics = haptics;
             int voiceCount = library != null ? Mathf.Max(1, library.voices) : 1;
             _voices = new AudioSource[voiceCount];
-            for (int i = 0; i < voiceCount; i++)
-            {
-                _voices[i] = CreateSource(host, false);
-            }
-
-            _music = CreateSource(host, true);
+            for (int i = 0; i < voiceCount; i++) _voices[i] = CreateSource(host, false);
+            _lastPlayed = new float[Enum.GetValues(typeof(SoundId)).Length];
+            _played = new int[_lastPlayed.Length];
+            for (int i = 0; i < _lastPlayed.Length; i++) _lastPlayed[i] = float.NegativeInfinity;
             Subscribe();
-            ApplyMusic();
         }
 
-        /// <summary>Number of hooks fired (played or silent); handy for tests.</summary>
+        /// <summary>Number of hooks fired (played, limited or silent); handy for tests.</summary>
         public int HooksFired { get; private set; }
 
-        public void Play(SoundId id)
+        /// <summary>Clips actually started.</summary>
+        public int SoundsPlayed { get; private set; }
+
+        public SoundId LastPlayed { get; private set; }
+
+        /// <summary>How often this hook's clip has started (tests).</summary>
+        public int TimesPlayed(SoundId id) => (int)id < _played.Length ? _played[(int)id] : 0;
+
+        /// <param name="now">Seconds on any steady clock (unscaled time by default); used for the repeat limit.</param>
+        public void Play(SoundId id) => Play(id, Time.unscaledTime);
+
+        public void Play(SoundId id, float now)
         {
             HooksFired++;
-            if (!_settings.SoundOn || _library == null || !_library.TryGet(id, out SoundEntry entry))
+            if (_library == null || !_library.TryGetEntry(id, out SoundEntry entry)) return;
+            int slot = (int)id;
+            if (slot < _lastPlayed.Length)
             {
-                return;
+                if (now - _lastPlayed[slot] < entry.minInterval) return;
+                _lastPlayed[slot] = now;
             }
+
+            if (_haptics != null && _settings.VibrationOn) _haptics.Play(entry.haptic);
+            if (entry.clip == null || _settings.SoundVolume <= 0f) return;
 
             AudioSource voice = _voices[_nextVoice];
             _nextVoice = (_nextVoice + 1) % _voices.Length;
-            voice.PlayOneShot(entry.clip, entry.volume);
+            voice.pitch = 1f + UnityEngine.Random.Range(-entry.pitchJitter, entry.pitchJitter);
+            voice.PlayOneShot(entry.clip, entry.volume * _settings.SoundVolume);
+            SoundsPlayed++;
+            if (slot < _played.Length) _played[slot]++;
+            LastPlayed = id;
         }
 
         public void Dispose()
@@ -74,7 +97,9 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Unsubscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
             EventBus.Unsubscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
-            EventBus.Unsubscribe<SettingsChanged>(OnSettingsChanged);
+            EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Unsubscribe<BeachEventStarted>(OnBeachEventStarted);
+            EventBus.Unsubscribe<MoveEnded>(OnMoveEnded);
         }
 
         private void Subscribe()
@@ -91,7 +116,9 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<QuestCompleted>(OnQuestCompleted);
             EventBus.Subscribe<OfflineRewardClaimed>(OnOfflineRewardClaimed);
             EventBus.Subscribe<DailyRewardClaimed>(OnDailyRewardClaimed);
-            EventBus.Subscribe<SettingsChanged>(OnSettingsChanged);
+            EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
+            EventBus.Subscribe<BeachEventStarted>(OnBeachEventStarted);
+            EventBus.Subscribe<MoveEnded>(OnMoveEnded);
         }
 
         private void OnSoundRequested(SoundRequested evt) => Play(evt.Id);
@@ -105,7 +132,13 @@ namespace BeachTycoon.Gameplay
         private void OnQuestCompleted(QuestCompleted evt) => Play(SoundId.QuestComplete);
         private void OnOfflineRewardClaimed(OfflineRewardClaimed evt) => Play(SoundId.Reward);
         private void OnDailyRewardClaimed(DailyRewardClaimed evt) => Play(SoundId.Reward);
-        private void OnSettingsChanged(SettingsChanged evt) => ApplyMusic();
+        private void OnAchievementCompleted(AchievementCompleted evt) => Play(SoundId.Trophy);
+        private void OnBeachEventStarted(BeachEventStarted evt) => Play(SoundId.EventStart);
+
+        private void OnMoveEnded(MoveEnded evt)
+        {
+            if (evt.Committed) Play(SoundId.Place);
+        }
 
         private void OnLotStateChanged(LotStateChanged evt)
         {
@@ -114,21 +147,6 @@ namespace BeachTycoon.Gameplay
             {
                 Play(SoundId.BuildStart);
             }
-        }
-
-        private void ApplyMusic()
-        {
-            AudioClip clip = _library != null ? _library.music : null;
-            bool shouldPlay = clip != null && _settings.MusicOn;
-            if (!shouldPlay)
-            {
-                _music.Stop();
-                return;
-            }
-
-            if (_music.clip != clip) _music.clip = clip;
-            _music.volume = _library.musicVolume;
-            if (!_music.isPlaying) _music.Play();
         }
 
         private static AudioSource CreateSource(GameObject host, bool loop)

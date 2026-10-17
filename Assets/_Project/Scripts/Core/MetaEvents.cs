@@ -22,6 +22,19 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>The player answered (or changed) the privacy question.</summary>
+    public readonly struct PrivacyChanged
+    {
+        public readonly bool AnalyticsAllowed;
+        public readonly bool PersonalizedAds;
+
+        public PrivacyChanged(bool analyticsAllowed, bool personalizedAds)
+        {
+            AnalyticsAllowed = analyticsAllowed;
+            PersonalizedAds = personalizedAds;
+        }
+    }
+
     /// <summary>Sound or music settings changed.</summary>
     public readonly struct SettingsChanged
     {

@@ -13,7 +13,7 @@ namespace BeachTycoon.Gameplay
     /// ticks them each frame, saves on pause/quit and then loads the Beach scene.
     /// </summary>
     [DefaultExecutionOrder(-1000)]
-    public sealed class GameBootstrap : MonoBehaviour
+    public sealed partial class GameBootstrap : MonoBehaviour
     {
         [SerializeField] private GameDatabase database = null;
 
@@ -52,7 +52,7 @@ namespace BeachTycoon.Gameplay
         }
 
         // Order follows the design doc: Save, Economy, Progression, Building, Visitors, Neighbours, UI.
-        // Platform seams (analytics, ads, IAP) come right after Save so every later service can use them.
+        // Platform seams (privacy, analytics, ads, IAP) come right after Save so every later service can use them.
         private void CreateServices()
         {
             ServiceLocator.Register(database);
@@ -65,12 +65,8 @@ namespace BeachTycoon.Gameplay
             GameSaveData data = _save.Data;
             MonetizationConfig monetization = database.monetization;
 
-            var analytics = new MockAnalyticsService(monetization.logAnalyticsToConsole);
-            ServiceLocator.Register<IAnalyticsService>(analytics);
-            var ads = new MockAdsService(monetization.mockAdSeconds);
-            ServiceLocator.Register<IAdsService>(ads);
-            _tickables.Add(ads);
-            ServiceLocator.Register<IIapService>(new MockIapService(data.meta, monetization.removeAdsProductId));
+            var privacy = Add(new PrivacyService(data.meta.settings));
+            IAnalyticsService analytics = AddPlatform(data, monetization, privacy, out IAdsService ads);
 
             var economy = new EconomyService(data.wallet);
             ServiceLocator.Register<IEconomyService>(economy);
@@ -87,7 +83,7 @@ namespace BeachTycoon.Gameplay
             var stands = Add(new StandService(database, economy, buildings, data.stands, sales));
             events.AttachStands(stands);
             placement.EnsureShoreStands();
-            Add(new DayClock(database.dayNight, data.meta));
+            var dayClock = Add(new DayClock(database.dayNight, data.meta));
             var popularity = Add(new PopularityService(database, progression, stands));
             Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
             var navigation = Add(new WorldNavigation(database.world, database.visitors, placement));
@@ -104,7 +100,7 @@ namespace BeachTycoon.Gameplay
                 boost, ads, analytics));
             AddOnline(data, placement, popularity, clock, estimator, economy, analytics);
             Add(AchievementService.Create(database, data, buildings, stands, neighbours, economy, boost, analytics));
-            Add(new AudioService(database.sounds, settings, gameObject));
+            AddFeedback(settings, dayClock);
             Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
 
             // UI lives in the Beach scene and resolves services from the locator.

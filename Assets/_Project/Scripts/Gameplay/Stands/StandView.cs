@@ -1,4 +1,5 @@
 using BeachTycoon.Core;
+using BeachTycoon.Data;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
@@ -41,6 +42,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<ManagerHired>(OnManagerHired);
             EventBus.Subscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
+            EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
             ShowManager(stand.Model.manager);
             ShowUpgrades(ServiceLocator.TryGet(out MiniGameService games) ? games.LevelsPassed(stand.Model.productId) : 0);
             SnapToPlacement();
@@ -74,6 +76,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
             EventBus.Unsubscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
+            EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
         }
 
         public void ShowManager(bool hired)
@@ -97,7 +100,21 @@ namespace BeachTycoon.Gameplay
 
         private void OnMiniGameLevelPassed(MiniGameLevelPassed evt)
         {
-            if (Stand != null && evt.ProductId == Stand.Model.productId) ShowUpgrades(evt.LevelsPassed);
+            if (Stand == null || evt.ProductId != Stand.Model.productId) return;
+            ShowUpgrades(evt.LevelsPassed);
+            Punch();
+        }
+
+        private void OnStandUpgraded(StandUpgraded evt)
+        {
+            if (Stand != null && evt.StandIndex == Stand.Index) Punch();
+        }
+
+        /// <summary>A quick springy bounce (levelled up, new manager, new decoration, just built).</summary>
+        public void Punch()
+        {
+            PresentationConfig config = ServiceLocator.Get<GameDatabase>().presentation;
+            ScalePunch.On(this, config.punchScale, config.punchSeconds);
         }
 
         // The new manager picks up whatever is already lying at the stand.
@@ -105,6 +122,7 @@ namespace BeachTycoon.Gameplay
         {
             if (Stand == null || evt.StandIndex != Stand.Index) return;
             ShowManager(true);
+            Punch();
             _coinSpawner.AutoCollectSource(Stand.Index);
         }
 

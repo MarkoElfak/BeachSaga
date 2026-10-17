@@ -41,7 +41,7 @@ namespace BeachTycoon.EditorTools
             UpgradePanelBuilder.Build(safe);
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
-            MetaUiBuilder.BuildSettings(safe);
+            SettingsUiBuilder.Build(safe);
             MetaUiBuilder.BuildDailyRewards(safe);
             OnlineUiBuilder.BuildVisitPanel(safe);
             AchievementUiBuilder.Build(safe);
@@ -49,6 +49,8 @@ namespace BeachTycoon.EditorTools
             MiniGameUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
             BringWindowsToFront(safe);
+            safe.Find("PrivacyPanel").SetAsLastSibling(); // the first-launch question sits above everything
+            FeelUiBuilder.BuildConfetti(safe); // over everything, windows included
         }
 
         // A HUD button built after a window would draw (and take taps) over its backdrop, so windows go last.

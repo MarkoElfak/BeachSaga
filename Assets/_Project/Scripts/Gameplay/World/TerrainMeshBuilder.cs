@@ -8,6 +8,9 @@ namespace BeachTycoon.Gameplay
     {
         private const float NormalSampleDistance = 0.25f;
 
+        // Ground this far above the water still gets water over it, so the shoreline stays continuous.
+        private const float DryMargin = 0.05f;
+
         public static Mesh BuildTerrain(TerrainShape shape, float cellSize)
         {
             Rect rect = shape.TerrainRect;
@@ -49,6 +52,7 @@ namespace BeachTycoon.Gameplay
             int gridCount = stride * (rows + 1);
             var vertices = new Vector3[gridCount + 8];
             var colors = new Color[vertices.Length];
+            var wet = new bool[gridCount];
             float y = shape.WaterLevel;
 
             for (int r = 0; r <= rows; r++)
@@ -57,9 +61,11 @@ namespace BeachTycoon.Gameplay
                 {
                     float x = rect.xMin + (float)c / columns * rect.width;
                     float z = rect.yMin + (float)r / rows * rect.height;
-                    float depth = Mathf.Max(0f, shape.WaterDepth(x, z));
+                    float signedDepth = shape.WaterDepth(x, z);
+                    float depth = Mathf.Max(0f, signedDepth);
                     bool border = r == 0 || c == 0 || r == rows || c == columns;
                     int i = r * stride + c;
+                    wet[i] = signedDepth > -DryMargin || border;
                     vertices[i] = new Vector3(x, y, z);
                     colors[i] = new Color(1f - Mathf.Clamp01(depth / shoreRange), Mathf.Clamp01(depth / deepRange), border ? 0f : 1f, 1f);
                 }
@@ -75,10 +81,10 @@ namespace BeachTycoon.Gameplay
                 colors[gridCount + k] = new Color(0f, 1f, 0f, 1f);
             }
 
-            int[] grid = Grid(columns, rows);
-            var triangles = new int[grid.Length + 24];
-            grid.CopyTo(triangles, 0);
-            int t = grid.Length;
+            int[] grid = WetGrid(columns, rows, wet, out int gridLength);
+            var triangles = new int[gridLength + 24];
+            System.Array.Copy(grid, triangles, gridLength);
+            int t = gridLength;
             for (int side = 0; side < 4; side++)
             {
                 int a = gridCount + side, b = gridCount + (side + 1) % 4;
@@ -99,6 +105,24 @@ namespace BeachTycoon.Gameplay
             float hx = shape.Height(x + d, z) - shape.Height(x - d, z);
             float hz = shape.Height(x, z + d) - shape.Height(x, z - d);
             return new Vector3(-hx, 2f * d, -hz).normalized;
+        }
+
+        // Water cells with at least one corner in (or just under) the sea. Water hidden under the island is left out:
+        // it costs fill rate on phones and must never show through the sand.
+        private static int[] WetGrid(int columns, int rows, bool[] wet, out int length)
+        {
+            int[] grid = Grid(columns, rows);
+            int stride = columns + 1;
+            length = 0;
+            for (int t = 0; t < grid.Length; t += 6)
+            {
+                int i = grid[t];
+                if (!wet[i] && !wet[i + 1] && !wet[i + stride] && !wet[i + stride + 1]) continue;
+                System.Array.Copy(grid, t, grid, length, 6);
+                length += 6;
+            }
+
+            return grid;
         }
 
         private static int[] Grid(int columns, int rows)

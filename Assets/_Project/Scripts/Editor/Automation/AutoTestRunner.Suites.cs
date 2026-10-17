@@ -8,6 +8,12 @@ namespace BeachTycoon.EditorTools
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 12 (release)", priority = 30)]
+        private static void RequestRelease() => File.WriteAllText(RequestPath, SuiteRelease);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 11 (sound and feel)", priority = 31)]
+        private static void RequestFeel() => File.WriteAllText(RequestPath, SuiteFeel);
+
         [MenuItem("Beach Tycoon/Run Playtest: Mini-games", priority = 32)]
         private static void RequestMiniGames() => File.WriteAllText(RequestPath, SuiteMiniGames);
 
@@ -48,10 +54,13 @@ namespace BeachTycoon.EditorTools
         private const string SuiteEvents = "m9";
         private const string SuiteSeason = "m10";
         private const string SuiteMiniGames = "games";
+        private const string SuiteFeel = "feel";
+        private const string SuiteRelease = "release";
 
         private static bool IsKnownSuite(string suite) =>
             suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
-            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames;
+            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames
+            || suite == SuiteFeel || suite == SuiteRelease;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -67,6 +76,8 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteEvents) return "M9 day/night + events";
                 if (Suite == SuiteSeason) return "M10 new season";
                 if (Suite == SuiteMiniGames) return "Mini-games";
+                if (Suite == SuiteFeel) return "M11 sound and feel";
+                if (Suite == SuiteRelease) return "M12 release";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -81,6 +92,8 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteEvents) return EventPlaytestSteps.IsReady(step);
             if (Suite == SuiteSeason) return SeasonPlaytestSteps.IsReady(step);
             if (Suite == SuiteMiniGames) return MiniGamePlaytestSteps.IsReady(step);
+            if (Suite == SuiteFeel) return FeelPlaytestSteps.IsReady(step);
+            if (Suite == SuiteRelease) return ReleasePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -94,6 +107,8 @@ namespace BeachTycoon.EditorTools
             else if (Suite == SuiteEvents) EventPlaytestSteps.Run(step);
             else if (Suite == SuiteSeason) SeasonPlaytestSteps.Run(step);
             else if (Suite == SuiteMiniGames) MiniGamePlaytestSteps.Run(step);
+            else if (Suite == SuiteFeel) FeelPlaytestSteps.Run(step);
+            else if (Suite == SuiteRelease) ReleasePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
         }

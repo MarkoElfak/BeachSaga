@@ -76,8 +76,9 @@ namespace BeachTycoon.EditorTools
                     PlaytestTools.CapturePortraitWithHud("m3_2_boost_active.png");
                     SettingsPanelView settings = PlaytestTools.Find<SettingsPanelView>();
                     PlaytestTools.Click(PlaytestTools.Find<Canvas>(), "SettingsButton"); // sits on the HUD, outside the panel
-                    PlaytestTools.Click(settings, "SoundButton");
-                    Check(settings.IsOpen && !ServiceLocator.Get<SettingsService>().SoundOn, "settings panel turns sound off");
+                    PlaytestTools.SetSlider(settings, "SoundSlider", 0f);
+                    Check(settings.IsOpen && !ServiceLocator.Get<SettingsService>().SoundOn && settings.SoundText == "Sound: OFF",
+                        $"dragging the sound slider to 0 turns sound off ('{settings.SoundText}')");
                     PlaytestTools.CapturePortraitWithHud("m3_3_settings.png");
                     PlaytestTools.Click(settings, "CloseButton");
                     Check(ServiceLocator.Get<AudioService>().HooksFired > 0, $"audio hooks fired ({ServiceLocator.Get<AudioService>().HooksFired})");

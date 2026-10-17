@@ -70,7 +70,7 @@ namespace BeachTycoon.Gameplay
             var offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * _config.coinRingRadius;
 
             CoinPickupView coin = _pool.Get();
-            coin.Show(sourceId, anchorPosition + offset, amount);
+            coin.Show(sourceId, anchorPosition + offset, amount, anchorPosition);
             _active.Add(coin);
             if (autoCollect) coin.StartAutoCollect();
         }

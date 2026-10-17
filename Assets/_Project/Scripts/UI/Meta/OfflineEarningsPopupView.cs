@@ -56,7 +56,7 @@ namespace BeachTycoon.UI
             int minutes = seconds % SecondsPerHour / SecondsPerMinute;
             string away = hours > 0 ? $"{hours}h {minutes}m" : $"{minutes}m";
             body.text = $"Your beach kept working for {away}.\nYou earned <b>{NumberFormatter.Format(_offline.PendingCoins)}</b> coins.";
-            doubleLabel.text = $"Watch ad: {NumberFormatter.Format(_offline.DoubledCoins)}";
+            doubleLabel.text = $"{AdWording.Watch(_ads)}: {NumberFormatter.Format(_offline.DoubledCoins)}";
             doubleButton.gameObject.SetActive(_ads.IsRewardedReady);
             root.SetActive(true);
         }

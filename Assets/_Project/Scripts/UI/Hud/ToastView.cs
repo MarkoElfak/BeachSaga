@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Gameplay;
+using BeachTycoon.Services;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace BeachTycoon.UI
     {
         private const float ShowSeconds = 2.6f;
         private const float FadeSeconds = 0.35f;
+        private const float MaxStep = 0.1f;
 
         [SerializeField] private CanvasGroup group = null;
         [SerializeField] private TMP_Text label = null;
@@ -19,6 +21,8 @@ namespace BeachTycoon.UI
         private readonly Queue<string> _queue = new Queue<string>();
         private float _timer;
         private GameDatabase _database;
+
+        public string Text => label.text;
 
         private void Start()
         {
@@ -32,6 +36,15 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
+            if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
+        }
+
+        // A damaged save is never silent: the player learns what was restored.
+        private void ShowRecovery(SaveRecovery recovery)
+        {
+            if (recovery == SaveRecovery.FromBackup) Show("Your save was damaged, so the backup was restored.");
+            else if (recovery == SaveRecovery.FromUnfinishedWrite) Show("Your last save was restored.");
+            else if (recovery == SaveRecovery.NewGame) Show("Your save could not be read, so a new beach was started.");
         }
 
         private void OnDestroy()
@@ -62,7 +75,7 @@ namespace BeachTycoon.UI
                 _timer = ShowSeconds;
             }
 
-            _timer -= Time.unscaledDeltaTime;
+            _timer -= Mathf.Min(Time.unscaledDeltaTime, MaxStep); // a loading hitch must not swallow a message
             float fadeIn = Mathf.Clamp01((ShowSeconds - _timer) / FadeSeconds);
             float fadeOut = Mathf.Clamp01(_timer / FadeSeconds);
             group.alpha = Mathf.Min(fadeIn, fadeOut);

@@ -131,8 +131,17 @@ namespace BeachTycoon.UI
         {
             _view.Render();
             if (Game.HasTimeLimit) MiniGameView.SetFill(timerFill, Game.TimeLeft / Game.Level.timeLimit);
-            if (_shownScore != Game.Score) scoreText.text = $"{(_shownScore = Game.Score)} / {Game.Target}";
-            if (_shownLives != Game.LivesLeft) livesText.text = LivesText(_shownLives = Game.LivesLeft);
+            if (_shownScore != Game.Score)
+            {
+                if (_shownScore >= 0 && Game.Score > _shownScore) EventBus.Publish(new SoundRequested(SoundId.MiniGameHit));
+                scoreText.text = $"{(_shownScore = Game.Score)} / {Game.Target}";
+            }
+
+            if (_shownLives != Game.LivesLeft)
+            {
+                if (_shownLives >= 0 && Game.LivesLeft < _shownLives) EventBus.Publish(new SoundRequested(SoundId.MiniGameMiss));
+                livesText.text = LivesText(_shownLives = Game.LivesLeft);
+            }
         }
 
         private void ShowIntro()
@@ -147,7 +156,7 @@ namespace BeachTycoon.UI
         {
             bool won = Game.State == MiniGameState.Won;
             LastRunRewarded = _games.ReportResult(Definition, LevelIndex, won);
-            EventBus.Publish(new SoundRequested(won ? SoundId.Reward : SoundId.UiClick));
+            EventBus.Publish(new SoundRequested(won ? SoundId.MiniGameWin : SoundId.MiniGameLose));
             ShowPage(resultPage);
             FillResult(won);
         }

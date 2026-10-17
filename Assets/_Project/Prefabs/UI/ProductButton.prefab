@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 5352021689307282609}
   - component: {fileID: 4391149094619961911}
   - component: {fileID: 8016063436263998299}
+  - component: {fileID: 6690712891106235356}
   - component: {fileID: 5817109974377604849}
   m_Layer: 0
   m_Name: ProductButton
@@ -261,6 +262,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6690712891106235356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368839483141429168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc06da431804da6ab78f40db005ac58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BeachTycoon.UI::BeachTycoon.UI.ButtonFeel
+  pressedScale: 0.92
+  stiffness: 320
+  damping: 16
 --- !u!114 &5817109974377604849
 MonoBehaviour:
   m_ObjectHideFlags: 0

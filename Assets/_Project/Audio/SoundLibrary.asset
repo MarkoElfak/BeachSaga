@@ -14,35 +14,109 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.SoundLibrary
   sounds:
   - id: 0
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 70a251c4a672c4d30865c4ac296c2048, type: 3}
+    volume: 0.6
+    pitchJitter: 0.08
+    minInterval: 0.05
+    haptic: 1
   - id: 1
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 8a772656382b14cd585a0d0930772b18, type: 3}
+    volume: 0.3
+    pitchJitter: 0.1
+    minInterval: 0.12
+    haptic: 0
   - id: 2
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: b4ba5cd29dabe40619cd94f4189543a5, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 1
   - id: 3
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 54f96c3a64e6d4e66b2b1e5dee94a948, type: 3}
+    volume: 0.85
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 3
   - id: 4
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 8f7940144b3624d7d83bfa781245214e, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
   - id: 5
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 1b97131bd51434c268c09c3e719afe25, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
   - id: 6
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 513fd5c9ae54b4b33bd232200e6d0dea, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
   - id: 7
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 6fd96fe6514e64399a96bc6ab0e913f1, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
   - id: 8
-    clip: {fileID: 0}
-    volume: 1
+    clip: {fileID: 8300000, guid: 3b2c093cb902247329c753b8eea1a019, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
   - id: 9
-    clip: {fileID: 0}
-    volume: 1
-  music: {fileID: 0}
-  musicVolume: 0.5
+    clip: {fileID: 8300000, guid: ef372866e3ed647599f139cee083a801, type: 3}
+    volume: 0.5
+    pitchJitter: 0.05
+    minInterval: 0.03
+    haptic: 0
+  - id: 10
+    clip: {fileID: 8300000, guid: a87e2816e7f4d49f59caefd1c1d40ef9, type: 3}
+    volume: 0.6
+    pitchJitter: 0.06
+    minInterval: 0.03
+    haptic: 1
+  - id: 11
+    clip: {fileID: 8300000, guid: 5b5289ab93fee4757b3bf97ff5ecf569, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
+  - id: 12
+    clip: {fileID: 8300000, guid: 155f5c919c2f348c8b68e5331d4a9380, type: 3}
+    volume: 0.85
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 3
+  - id: 13
+    clip: {fileID: 8300000, guid: ca689f6f6933e44f98a6e3da92d4cf3d, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
+  - id: 14
+    clip: {fileID: 8300000, guid: d200ec0c29f804efd901bbeaa9044506, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 2
+  - id: 15
+    clip: {fileID: 8300000, guid: 1f02cb9b1aacd499d8f55d0e1e535ffe, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    minInterval: 0
+    haptic: 1
+  - id: 16
+    clip: {fileID: 8300000, guid: ba50eebfa58e64959a9b702f291b79c2, type: 3}
+    volume: 0.7
+    pitchJitter: 0.08
+    minInterval: 0.05
+    haptic: 1
+  music: {fileID: 8300000, guid: 50369f94364cf46f49127742d35867b1, type: 3}
+  nightMusic: {fileID: 8300000, guid: 02980573c10424f75b9230ddeab88e0d, type: 3}
+  musicVolume: 0.45
+  musicFadeSeconds: 4
   voices: 6

@@ -49,7 +49,28 @@ namespace BeachTycoon.Data
     [Serializable]
     public sealed class SettingsModel
     {
+        // Version 3 on/off switches; since version 13 the volumes decide (0 = off) and these are unused.
         public bool soundOn = true;
         public bool musicOn = true;
+
+        // Version 13: volume sliders and vibration.
+        public float soundVolume = 1f;
+        public float musicVolume = 1f;
+        public bool vibrationOn = true;
+
+        // Version 14: the player's answer to the privacy question (PrivacyChoice; 0 = not asked yet).
+        public int privacy;
+    }
+
+    /// <summary>What the player allowed when asked about privacy.</summary>
+    public enum PrivacyChoice
+    {
+        NotAsked = 0,
+
+        /// <summary>Analytics and personalised ads.</summary>
+        Accepted = 1,
+
+        /// <summary>Only what the game needs to run: no analytics, non-personalised ads.</summary>
+        Declined = 2,
     }
 }

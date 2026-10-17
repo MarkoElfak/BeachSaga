@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 12;
+        public const int CurrentVersion = 14;
 
         public int version = CurrentVersion;
 
@@ -39,6 +39,8 @@ namespace BeachTycoon.Data
         // Version 10: stands can have a manager (StandModel.manager).
         // Version 11: seasons (MetaModel.seashells, seasonsCompleted; WalletModel.seasonEarned).
         // Version 12: mini-games (miniGames).
+        // Version 13: sound and music volumes, vibration (SettingsModel).
+        // Version 14: privacy choice (SettingsModel.privacy).
 
         public static GameSaveData CreateNew(long startingCoins)
         {
