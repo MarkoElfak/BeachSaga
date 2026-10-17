@@ -58,7 +58,9 @@ namespace BeachTycoon.EditorTools
         public static string Build(string platform)
         {
             if (platform == "android-dev" || platform == "android-gles") return BuildAndroidTest(platform == "android-gles");
-            return Build(platform, BuildOptions.None, null);
+            // Store builds are always clean: an incremental Android build once shipped without the 3D world.
+            BuildOptions options = platform == "mac" ? BuildOptions.None : BuildOptions.CleanBuildCache;
+            return Build(platform, options, null);
         }
 
         private static string BuildAndroidTest(bool gles)
