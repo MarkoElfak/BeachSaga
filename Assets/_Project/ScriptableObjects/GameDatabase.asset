@@ -29,6 +29,7 @@ MonoBehaviour:
   online: {fileID: 11400000, guid: f26e6efc7d884102a497024a0f4e879e, type: 2}
   dayNight: {fileID: 11400000, guid: 25e5dde6f005f4348b216720bca4425d, type: 2}
   beachEvents: {fileID: 11400000, guid: 220dbbce4a5914e29a0aa3a3c76b215d, type: 2}
+  village: {fileID: 11400000, guid: 5115c740c15df45028136f362b65e446, type: 2}
   tiers:
   - {fileID: 11400000, guid: cfd40ba1c17d84fc7ae4a586c9117472, type: 2}
   - {fileID: 11400000, guid: 4a9d9966489394ce1ac48cf396d0270d, type: 2}

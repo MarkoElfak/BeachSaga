@@ -9,6 +9,7 @@ namespace BeachTycoon.Data
     {
         public string ownerId;
         public string displayName;
+        public string villageName;
         [Min(1)] public int tier;
         [Min(0)] public int houses;
         [Min(0)] public int decorations;
@@ -41,9 +42,9 @@ namespace BeachTycoon.Data
         [Header("Mock friends")]
         public DemoIsland[] demoFriends =
         {
-            new DemoIsland { ownerId = "demo-coral", displayName = "Coral", tier = 2, houses = 1, decorations = 3, popularity = 0.6f },
-            new DemoIsland { ownerId = "demo-kai", displayName = "Kai", tier = 3, houses = 3, decorations = 6, popularity = 1.2f },
-            new DemoIsland { ownerId = "demo-marina", displayName = "Marina", tier = 5, houses = 5, decorations = 10, popularity = 2.1f },
+            new DemoIsland { ownerId = "demo-coral", displayName = "Coral", villageName = "Coral Cove", tier = 2, houses = 1, decorations = 3, popularity = 0.6f },
+            new DemoIsland { ownerId = "demo-kai", displayName = "Kai", villageName = "Palm Harbour", tier = 3, houses = 3, decorations = 6, popularity = 1.2f },
+            new DemoIsland { ownerId = "demo-marina", displayName = "Marina", villageName = "Marina Bay", tier = 5, houses = 5, decorations = 10, popularity = 2.1f },
         };
     }
 }

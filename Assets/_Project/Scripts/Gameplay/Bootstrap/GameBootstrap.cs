@@ -71,6 +71,7 @@ namespace BeachTycoon.Gameplay
             var economy = new EconomyService(data.wallet);
             ServiceLocator.Register<IEconomyService>(economy);
             var settings = Add(new SettingsService(data.meta.settings));
+            var village = Add(new VillageService(database.village, data.meta, analytics));
             var boost = Add(new IncomeBoost(monetization, data.meta));
             var season = Add(new SeasonService(database.economy, data, analytics, Reboot));
 
@@ -98,7 +99,7 @@ namespace BeachTycoon.Gameplay
             Add(new TutorialService(database.tutorial, data.meta, buildings));
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
                 boost, ads, analytics));
-            AddOnline(data, placement, popularity, clock, estimator, economy, analytics);
+            AddOnline(data, village, placement, popularity, clock, estimator, economy, analytics);
             Add(AchievementService.Create(database, data, buildings, stands, neighbours, economy, boost, analytics));
             AddFeedback(settings, dayClock);
             Add(new AnalyticsReporter(analytics)).LogSessionStart(_save.LoadedFromDisk);
@@ -110,7 +111,7 @@ namespace BeachTycoon.Gameplay
         }
 
         // Online seams with local mocks: identity, snapshot storage (demo friends seeded) and visiting.
-        private void AddOnline(GameSaveData data, PlacementService placement, PopularityService popularity,
+        private void AddOnline(GameSaveData data, VillageService village, PlacementService placement, PopularityService popularity,
             ITimeProvider clock, IncomeEstimator estimator, IEconomyService economy, IAnalyticsService analytics)
         {
             var auth = new LocalAuthService(data.meta, database.online.defaultPlayerName);
@@ -121,7 +122,7 @@ namespace BeachTycoon.Gameplay
             ServiceLocator.Register<ISocialService>(social);
             DemoIslands.Seed(database, islands, clock.UtcNow);
 
-            IslandSnapshot CaptureHome() => IslandSnapshotFactory.Capture(auth.PlayerId, auth.DisplayName, data.lots,
+            IslandSnapshot CaptureHome() => IslandSnapshotFactory.Capture(auth.PlayerId, auth.DisplayName, village.Name, data.lots,
                 data.stands, data.decorations, placement, popularity.Value, clock.UtcNow);
             var ledger = new VisitBonusLedger(data.meta, database.online.maxBonusesPerDay);
             Add(new VisitService(database, auth, islands, social, CaptureHome, ledger, clock, estimator.IncomePerSecond,

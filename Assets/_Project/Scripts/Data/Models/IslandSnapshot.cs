@@ -17,6 +17,9 @@ namespace BeachTycoon.Data
         public string ownerId = string.Empty;
         public string ownerName = string.Empty;
 
+        /// <summary>Name of the owner's village (empty on snapshots from before villages existed).</summary>
+        public string villageName = string.Empty;
+
         /// <summary>Main building tier (0 before the tent is built).</summary>
         public int tier;
         public float popularity;

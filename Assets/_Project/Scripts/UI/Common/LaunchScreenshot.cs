@@ -33,6 +33,7 @@ namespace BeachTycoon.UI
         {
             yield return new WaitForSecondsRealtime(SettleSeconds);
             foreach (PrivacyPanelView privacy in FindObjectsByType<PrivacyPanelView>()) privacy.Close();
+            foreach (StartScreenView start in FindObjectsByType<StartScreenView>()) start.Close();
             yield return new WaitForSecondsRealtime(1f);
             ScreenCapture.CaptureScreenshot(_path);
             yield return new WaitForSecondsRealtime(2f);
