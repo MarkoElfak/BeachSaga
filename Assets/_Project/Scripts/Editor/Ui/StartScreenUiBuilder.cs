@@ -50,8 +50,9 @@ namespace BeachTycoon.EditorTools
         private static void BuildNamePage(RectTransform window, StartScreenView view)
         {
             RectTransform page = UiKit.Stretch("NamePage", window);
-            TextMeshProUGUI heading = Text(page, "Heading", "Name your village", -50f, 100f, 60f, UiKit.TextDark, FontStyles.Bold);
-            Text(page, "Hint", "You can rename it later in Settings.", -160f, 60f, 36f, UiKit.TextDark, FontStyles.Italic);
+            TextMeshProUGUI heading = Text(page, "Heading", "Name your village", -50f, 100f, 54f, UiKit.TextDark, FontStyles.Bold);
+            heading.rectTransform.sizeDelta = new Vector2(-260f, 100f); // clear of the close button
+            TextMeshProUGUI hint = Text(page, "Hint", "You can rename it later in Settings.", -160f, 60f, 36f, UiKit.TextDark, FontStyles.Italic);
             TMP_InputField input = NameInput(page);
 
             RectTransform ideaRect = UiKit.Rect("IdeaButton", page, Top, Top, Top, new Vector2(300f, -255f), new Vector2(150f, 130f));
@@ -68,6 +69,7 @@ namespace BeachTycoon.EditorTools
 
             PrimitiveKit.SetReference(view, "namePage", page.gameObject);
             PrimitiveKit.SetReference(view, "heading", heading);
+            PrimitiveKit.SetReference(view, "hint", hint);
             PrimitiveKit.SetReference(view, "nameInput", input);
             PrimitiveKit.SetReference(view, "ideaButton", idea);
             PrimitiveKit.SetReference(view, "error", error);

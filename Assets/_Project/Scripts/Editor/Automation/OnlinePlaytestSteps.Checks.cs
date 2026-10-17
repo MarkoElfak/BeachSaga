@@ -100,7 +100,7 @@ namespace BeachTycoon.EditorTools
         {
             IslandSnapshot island = Visits.Current;
             Check(!Visits.IsOwnIsland && island.ownerName == "Kai" && island.tier == 3, "Kai's island loads (tier 3)");
-            Check(Text("Banner/Title") == "Kai's island", "HUD names the owner");
+            Check(Text("Banner/Title") == "Palm Harbour" && Text("Banner/Details").StartsWith("Kai"), "HUD names Kai's village and Kai");
             CheckBonus();
             IslandHudView hud = PlaytestTools.Find<IslandHudView>();
             PlaytestTools.Click(hud, "LikeButton");

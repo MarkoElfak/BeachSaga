@@ -19,6 +19,7 @@ namespace BeachTycoon.UI
         [SerializeField] private Button playButton = null;
         [SerializeField] private GameObject namePage = null;
         [SerializeField] private TMP_Text heading = null;
+        [SerializeField] private TMP_Text hint = null;
         [SerializeField] private TMP_InputField nameInput = null;
         [SerializeField] private Button ideaButton = null;
         [SerializeField] private TMP_Text error = null;
@@ -96,6 +97,7 @@ namespace BeachTycoon.UI
             _renaming = renaming;
             heading.text = renaming ? "Rename your village" : "Name your village";
             confirmLabel.text = renaming ? "Save" : "Found village";
+            hint.gameObject.SetActive(!renaming);
             closeButton.gameObject.SetActive(renaming);
             nameInput.SetTextWithoutNotify(renaming ? _village.Name : string.Empty);
             error.text = string.Empty;
