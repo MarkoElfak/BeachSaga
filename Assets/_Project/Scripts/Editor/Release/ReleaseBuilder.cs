@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace BeachTycoon.EditorTools
 {
@@ -49,8 +50,42 @@ namespace BeachTycoon.EditorTools
         /// <summary>A desktop copy of the game, used to check how a built player renders.</summary>
         public const string MacAppPath = "Builds/Mac/BeachTycoon.app";
 
-        /// <summary>Builds "android" (Builds/Android/BeachTycoon.apk), "ios" (Builds/iOS) or "mac"; returns a short report.</summary>
+        /// <summary>
+        /// Builds "android" (Builds/Android/BeachTycoon.apk), "ios" (Builds/iOS) or "mac"; returns a short report.
+        /// Phone test builds: "android-dev" (Vulkan) and "android-gles" (OpenGL ES 3 only) are development builds
+        /// that show errors on screen, written next to the release APK.
+        /// </summary>
         public static string Build(string platform)
+        {
+            if (platform == "android-dev" || platform == "android-gles") return BuildAndroidTest(platform == "android-gles");
+            return Build(platform, BuildOptions.None, null);
+        }
+
+        private static string BuildAndroidTest(bool gles)
+        {
+            GraphicsDeviceType[] apis = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
+            bool automatic = PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android);
+            if (gles)
+            {
+                PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
+                PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, new[] { GraphicsDeviceType.OpenGLES3 });
+            }
+
+            try
+            {
+                string name = gles ? "BeachTycoon-gles-test.apk" : "BeachTycoon-vulkan-test.apk";
+                // A clean build, so a switch of graphics API is never served from the previous build's cache.
+                return Build("android", BuildOptions.Development | BuildOptions.CleanBuildCache, "Builds/Android/" + name);
+            }
+            finally
+            {
+                PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, automatic);
+                if (!automatic) PlayerSettings.SetGraphicsAPIs(BuildTarget.Android, apis);
+                AssetDatabase.SaveAssets();
+            }
+        }
+
+        private static string Build(string platform, BuildOptions buildOptions, string pathOverride)
         {
             bool android = platform == "android", mac = platform == "mac";
             if (!android && !mac && platform != "ios") return "RESULT: FAIL unknown platform " + platform;
@@ -59,7 +94,7 @@ namespace BeachTycoon.EditorTools
             if (!BuildPipeline.IsBuildTargetSupported(group, target)) return $"RESULT: FAIL {target} build support is not installed (add the module in Unity Hub)";
 
             ApplySettings();
-            string path = android ? "Builds/Android/BeachTycoon.apk" : mac ? MacAppPath : "Builds/iOS";
+            string path = pathOverride ?? (android ? "Builds/Android/BeachTycoon.apk" : mac ? MacAppPath : "Builds/iOS");
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "Builds");
             var options = new BuildPlayerOptions
             {
@@ -67,7 +102,7 @@ namespace BeachTycoon.EditorTools
                 locationPathName = path,
                 target = target,
                 targetGroup = group,
-                options = BuildOptions.None,
+                options = buildOptions,
             };
 
             BuildReport report = BuildPipeline.BuildPlayer(options);
