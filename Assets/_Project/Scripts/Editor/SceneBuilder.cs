@@ -32,6 +32,7 @@ namespace BeachTycoon.EditorTools
             var world = new GameObject("World").AddComponent<BeachWorldBuilder>();
             Transform lotsRoot = new GameObject("Lots").transform;
             var decorations = new GameObject("Decorations").AddComponent<DecorationLayer>();
+            VillageSignBuilder.Build(database.palette);
 
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>();
             PrimitiveKit.SetReference(coins, "coinPrefab",

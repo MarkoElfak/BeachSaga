@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Test save files: a clean start, a damaged save for the recovery test, and the privacy answer.</summary>
+    /// <summary>Test save files: a clean start, a damaged save for the recovery test, the privacy answer and the village.</summary>
     internal static partial class AutoTestRunner
     {
         private static readonly string[] SaveSuffixes = { "", ".tmp", ".bak", ".corrupt" };
@@ -42,6 +42,16 @@ namespace BeachTycoon.EditorTools
             privacy.Answer(PrivacyChoice.Accepted);
             PrivacyPanelView panel = PlaytestTools.Find<PrivacyPanelView>();
             if (panel != null && panel.IsOpen) panel.Close();
+        }
+
+        // Older suites play an already founded village and skip the greeting, so the start screen stays away.
+        private static void AnswerStartScreen()
+        {
+            if (Suite == SuiteStart || !ServiceLocator.TryGet(out VillageService village)) return;
+            StartScreenView.SkipGreetingThisRun();
+            if (!village.IsFounded) village.TryFound("Test Bay", string.Empty, out _);
+            StartScreenView screen = PlaytestTools.Find<StartScreenView>();
+            if (screen != null && screen.IsOpen) screen.Close();
         }
     }
 }

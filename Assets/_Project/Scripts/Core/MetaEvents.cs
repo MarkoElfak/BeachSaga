@@ -35,6 +35,17 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>The village was founded or renamed.</summary>
+    public readonly struct VillageRenamed
+    {
+        public readonly string Name;
+
+        public VillageRenamed(string name)
+        {
+            Name = name;
+        }
+    }
+
     /// <summary>Sound or music settings changed.</summary>
     public readonly struct SettingsChanged
     {

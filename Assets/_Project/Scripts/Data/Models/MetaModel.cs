@@ -44,6 +44,13 @@ namespace BeachTycoon.Data
         /// <summary>Seashells collected over all seasons; each one raises all income for good.</summary>
         public long seashells;
         public int seasonsCompleted;
+
+        // Version 15: the village founded on first launch.
+        /// <summary>Name the player gave the village; empty until the start screen is answered.</summary>
+        public string villageName = string.Empty;
+
+        /// <summary>Culture picked when the village was founded; it never changes afterwards.</summary>
+        public string cultureId = string.Empty;
     }
 
     [Serializable]

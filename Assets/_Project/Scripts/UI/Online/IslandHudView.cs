@@ -21,6 +21,8 @@ namespace BeachTycoon.UI
         [SerializeField] private Button homeButton = null;
 
         private VisitService _visits;
+
+        public string TitleText => title.text;
         private ISocialService _social;
 
         private void Start()
@@ -29,8 +31,9 @@ namespace BeachTycoon.UI
             _social = ServiceLocator.Get<ISocialService>();
             IslandSnapshot island = _visits.Current;
             TierDefinition tier = ServiceLocator.Get<GameDatabase>().GetTier(island.tier);
-            title.text = _visits.IsOwnIsland ? "Your island (saved snapshot)" : $"{island.ownerName}'s island";
-            details.text = $"{(tier != null ? tier.displayName : "Empty beach")}  -  Popularity {island.popularity:0.00}";
+            title.text = Title(island, _visits.IsOwnIsland);
+            string owner = _visits.IsOwnIsland || string.IsNullOrEmpty(island.villageName) ? string.Empty : $"{island.ownerName}  -  ";
+            details.text = $"{owner}{(tier != null ? tier.displayName : "Empty beach")}  -  Popularity {island.popularity:0.00}";
             bonusLabel.text = _visits.LastBonus > 0
                 ? $"Visit bonus +{NumberFormatter.Format(_visits.LastBonus)} coins!"
                 : "Visit bonus already collected today";
@@ -42,6 +45,14 @@ namespace BeachTycoon.UI
             homeButton.onClick.AddListener(Home);
             EventBus.Subscribe<SocialActionDone>(OnSocialDone);
             RefreshSocial();
+        }
+
+        // The village name when the island has one; snapshots from before villages show the owner instead.
+        private static string Title(IslandSnapshot island, bool own)
+        {
+            bool named = !string.IsNullOrEmpty(island.villageName);
+            if (own) return named ? $"{island.villageName} (your saved snapshot)" : "Your island (saved snapshot)";
+            return named ? island.villageName : $"{island.ownerName}'s island";
         }
 
         private void OnDestroy()

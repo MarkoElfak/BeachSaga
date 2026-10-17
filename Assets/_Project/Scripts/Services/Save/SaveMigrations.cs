@@ -20,6 +20,7 @@ namespace BeachTycoon.Services
             new AddMiniGames(),
             new AddVolumes(),
             new AddPrivacy(),
+            new AddVillage(),
         };
 
         /// <summary>
@@ -124,6 +125,13 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 13;
             public string Migrate(string json) => json.Replace("\"version\":13", "\"version\":14");
+        }
+
+        /// <summary>v14 -> v15: village name and culture; old saves have neither, so the start screen asks once.</summary>
+        private sealed class AddVillage : ISaveMigration
+        {
+            public int FromVersion => 14;
+            public string Migrate(string json) => json.Replace("\"version\":14", "\"version\":15");
         }
     }
 }

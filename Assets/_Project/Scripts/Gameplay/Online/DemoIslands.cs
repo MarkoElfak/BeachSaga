@@ -53,7 +53,7 @@ namespace BeachTycoon.Gameplay
 
             AddStands(database, layout, tier);
             AddDecorations(database, layout, tier, demo.decorations);
-            IslandSnapshot snapshot = IslandSnapshotFactory.Capture(demo.ownerId, demo.displayName, layout.Lots,
+            IslandSnapshot snapshot = IslandSnapshotFactory.Capture(demo.ownerId, demo.displayName, demo.villageName, layout.Lots,
                 layout.Stands, layout.Decorations, layout.Placement, demo.popularity, utcNow);
             layout.Dispose();
             return snapshot;

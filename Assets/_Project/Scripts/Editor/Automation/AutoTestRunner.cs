@@ -177,6 +177,7 @@ namespace BeachTycoon.EditorTools
             {
                 Write($"Beach scene running (step {CurrentStep})");
                 AnswerPrivacy();
+                AnswerStartScreen();
                 CurrentStage = Stage.Playing;
                 _stageStartTime = Now;
             }

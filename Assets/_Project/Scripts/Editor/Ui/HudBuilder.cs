@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Builds the Beach HUD: top bar (coins, popularity), bottom build bar, floating text and upgrade panel.</summary>
+    /// <summary>Builds the Beach HUD: top bar (coins, village name and popularity), bottom build bar, floating text, panels and the start screen.</summary>
     internal static class HudBuilder
     {
         private const string UiPrefabs = ProjectPaths.Prefabs + "/UI";
@@ -41,7 +41,8 @@ namespace BeachTycoon.EditorTools
             UpgradePanelBuilder.Build(safe);
             DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
             PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
-            SettingsUiBuilder.Build(safe);
+            StartScreenView startScreen = StartScreenUiBuilder.Build(safe);
+            SettingsUiBuilder.Build(safe, startScreen);
             MetaUiBuilder.BuildDailyRewards(safe);
             OnlineUiBuilder.BuildVisitPanel(safe);
             AchievementUiBuilder.Build(safe);
@@ -49,7 +50,8 @@ namespace BeachTycoon.EditorTools
             MiniGameUiBuilder.Build(safe);
             MetaUiBuilder.BuildOfflinePopup(safe);
             BringWindowsToFront(safe);
-            safe.Find("PrivacyPanel").SetAsLastSibling(); // the first-launch question sits above everything
+            safe.Find("PrivacyPanel").SetAsLastSibling(); // the first-launch question sits above everything...
+            startScreen.transform.SetAsLastSibling(); // ...except the start screen, which comes first
             FeelUiBuilder.BuildConfetti(safe); // over everything, windows included
         }
 
@@ -102,8 +104,14 @@ namespace BeachTycoon.EditorTools
             UiKit.AddImage(pop, UiKit.PanelColor);
             RectTransform popIcon = UiKit.Rect("Icon", pop, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(56f, 0f), new Vector2(52f, 52f));
             UiKit.AddImage(popIcon, new Color(0.95f, 0.45f, 0.65f), false);
-            RectTransform popLabelRect = UiKit.Rect("Label", pop, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(100f, 0f), new Vector2(-115f, 0f));
-            TextMeshProUGUI popLabel = UiKit.AddText(popLabelRect, "Popularity 0.00", 40f, TextAlignmentOptions.MidlineLeft, Color.white);
+            // Village name on top, popularity below it.
+            RectTransform nameRect = UiKit.Rect("VillageName", pop, new Vector2(0f, 0.48f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(100f, -2f), new Vector2(-115f, 0f));
+            TextMeshProUGUI nameLabel = UiKit.AddText(nameRect, "Village", 38f, TextAlignmentOptions.BottomLeft, Color.white, FontStyles.Bold);
+            nameLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            nameLabel.overflowMode = TextOverflowModes.Ellipsis;
+            PrimitiveKit.SetReference(nameRect.gameObject.AddComponent<VillageNameView>(), "label", nameLabel);
+            RectTransform popLabelRect = UiKit.Rect("Label", pop, new Vector2(0f, 0f), new Vector2(1f, 0.48f), new Vector2(0f, 0.5f), new Vector2(100f, 2f), new Vector2(-115f, 0f));
+            TextMeshProUGUI popLabel = UiKit.AddText(popLabelRect, "Popularity 0.00", 34f, TextAlignmentOptions.TopLeft, Color.white);
             PrimitiveKit.SetReference(pop.gameObject.AddComponent<PopularityLabelView>(), "label", popLabel);
         }
 
