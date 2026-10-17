@@ -57,6 +57,7 @@ namespace BeachTycoon.Tests
                 Assert.Greater(product.price, 0, product.id);
                 Assert.Greater(product.serveSeconds, 0f, product.id);
                 Assert.IsNotNull(product.standPrefab, product.id);
+                Assert.Greater(product.managerCost, 0, $"{product.id} manager cost");
             }
         }
 
@@ -88,6 +89,22 @@ namespace BeachTycoon.Tests
                     $"tier {tier} land contains the previous tier's");
                 Assert.GreaterOrEqual(definition.buildArea.width, previous.width, $"tier {tier} land grows");
                 previous = definition.buildArea;
+            }
+        }
+
+        [Test]
+        public void AchievementsHaveUniqueIdsTargetsAndProducts()
+        {
+            Assert.IsNotEmpty(_database.achievements);
+            var ids = new HashSet<string>();
+            foreach (AchievementDefinition achievement in _database.achievements)
+            {
+                Assert.IsNotNull(achievement);
+                Assert.IsTrue(ids.Add(achievement.id), $"duplicate achievement id {achievement.id}");
+                Assert.Greater(achievement.target, 0, achievement.id);
+                Assert.IsFalse(string.IsNullOrEmpty(achievement.title), achievement.id);
+                if (achievement.goal == AchievementGoal.SellProduct) Assert.IsNotNull(achievement.product, achievement.id);
+                if (achievement.goal == AchievementGoal.ReachTier) Assert.LessOrEqual(achievement.target, _database.MaxTier, achievement.id);
             }
         }
 

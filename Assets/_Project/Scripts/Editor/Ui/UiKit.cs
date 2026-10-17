@@ -1,3 +1,4 @@
+using BeachTycoon.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -65,6 +66,7 @@ namespace BeachTycoon.EditorTools
             image = AddImage(rect, color);
             var button = rect.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
+            rect.gameObject.AddComponent<ButtonFeel>(); // squashes while pressed
             return button;
         }
     }

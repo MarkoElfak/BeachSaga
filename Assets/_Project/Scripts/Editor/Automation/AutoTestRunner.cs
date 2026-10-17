@@ -100,8 +100,7 @@ namespace BeachTycoon.EditorTools
                     {
                         string suite = File.ReadAllText(RequestPath).Trim();
                         File.Delete(RequestPath);
-                        bool known = suite == SuiteIsland || suite == SuiteMove;
-                        SessionState.SetString(KeyPrefix + "Suite", known ? suite : SuiteMeta);
+                        SessionState.SetString(KeyPrefix + "Suite", IsKnownSuite(suite) ? suite : SuiteMeta);
                         Begin();
                     }
                     break;
@@ -115,13 +114,15 @@ namespace BeachTycoon.EditorTools
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
                     {
                         ApplySimulatedAbsence();
+                        ApplyDamagedSave();
                         EnterPlay();
                     }
                     break;
                 case Stage.Cleanup:
                     if (!EditorApplication.isPlayingOrWillChangePlaymode)
                     {
-                        File.Delete(SavePath); // leave the user a fresh game
+                        DeleteSaves(); // leave the user a fresh game
+                        DeleteIslandSnapshots();
                         CurrentStage = Stage.Idle;
                     }
                     break;
@@ -135,7 +136,8 @@ namespace BeachTycoon.EditorTools
             CurrentStep = 0;
             CurrentStage = Stage.WaitingForPlay; // marks the run active so setup logs are captured
             Write($"Automated playtest ({SuiteTitle}) started " + System.DateTime.UtcNow.ToString("u"));
-            File.Delete(SavePath);
+            DeleteSaves();
+            DeleteIslandSnapshots();
 
             bool setupOk;
             try
@@ -174,6 +176,7 @@ namespace BeachTycoon.EditorTools
             if (GameBootstrap.IsReady && Camera.main != null && SceneManager.GetActiveScene().name == SceneNames.Beach)
             {
                 Write($"Beach scene running (step {CurrentStep})");
+                AnswerPrivacy();
                 CurrentStage = Stage.Playing;
                 _stageStartTime = Now;
             }

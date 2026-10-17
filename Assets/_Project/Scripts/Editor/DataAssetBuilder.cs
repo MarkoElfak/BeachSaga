@@ -26,12 +26,17 @@ namespace BeachTycoon.EditorTools
             database.tutorial = LoadOrCreate<TutorialConfig>(ProjectPaths.Config + "/TutorialConfig.asset", out _);
             database.sounds = BuildSoundLibrary();
             database.placement = LoadOrCreate<PlacementConfig>(ProjectPaths.Config + "/PlacementConfig.asset", out _);
+            database.dailyRewards = LoadOrCreate<DailyRewardConfig>(ProjectPaths.Config + "/DailyRewardConfig.asset", out _);
+            database.online = LoadOrCreate<OnlineConfig>(ProjectPaths.Config + "/OnlineConfig.asset", out _);
             database.world = BuildWorld();
             database.terrain = BuildTerrain(palette);
             database.palette = palette;
 
             ContentAssetBuilder.Fill(database);
             CommunityAssetBuilder.Fill(database);
+            AchievementAssetBuilder.Fill(database);
+            EventAssetBuilder.Fill(database);
+            MiniGameAssetBuilder.Fill(database);
             FootprintMeasure.Bake(database);
 
             EditorUtility.SetDirty(database);
@@ -66,23 +71,12 @@ namespace BeachTycoon.EditorTools
             return world;
         }
 
-        // One silent slot per sound hook; drop clips in later without touching code.
+        // A slot per sound hook, filled with generated placeholder clips; assign your own clips any time.
         private static SoundLibrary BuildSoundLibrary()
         {
             ProjectPaths.EnsureFolder(ProjectPaths.Audio);
-            var library = LoadOrCreate<SoundLibrary>(ProjectPaths.Audio + "/SoundLibrary.asset", out bool created);
-            if (created)
-            {
-                var ids = (SoundId[])System.Enum.GetValues(typeof(SoundId));
-                library.sounds = new SoundEntry[ids.Length];
-                for (int i = 0; i < ids.Length; i++)
-                {
-                    library.sounds[i] = new SoundEntry { id = ids[i], volume = 1f };
-                }
-
-                EditorUtility.SetDirty(library);
-            }
-
+            var library = LoadOrCreate<SoundLibrary>(ProjectPaths.Audio + "/SoundLibrary.asset", out _);
+            AudioAssetBuilder.Fill(library);
             return library;
         }
 

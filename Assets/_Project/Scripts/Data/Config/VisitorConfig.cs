@@ -12,6 +12,12 @@ namespace BeachTycoon.Data
         [Min(0.01f)] public float arriveDistance = 0.1f;
         [Tooltip("Gap between visitors standing in a stand's queue.")]
         [Min(0.1f)] public float queueSpacing = 0.9f;
+        [Tooltip("Visitors per queue line; the next ones start a new line beside it.")]
+        [Min(1)] public int queuePerLine = 3;
+        [Tooltip("Queue lines side by side in front of a stand.")]
+        [Min(1)] public int queueLines = 2;
+        [Tooltip("Sideways distance between two queue lines.")]
+        [Min(0.1f)] public float queueLineSpacing = 0.8f;
 
         [Header("Behaviour")]
         [Tooltip("Seconds spent relaxing on the towel between purchases (min, max).")]

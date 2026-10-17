@@ -38,7 +38,8 @@ namespace BeachTycoon.Gameplay
         {
             if (evt.Kind != PlaceableKind.Decoration || evt.Index >= _instances.Count || _instances[evt.Index] == null) return;
             Vector2 position = _placement.GetDecorationPosition(evt.Index);
-            _instances[evt.Index].position = _ground.Ground(position.x, position.y);
+            _instances[evt.Index].SetPositionAndRotation(_ground.Ground(position.x, position.y),
+                _placement.GetRotation(PlaceableId.Decoration(evt.Index)));
         }
 
         private void Spawn(int index)
@@ -51,10 +52,11 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            // Unrotated, so the footprint measured from the prefab matches what is on screen.
+            // The tap box is fitted to the unturned prefab (like its footprint), then the saved yaw is applied.
             Vector2 position = _placement.GetDecorationPosition(index);
             GameObject instance = Instantiate(definition.prefab, _ground.Ground(position.x, position.y), Quaternion.identity, transform);
             instance.AddComponent<DecorationView>().Bind(index);
+            instance.transform.rotation = _placement.GetRotation(PlaceableId.Decoration(index));
             _instances[index] = instance.transform;
         }
     }

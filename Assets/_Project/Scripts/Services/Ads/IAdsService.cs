@@ -7,6 +7,7 @@ namespace BeachTycoon.Services
     {
         public const string IncomeBoost = "income_boost";
         public const string OfflineDouble = "offline_double";
+        public const string DailyDouble = "daily_double";
     }
 
     /// <summary>Rewarded ads seam. The game only ever asks "show one, tell me if it was watched".</summary>

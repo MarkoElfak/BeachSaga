@@ -14,6 +14,7 @@ namespace BeachTycoon.UI
         // TMP's "{n:0}" means zero decimals; seconds are split into tens and ones to keep two digits.
         private const string ActiveFormat = "2x  {0:0}:{1:0}{2:0}";
         private const string IdleText = "2x income (ad)";
+        private const string FreeText = "2x income";
         private const float SecondsPerMinute = 60f;
 
         [SerializeField] private Button button = null;
@@ -22,6 +23,9 @@ namespace BeachTycoon.UI
         private IncomeBoost _boost;
         private IAdsService _ads;
         private int _shownSeconds = -1;
+        private bool _shownFree;
+
+        public string LabelText => label.text;
 
         private void Start()
         {
@@ -47,12 +51,14 @@ namespace BeachTycoon.UI
             }
 
             int seconds = Mathf.CeilToInt(_boost.RemainingSeconds);
-            if (seconds == _shownSeconds)
+            bool free = AdWording.AdsRemoved(_ads);
+            if (seconds == _shownSeconds && free == _shownFree)
             {
                 return;
             }
 
             _shownSeconds = seconds;
+            _shownFree = free;
             button.interactable = !_boost.IsActive && _ads.IsRewardedReady;
             if (_boost.IsActive)
             {
@@ -61,7 +67,7 @@ namespace BeachTycoon.UI
             }
             else
             {
-                label.SetText(IdleText);
+                label.SetText(free ? FreeText : IdleText);
             }
         }
 

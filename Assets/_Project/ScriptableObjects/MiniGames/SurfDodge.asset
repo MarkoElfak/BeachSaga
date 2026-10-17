@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c815e6387b84e46b6e3f98f98a5e52e, type: 3}
+  m_Name: SurfDodge
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.MiniGameDefinition
+  id: SurfDodge
+  kind: 3
+  product: {fileID: 11400000, guid: 0e812ba1429004228a82b807365f570b, type: 2}
+  title: Surf dodge
+  howToPlay: Steer the board left and right to dodge the rocks and buoys. Get past
+    every row to pass.
+  incomeBonusPerLevel: 0.1
+  levels:
+  - target: 8
+    timeLimit: 0
+    lives: 3
+    speed: 0.35
+    pace: 1.6
+    patience: 3
+    tolerance: 0.2
+    choices: 3
+  - target: 12
+    timeLimit: 0
+    lives: 3
+    speed: 0.42
+    pace: 1.4
+    patience: 3
+    tolerance: 0.2
+    choices: 3
+  - target: 16
+    timeLimit: 0
+    lives: 3
+    speed: 0.5
+    pace: 1.2
+    patience: 3
+    tolerance: 0.2
+    choices: 4
+  - target: 20
+    timeLimit: 0
+    lives: 2
+    speed: 0.58
+    pace: 1.05
+    patience: 3
+    tolerance: 0.2
+    choices: 4
+  - target: 25
+    timeLimit: 0
+    lives: 2
+    speed: 0.65
+    pace: 0.95
+    patience: 3
+    tolerance: 0.2
+    choices: 5

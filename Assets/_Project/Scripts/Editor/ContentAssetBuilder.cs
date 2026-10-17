@@ -25,6 +25,11 @@ namespace BeachTycoon.EditorTools
             ProductDefinition surf = Product("SurfLessons", "surf_lessons", "Surf lessons", 3000, 60, 8f, 4, 300, PlaceholderPrefabBuilder.SurfSchoolPath);
             ProductDefinition houses = Product("Houses", "houses", "Houses", 25000, 5000, 20f, 5, 25000, PlaceholderPrefabBuilder.RealEstatePath);
 
+            ManagerCost(donuts, 500);
+            ManagerCost(towels, 1500);
+            ManagerCost(drinks, 5000);
+            ManagerCost(surf, 15000);
+            ManagerCost(houses, 100000);
             database.products = new[] { donuts, towels, drinks, surf, houses };
             database.tiers = new[]
             {
@@ -64,6 +69,14 @@ namespace BeachTycoon.EditorTools
             tier.buildArea = Rect.MinMaxRect(-land.x, land.y, land.x, LandTopZ);
             tier.maxZoomDistance = land.z;
             EditorUtility.SetDirty(tier);
+        }
+
+        // Managers came later (M8): products without a manager cost get the default one.
+        private static void ManagerCost(ProductDefinition product, long cost)
+        {
+            if (product.managerCost > 0) return;
+            product.managerCost = cost;
+            EditorUtility.SetDirty(product);
         }
 
         private static ProductDefinition Product(string file, string id, string displayName, long unlockCost,

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Authors the Boot and Beach scenes and registers them in the build scene list.</summary>
+    /// <summary>Authors the Boot, Beach and Island scenes and registers them in the build scene list.</summary>
     internal static class SceneBuilder
     {
         public static void BuildBootScene()
@@ -64,12 +64,44 @@ namespace BeachTycoon.EditorTools
             EditorSceneManager.SaveScene(scene, ProjectPaths.BeachScene);
         }
 
+        /// <summary>Read-only visit scene: world, props, crowd, camera and input, and the island HUD.</summary>
+        public static void BuildIslandScene()
+        {
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            GameDatabase database = ReloadDatabase();
+
+            Camera camera = CreateCamera(database);
+            SceneEnvironment.Build(camera);
+            var world = new GameObject("World").AddComponent<BeachWorldBuilder>();
+            var props = new GameObject("IslandProps").AddComponent<IslandPropSpawner>();
+            var crowd = new GameObject("Visitors").AddComponent<VisitCrowd>();
+
+            var input = new GameObject("Input");
+            var gestures = input.AddComponent<PointerGestureSource>();
+            var tapRouter = input.AddComponent<TapInputRouter>();
+            PrimitiveKit.SetReference(tapRouter, "worldCamera", camera);
+
+            CreateEventSystem();
+            OnlineUiBuilder.BuildIslandHud();
+
+            var root = new GameObject("IslandSceneRoot").AddComponent<IslandSceneRoot>();
+            PrimitiveKit.SetReference(root, "worldBuilder", world);
+            PrimitiveKit.SetReference(root, "cameraController", camera.GetComponent<TopDownCameraController>());
+            PrimitiveKit.SetReference(root, "gestureSource", gestures);
+            PrimitiveKit.SetReference(root, "tapRouter", tapRouter);
+            PrimitiveKit.SetReference(root, "props", props);
+            PrimitiveKit.SetReference(root, "crowd", crowd);
+
+            EditorSceneManager.SaveScene(scene, ProjectPaths.IslandScene);
+        }
+
         public static void RegisterBuildScenes()
         {
             EditorBuildSettings.scenes = new[]
             {
                 new EditorBuildSettingsScene(ProjectPaths.BootScene, true),
                 new EditorBuildSettingsScene(ProjectPaths.BeachScene, true),
+                new EditorBuildSettingsScene(ProjectPaths.IslandScene, true),
             };
         }
 
@@ -98,9 +130,10 @@ namespace BeachTycoon.EditorTools
 
         private static void CreateEventSystem()
         {
+            // No actions assigned: the module picks up the default UI actions in OnEnable at runtime. Assigning
+            // them here works only once per editor session (the shared default asset dies with the first scene).
             var go = new GameObject("EventSystem", typeof(EventSystem));
-            var module = go.AddComponent<InputSystemUIInputModule>();
-            module.AssignDefaultActions();
+            go.AddComponent<InputSystemUIInputModule>();
         }
     }
 }

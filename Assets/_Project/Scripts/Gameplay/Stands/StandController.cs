@@ -14,14 +14,14 @@ namespace BeachTycoon.Gameplay
         private const int NoVisitor = -1;
 
         private readonly EconomyConfig _economy;
-        private readonly IncomeBoost _boost;
+        private readonly SaleMultipliers _multipliers;
         private readonly List<Order> _orders;
         private float _serveRemaining;
 
         public StandController(int index, StandModel model, ProductDefinition product, EconomyConfig economy,
-            IncomeBoost boost)
+            SaleMultipliers multipliers)
         {
-            _boost = boost;
+            _multipliers = multipliers;
             Index = index;
             Model = model;
             Product = product;
@@ -39,6 +39,9 @@ namespace BeachTycoon.Gameplay
         public float ServeProgress => IsServing ? 1f - _serveRemaining / Product.serveSeconds : 0f;
         public int ServingVisitorId => IsServing ? _orders[0].VisitorId : NoVisitor;
 
+        /// <summary>Orders taken since launch (not saved); playtests use it to measure demand.</summary>
+        public int TotalOrders { get; private set; }
+
         /// <summary>Adds an order to the back of the queue. Returns false when the queue is full.</summary>
         public bool TryEnqueueOrder(int visitorId, float spendMultiplier)
         {
@@ -48,6 +51,7 @@ namespace BeachTycoon.Gameplay
             }
 
             _orders.Add(new Order(visitorId, spendMultiplier));
+            TotalOrders++;
             if (_orders.Count == 1)
             {
                 _serveRemaining = Product.serveSeconds;
@@ -105,7 +109,7 @@ namespace BeachTycoon.Gameplay
 
             long amount = EconomyMath.SaleValue(
                 Product.price, served.SpendMultiplier, Model.level, _economy.standLevelIncomeBonus);
-            amount = EconomyMath.ApplyMultiplier(amount, _boost.Multiplier);
+            amount = _multipliers.Apply(amount, Product);
             EventBus.Publish(new SaleCompleted(Index, amount, served.VisitorId));
         }
 

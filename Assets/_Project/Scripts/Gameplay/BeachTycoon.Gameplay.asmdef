@@ -5,6 +5,7 @@
         "BeachTycoon.Core",
         "BeachTycoon.Data",
         "BeachTycoon.Services",
+        "BeachTycoon.Platform",
         "Unity.InputSystem",
         "UnityEngine.UI"
     ],

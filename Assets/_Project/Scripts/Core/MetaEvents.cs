@@ -22,9 +22,37 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>The player answered (or changed) the privacy question.</summary>
+    public readonly struct PrivacyChanged
+    {
+        public readonly bool AnalyticsAllowed;
+        public readonly bool PersonalizedAds;
+
+        public PrivacyChanged(bool analyticsAllowed, bool personalizedAds)
+        {
+            AnalyticsAllowed = analyticsAllowed;
+            PersonalizedAds = personalizedAds;
+        }
+    }
+
     /// <summary>Sound or music settings changed.</summary>
     public readonly struct SettingsChanged
     {
+    }
+
+    /// <summary>The player claimed a daily login reward (Coins already includes any ad multiplier).</summary>
+    public readonly struct DailyRewardClaimed
+    {
+        public readonly int DayIndex;
+        public readonly long Coins;
+        public readonly float BoostMinutes;
+
+        public DailyRewardClaimed(int dayIndex, long coins, float boostMinutes)
+        {
+            DayIndex = dayIndex;
+            Coins = coins;
+            BoostMinutes = boostMinutes;
+        }
     }
 
     /// <summary>The player claimed offline earnings (Amount already includes any ad multiplier).</summary>

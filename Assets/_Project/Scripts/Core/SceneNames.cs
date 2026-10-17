@@ -5,5 +5,8 @@ namespace BeachTycoon.Core
     {
         public const string Boot = "Boot";
         public const string Beach = "Beach";
+
+        /// <summary>Read-only view of an island snapshot (visiting).</summary>
+        public const string Island = "Island";
     }
 }

@@ -1,15 +1,22 @@
+using BeachTycoon.Core;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
 {
-    /// <summary>Added to every spawned decoration so it can be long-pressed and moved.</summary>
-    public sealed class DecorationView : MonoBehaviour, IMovable
+    /// <summary>Added to every spawned decoration so it can be tapped (selected, rotated) and long-pressed (moved).</summary>
+    public sealed class DecorationView : MonoBehaviour, ITappable, IMovable
     {
         private int _index = -1;
 
         public PlaceableId Placeable => PlaceableId.Decoration(_index);
         public bool CanMoveNow => _index >= 0;
         public Transform MoveRoot => transform;
+
+        public void OnTapped()
+        {
+            if (_index < 0) return;
+            ServiceLocator.Get<SelectionService>().Select(Placeable, SelectionService.TopOf(transform), -1);
+        }
 
         /// <summary>Gives the decoration its index and a tap/drag collider sized to its visible bounds.</summary>
         public void Bind(int index)

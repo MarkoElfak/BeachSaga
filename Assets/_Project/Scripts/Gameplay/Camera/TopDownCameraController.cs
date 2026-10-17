@@ -7,7 +7,8 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Fixed-angle camera orbiting a focus point on the ground. Drag pans so the ground stays under the
     /// finger; pinch or mouse wheel changes distance. The focus point is clamped to the unlocked land, and the
-    /// zoom-out limit grows with the main building's tier.
+    /// zoom-out limit grows with the main building's tier. A CameraShakeRequested wobbles it briefly (unscaled
+    /// time) around the same pose.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public sealed class TopDownCameraController : MonoBehaviour
@@ -21,11 +22,18 @@ namespace BeachTycoon.Gameplay
         private float _distance;
         private float _maxDistance;
         private bool _initialized;
+        private float _shakeLeft;
+        private float _shakeStrength;
 
         /// <param name="area">Land the focus point may move over (the unlocked area).</param>
         /// <param name="maxDistance">How far the player may zoom out for now.</param>
         /// <summary>Current zoom-out limit (grows as land is unlocked).</summary>
         public float MaxDistance => _maxDistance;
+
+        public bool IsShaking => _shakeLeft > 0f;
+
+        /// <summary>Shakes requested so far (tests).</summary>
+        public int ShakeCount { get; private set; }
 
         public void Initialize(CameraConfig config, Rect area, float maxDistance, Vector3 startFocus, Color background)
         {
@@ -67,12 +75,29 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Subscribe<DragEvent>(OnDrag);
             EventBus.Subscribe<PinchEvent>(OnPinch);
+            EventBus.Subscribe<CameraShakeRequested>(OnShake);
         }
 
         private void OnDisable()
         {
             EventBus.Unsubscribe<DragEvent>(OnDrag);
             EventBus.Unsubscribe<PinchEvent>(OnPinch);
+            EventBus.Unsubscribe<CameraShakeRequested>(OnShake);
+        }
+
+        private void OnShake(CameraShakeRequested evt)
+        {
+            if (!_initialized || evt.Strength <= 0f) return;
+            ShakeCount++;
+            _shakeStrength = IsShaking ? Mathf.Max(_shakeStrength, evt.Strength) : evt.Strength;
+            _shakeLeft = _config.shakeSeconds;
+        }
+
+        private void LateUpdate()
+        {
+            if (!IsShaking) return;
+            _shakeLeft = Mathf.Max(0f, _shakeLeft - Time.unscaledDeltaTime);
+            ApplyPose(); // the last call, with no shake left, settles back on the exact pose
         }
 
         private void OnDrag(DragEvent evt)
@@ -125,7 +150,17 @@ namespace BeachTycoon.Gameplay
         {
             Quaternion rotation = Quaternion.Euler(_config.pitchDegrees, _config.yawDegrees, 0f);
             Vector3 position = _focus - rotation * Vector3.forward * _distance;
+            if (IsShaking) position += rotation * ShakeOffset();
             transform.SetPositionAndRotation(position, rotation);
+        }
+
+        // Smooth noise on the screen's x and y, fading out over the shake.
+        private Vector3 ShakeOffset()
+        {
+            float fade = _shakeLeft / _config.shakeSeconds;
+            float amplitude = _config.shakeAmplitude * _shakeStrength * fade * 2f;
+            float time = Time.unscaledTime * _config.shakeFrequency;
+            return new Vector3(Mathf.PerlinNoise(time, 0.3f) - 0.5f, Mathf.PerlinNoise(0.7f, time) - 0.5f, 0f) * amplitude;
         }
     }
 }

@@ -7,6 +7,15 @@ namespace BeachTycoon.Services
         public const string TierUpgraded = "tier_upgraded";
         public const string ProductUnlocked = "product_unlocked";
         public const string OfflineRewardClaimed = "offline_reward_claimed";
+        public const string DailyRewardClaimed = "daily_reward_claimed";
+        public const string IslandVisited = "island_visited";
+        public const string IslandLiked = "island_liked";
+        public const string GiftSent = "gift_sent";
+        public const string AchievementClaimed = "achievement_claimed";
+        public const string ManagerHired = "manager_hired";
+        public const string BeachEventStarted = "beach_event_started";
+        public const string SeasonStarted = "season_started";
+        public const string MiniGameLevelPassed = "minigame_level_passed";
     }
 
     /// <summary>Analytics seam. One optional parameter keeps call sites allocation-free.</summary>

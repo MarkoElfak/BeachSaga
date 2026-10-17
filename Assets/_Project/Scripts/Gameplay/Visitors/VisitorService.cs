@@ -7,14 +7,16 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Spawns pooled visitors (interval = base / (1 + popularity), capped by the tier's maxVisitors),
-    /// picks their type by spawnWeight and ticks their state machines. All agents are preallocated.
+    /// Spawns pooled visitors (interval = base / (1 + popularity) / event rate, capped by the tier's
+    /// maxVisitors; an event's burst may go past the cap), picks their type by spawnWeight and ticks their
+    /// state machines. All agents are preallocated.
     /// </summary>
     public sealed class VisitorService : ITickable, IDisposable
     {
         private readonly GameDatabase _database;
         private readonly BuildingManager _buildings;
         private readonly PopularityService _popularity;
+        private readonly BeachEventService _events;
         private readonly WorldNavigation _navigation;
         private readonly VisitorStateMachine _machine;
         private readonly System.Random _random;
@@ -24,15 +26,16 @@ namespace BeachTycoon.Gameplay
         private float _spawnTimer;
 
         public VisitorService(GameDatabase database, BuildingManager buildings, StandService stands,
-            PopularityService popularity, WorldNavigation navigation)
+            PopularityService popularity, WorldNavigation navigation, BeachEventService events = null)
         {
             _database = database;
+            _events = events;
             _buildings = buildings;
             _popularity = popularity;
             _navigation = navigation;
             VisitorConfig config = database.visitors;
             _random = new System.Random(config.randomSeed);
-            _machine = new VisitorStateMachine(navigation, stands, config, _random, Despawn);
+            _machine = new VisitorStateMachine(navigation, stands, config, _random, Despawn, events);
 
             _agents = new VisitorAgent[config.poolMaxSize];
             _free = new Stack<int>(config.poolMaxSize);
@@ -46,6 +49,7 @@ namespace BeachTycoon.Gameplay
             _spawnTimer = SpawnInterval;
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Subscribe<BeachEventStarted>(OnBeachEventStarted);
         }
 
         public int ActiveCount => _active.Count;
@@ -53,7 +57,15 @@ namespace BeachTycoon.Gameplay
 
         public VisitorAgent Get(int visitorId) => _agents[visitorId];
 
-        private float SpawnInterval => _database.economy.baseSpawnIntervalSeconds / (1f + _popularity.Value);
+        /// <summary>Seconds between arrivals right now (popularity and any running event included).</summary>
+        public float SpawnInterval
+        {
+            get
+            {
+                float rate = (1f + _popularity.Value) * (_events != null ? _events.SpawnRateMultiplier : 1f);
+                return _database.economy.baseSpawnIntervalSeconds / rate;
+            }
+        }
 
         private int MaxVisitors
         {
@@ -87,6 +99,7 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
+            EventBus.Unsubscribe<BeachEventStarted>(OnBeachEventStarted);
         }
 
         /// <summary>Spawns one visitor right away if the pool allows (stress tests); false when it cannot.</summary>
@@ -128,6 +141,14 @@ namespace BeachTycoon.Gameplay
         {
             if (evt.Kind == PlaceableKind.Decoration) return;
             for (int i = 0; i < _active.Count; i++) _active[i].QueueSlot = -1;
+        }
+
+        // A tourist bus: a crowd arrives at once, and the next regular arrival comes at the faster rate.
+        private void OnBeachEventStarted(BeachEventStarted evt)
+        {
+            int burst = _events != null && _events.Active != null ? _events.Active.burstVisitors : 0;
+            for (int i = 0; i < burst && TrySpawn(); i++) { }
+            _spawnTimer = Mathf.Min(_spawnTimer, SpawnInterval);
         }
 
         private void OnSaleCompleted(SaleCompleted evt)

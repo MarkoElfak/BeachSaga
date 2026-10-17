@@ -14,6 +14,7 @@ namespace BeachTycoon.Gameplay
             _analytics = analytics;
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
+            EventBus.Subscribe<ManagerHired>(OnManagerHired);
         }
 
         public void LogSessionStart(bool returningPlayer)
@@ -25,6 +26,7 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
+            EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
         }
 
         private void OnTierUpgraded(TierUpgraded evt)
@@ -38,6 +40,11 @@ namespace BeachTycoon.Gameplay
         private void OnProductUnlocked(ProductUnlocked evt)
         {
             _analytics.LogEvent(AnalyticsEvents.ProductUnlocked, "product", evt.ProductId);
+        }
+
+        private void OnManagerHired(ManagerHired evt)
+        {
+            _analytics.LogEvent(AnalyticsEvents.ManagerHired, "product", evt.ProductId);
         }
     }
 }

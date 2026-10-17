@@ -20,6 +20,10 @@ namespace BeachTycoon.Data
         public TutorialConfig tutorial;
         public SoundLibrary sounds;
         public PlacementConfig placement;
+        public DailyRewardConfig dailyRewards;
+        public OnlineConfig online;
+        public DayNightConfig dayNight;
+        public BeachEventConfig beachEvents;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]
@@ -28,6 +32,8 @@ namespace BeachTycoon.Data
         public VisitorTypeDefinition[] visitorTypes;
         public QuestDefinition[] quests;
         public DecorationDefinition[] decorations;
+        public AchievementDefinition[] achievements;
+        public MiniGameDefinition[] miniGames;
 
         public int MaxTier => tiers != null ? tiers.Length : 0;
 

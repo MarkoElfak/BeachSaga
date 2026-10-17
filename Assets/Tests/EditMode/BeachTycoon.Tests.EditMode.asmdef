@@ -7,7 +7,8 @@
         "BeachTycoon.Core",
         "BeachTycoon.Data",
         "BeachTycoon.Services",
-        "BeachTycoon.Gameplay"
+        "BeachTycoon.Gameplay",
+        "BeachTycoon.Editor"
     ],
     "includePlatforms": [
         "Editor"

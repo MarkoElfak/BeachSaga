@@ -7,7 +7,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Estimates average coins per second for offline earnings: sales are limited by whichever is lower,
     /// visitor demand (arrivals, capped by maxVisitors / visit length, x purchases per visit) or stand
-    /// capacity (1 / serve time per stand); rent is added on top.
+    /// capacity (1 / serve time per stand); rent is added on top. The season's seashell bonus scales it all.
     /// </summary>
     public sealed class IncomeEstimator
     {
@@ -18,10 +18,15 @@ namespace BeachTycoon.Gameplay
         private readonly StandService _stands;
         private readonly PopularityService _popularity;
         private readonly NeighbourService _neighbours;
+        private readonly SeasonService _season;
+        private readonly MiniGameService _miniGames;
 
         public IncomeEstimator(GameDatabase database, BuildingManager buildings, StandService stands,
-            PopularityService popularity, NeighbourService neighbours)
+            PopularityService popularity, NeighbourService neighbours, SeasonService season = null,
+            MiniGameService miniGames = null)
         {
+            _season = season;
+            _miniGames = miniGames;
             _database = database;
             _buildings = buildings;
             _stands = stands;
@@ -29,7 +34,9 @@ namespace BeachTycoon.Gameplay
             _neighbours = neighbours;
         }
 
-        public double IncomePerSecond()
+        public double IncomePerSecond() => BaseIncomePerSecond() * (_season != null ? _season.IncomeMultiplier : 1f);
+
+        private double BaseIncomePerSecond()
         {
             double rent = _neighbours.Count * _database.neighbours.rentPerMinute / SecondsPerMinute;
             if (_buildings.MainTier <= 0 || _stands.Count == 0)
@@ -53,8 +60,9 @@ namespace BeachTycoon.Gameplay
             {
                 StandController stand = _stands.Get(i);
                 capacity += 1.0 / Math.Max(0.1f, stand.Product.serveSeconds);
-                totalValue += EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
+                double value = EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
                     _database.economy.standLevelIncomeBonus);
+                totalValue += _miniGames != null ? value * _miniGames.IncomeMultiplier(stand.Product) : value;
             }
 
             double averageSale = totalValue / _stands.Count;

@@ -14,7 +14,7 @@ namespace BeachTycoon.Gameplay
             ForEachPresent(id =>
             {
                 Vector2 at = GetPosition(id);
-                into.Add(BlockingRect(id, GetFootprint(id, at), at));
+                into.Add(BlockingRect(id, at, GetYaw(id)));
             });
         }
 

@@ -16,11 +16,19 @@ namespace BeachTycoon.Data
         [Tooltip("Decorations sit on the natural ground: its height at their centre must be at least this " +
                  "far above the water.")]
         public float minHeightAboveWater = 0f;
-        [Tooltip("Width of the strip kept free in front of every stand for its queue (its length comes from " +
-                 "EconomyConfig.maxStandQueue x VisitorConfig.queueSpacing).")]
+        [Tooltip("Width of one queue line kept free in front of every stand (VisitorConfig sets how many lines " +
+                 "and how long they are).")]
         [Min(0f)] public float queueWidth = 1f;
+        [Tooltip("Turning steps for one full circle: 8 = 45 degrees per tap of a rotate arrow.")]
+        [Min(1)] public int rotationSteps = 8;
         [Tooltip("How far to look for a free spot when a default position is taken.")]
         [Min(1f)] public float searchRadius = 18f;
+
+        [Header("Shore")]
+        [Tooltip("Stands of these products must stand on the shore: the sea-side edge of their footprint within " +
+                 "Shore Distance of the water (the top of the unlocked land).")]
+        public string[] shoreOnlyProducts = { "surf_lessons" };
+        [Min(0.1f)] public float shoreDistance = 1.5f;
 
         [Header("Feel")]
         [Tooltip("How high a picked-up object floats while dragged.")]

@@ -10,7 +10,7 @@ namespace BeachTycoon.EditorTools
 {
     /// <summary>
     /// Measures prefabs for placement: the ground rectangle (x, z relative to the pivot) covered by their visible
-    /// meshes, vertex-exact. Progress bars and other floating UI are ignored. Setup stores the results in the
+    /// meshes, vertex-exact. Progress bars, other floating UI and the manager hat are ignored. Setup stores the results in the
     /// tier, product, house and decoration data (where Auto Footprint is on) and writes a readable report.
     /// </summary>
     [InitializeOnLoad]
@@ -125,7 +125,7 @@ namespace BeachTycoon.EditorTools
                 instance.GetComponentsInChildren(true, filters);
                 foreach (MeshFilter filter in filters)
                 {
-                    if (filter.sharedMesh == null || filter.GetComponentInParent<ProgressBarView>(true) != null) continue;
+                    if (filter.sharedMesh == null || IsIgnored(filter.transform)) continue;
                     if (filter.GetComponent<MeshRenderer>() == null) continue;
                     Matrix4x4 toWorld = filter.transform.localToWorldMatrix;
                     foreach (Vector3 vertex in filter.sharedMesh.vertices)
@@ -147,6 +147,18 @@ namespace BeachTycoon.EditorTools
             {
                 Object.DestroyImmediate(instance);
             }
+        }
+
+        // Floating UI and the manager's hat (it perches on the roof) do not take ground space.
+        private static bool IsIgnored(Transform part)
+        {
+            if (part.GetComponentInParent<ProgressBarView>(true) != null) return true;
+            for (Transform t = part; t != null; t = t.parent)
+            {
+                if (t.name == StandPrefabs.ManagerHatName || t.name == StandUpgradePrefabs.GroupName) return true;
+            }
+
+            return false;
         }
 
         /// <summary>Local x/z of the StandView's queue anchor (where visitors line up).</summary>

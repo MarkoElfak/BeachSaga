@@ -46,6 +46,7 @@ namespace BeachTycoon.Services
             }
 
             _wallet.coins += amount;
+            _wallet.seasonEarned += amount;
             EventBus.Publish(new CoinsChanged(_wallet.coins, amount));
         }
     }

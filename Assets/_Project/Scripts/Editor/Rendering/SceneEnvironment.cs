@@ -4,7 +4,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Warm late-morning sun, sky/ground ambient, light haze and a global post-processing volume.</summary>
+    /// <summary>Warm midday sun with the day and night cycle, sky/ground ambient, light haze and post-processing.</summary>
     internal static class SceneEnvironment
     {
         private static readonly Color SunColor = new Color(1f, 0.94f, 0.84f);
@@ -37,6 +37,8 @@ namespace BeachTycoon.EditorTools
             light.shadowNormalBias = 0.6f;
             light.transform.rotation = Quaternion.Euler(48f, -38f, 0f);
             RenderSettings.sun = light;
+            // Day and night: the sun, ambient, fog and sky colours above are the midday baseline it tints.
+            PrimitiveKit.SetReference(light.gameObject.AddComponent<BeachTycoon.Gameplay.DayNightView>(), "worldCamera", camera);
 
             var volume = new GameObject("Post Processing").AddComponent<Volume>();
             volume.isGlobal = true;
