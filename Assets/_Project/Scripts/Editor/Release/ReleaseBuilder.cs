@@ -46,17 +46,20 @@ namespace BeachTycoon.EditorTools
         [MenuItem("Beach Tycoon/Release/Build iOS (Xcode project)", priority = 62)]
         private static void BuildIosMenu() => Debug.Log(Build("ios"));
 
-        /// <summary>Builds "android" (Builds/Android/BeachTycoon.apk) or "ios" (Builds/iOS); returns a short report.</summary>
+        /// <summary>A desktop copy of the game, used to check how a built player renders.</summary>
+        public const string MacAppPath = "Builds/Mac/BeachTycoon.app";
+
+        /// <summary>Builds "android" (Builds/Android/BeachTycoon.apk), "ios" (Builds/iOS) or "mac"; returns a short report.</summary>
         public static string Build(string platform)
         {
-            bool android = platform == "android";
-            if (!android && platform != "ios") return "RESULT: FAIL unknown platform " + platform;
-            BuildTarget target = android ? BuildTarget.Android : BuildTarget.iOS;
-            BuildTargetGroup group = android ? BuildTargetGroup.Android : BuildTargetGroup.iOS;
+            bool android = platform == "android", mac = platform == "mac";
+            if (!android && !mac && platform != "ios") return "RESULT: FAIL unknown platform " + platform;
+            BuildTarget target = android ? BuildTarget.Android : mac ? BuildTarget.StandaloneOSX : BuildTarget.iOS;
+            BuildTargetGroup group = android ? BuildTargetGroup.Android : mac ? BuildTargetGroup.Standalone : BuildTargetGroup.iOS;
             if (!BuildPipeline.IsBuildTargetSupported(group, target)) return $"RESULT: FAIL {target} build support is not installed (add the module in Unity Hub)";
 
             ApplySettings();
-            string path = android ? "Builds/Android/BeachTycoon.apk" : "Builds/iOS";
+            string path = android ? "Builds/Android/BeachTycoon.apk" : mac ? MacAppPath : "Builds/iOS";
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "Builds");
             var options = new BuildPlayerOptions
             {

@@ -12,7 +12,8 @@ namespace BeachTycoon.EditorTools
     /// to Temp/BeachTycoonEditor.request; the result goes to Logs/BeachTycoonEditor.log.
     ///   probe                   build targets, identity and packages
     ///   packages add a b ...    adds packages (latest compatible version) through the Package Manager
-    ///   build android|ios       see ReleaseBuilder
+    ///   build android|ios|mac   see ReleaseBuilder
+    ///   shot file.png           runs the Mac build at phone quality; it saves a screenshot of the beach and quits
     /// </summary>
     [InitializeOnLoad]
     internal static class EditorRequests
@@ -38,6 +39,7 @@ namespace BeachTycoon.EditorTools
 
             if (!File.Exists(RequestPath) || EditorApplication.isCompiling || EditorApplication.isPlayingOrWillChangePlaymode) return;
             string command = File.ReadAllText(RequestPath).Trim();
+            if (command.Length == 0) return; // seen before its text arrived; read it again next update
             File.Delete(RequestPath);
             string[] words = command.Split(new[] { ' ', '\n', '\r', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
             if (words.Length == 0) return;
@@ -45,6 +47,7 @@ namespace BeachTycoon.EditorTools
             if (words[0] == "probe") Write(Probe());
             else if (words[0] == "packages" && words.Length > 2 && words[1] == "add") StartAdding(words);
             else if (words[0] == "build" && words.Length > 1) Write(ReleaseBuilder.Build(words[1]));
+            else if (words[0] == "shot" && words.Length > 1) Write(LaunchShot(words[1]));
             else Write("RESULT: unknown command '" + command + "'");
         }
 
@@ -64,6 +67,18 @@ namespace BeachTycoon.EditorTools
 
             text.Append("RESULT: done");
             return text.ToString();
+        }
+
+        private static string LaunchShot(string file)
+        {
+            string folder = Path.Combine(ReleaseBuilder.MacAppPath, "Contents/MacOS");
+            if (!Directory.Exists(folder)) return "RESULT: FAIL build mac first";
+            string executable = Directory.GetFiles(folder)[0];
+            string target = Path.GetFullPath(file);
+            File.Delete(target);
+            System.Diagnostics.Process.Start(executable,
+                $"-screen-fullscreen 0 -screen-width 540 -screen-height 960 -logFile \"{target}.log\" -beachQuality 0 -beachShot \"{target}\"");
+            return "Started " + executable + "\nRESULT: launched";
         }
 
         private static void StartAdding(string[] words)
