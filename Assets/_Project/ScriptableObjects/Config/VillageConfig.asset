@@ -29,3 +29,5 @@ MonoBehaviour:
   - Pebble Bay
   signPosition: {x: 3.6, y: -17.2}
   signYaw: -12
+  flagpolePrefab: {fileID: 233430143727392793, guid: 22d926beea99942d3984df45b15a916b, type: 3}
+  flagPixels: {x: 60, y: 40}

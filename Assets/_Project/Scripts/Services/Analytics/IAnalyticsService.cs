@@ -17,6 +17,7 @@ namespace BeachTycoon.Services
         public const string SeasonStarted = "season_started";
         public const string MiniGameLevelPassed = "minigame_level_passed";
         public const string VillageFounded = "village_founded";
+        public const string CultureChosen = "culture_chosen";
     }
 
     /// <summary>Analytics seam. One optional parameter keeps call sites allocation-free.</summary>

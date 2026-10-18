@@ -30,7 +30,7 @@ namespace BeachTycoon.EditorTools
             RooftopUmbrella(t, new Vector3(1.4f, 3 * FloorHeight + 0.16f, 1.6f), p);
             RooftopUmbrella(t, new Vector3(-1.4f, 3 * FloorHeight + 0.16f, 1.6f), p);
             PrimitiveKit.AddBox(root, new Vector3(0f, 2f, 0.55f), new Vector3(4.3f, 4f, 3.6f));
-            BuildingPrefabs.AddView(root);
+            BuildingPrefabs.AddView(root, flagAnchor: new Vector3(-1.9f, 3 * FloorHeight + 0.16f, 2.2f)); // back roof corner
             return root;
         }
 
@@ -65,7 +65,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.Part(t, PrimitiveType.Cylinder, "ColumnL", new Vector3(-1f, 0.62f, front - 1.15f), new Vector3(0.14f, 0.62f, 0.14f), plaster);
             PrimitiveKit.Part(t, PrimitiveType.Cylinder, "ColumnR", new Vector3(1f, 0.62f, front - 1.15f), new Vector3(0.14f, 0.62f, 0.14f), plaster);
             PrimitiveKit.AddBox(root, new Vector3(0f, 2.1f, 0.8f), new Vector3(4.4f, 4.2f, 4.2f));
-            BuildingPrefabs.AddView(root);
+            BuildingPrefabs.AddView(root, flagAnchor: new Vector3(1.55f, 2.9f, 1.9f)); // middle terrace, beside the pool
             return root;
         }
 

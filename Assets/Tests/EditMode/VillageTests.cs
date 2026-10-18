@@ -58,7 +58,7 @@ namespace BeachTycoon.Tests
         {
             var meta = new MetaModel();
             var analytics = new MockAnalyticsService(false);
-            var village = new VillageService(_config, meta, analytics, 1);
+            var village = new VillageService(_config, meta, analytics, seed: 1);
             Assert.IsFalse(village.IsFounded);
 
             Assert.IsFalse(village.TryFound("A", "greece", out string error));
@@ -82,7 +82,7 @@ namespace BeachTycoon.Tests
         public void Rename_ChangesOnlyTheName()
         {
             var meta = new MetaModel();
-            var village = new VillageService(_config, meta, new MockAnalyticsService(false), 1);
+            var village = new VillageService(_config, meta, new MockAnalyticsService(false), seed: 1);
             Assert.IsFalse(village.TryRename("Coral Cove", out string error), "nothing to rename before founding");
             Assert.AreEqual("Found the village first.", error);
 
@@ -100,7 +100,7 @@ namespace BeachTycoon.Tests
         [Test]
         public void SuggestName_ComesFromTheConfig_AndNeverRepeatsInARow()
         {
-            var village = new VillageService(_config, new MetaModel(), new MockAnalyticsService(false), 7);
+            var village = new VillageService(_config, new MetaModel(), new MockAnalyticsService(false), seed: 7);
             string previous = null;
             for (int i = 0; i < 30; i++)
             {

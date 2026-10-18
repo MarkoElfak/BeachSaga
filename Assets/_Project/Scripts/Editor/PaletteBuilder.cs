@@ -58,6 +58,8 @@ namespace BeachTycoon.EditorTools
             new Entry("placeValid", "#4CD964", 0.3f), new Entry("placeInvalid", "#FF3B30", 0.3f),
             new Entry("placeValidEdge", "#1B7A35", 0.3f), new Entry("placeInvalidEdge", "#A3170F", 0.3f),
             new Entry("fencePost", "#8A6A47", 0.1f), new Entry("fenceRope", "#E8D9B5", 0.1f),
+            // Milestone 14: the culture flag cloth (white, so the flag image shows its true colours)
+            new Entry("flag", "#FFFFFF", 0.1f),
         };
 
         public static PaletteDefinition BuildOrSync()

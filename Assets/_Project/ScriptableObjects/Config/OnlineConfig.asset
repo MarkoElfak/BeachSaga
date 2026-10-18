@@ -24,6 +24,7 @@ MonoBehaviour:
   - ownerId: demo-coral
     displayName: Coral
     villageName: Coral Cove
+    cultureId: greece
     tier: 2
     houses: 1
     decorations: 3
@@ -31,6 +32,7 @@ MonoBehaviour:
   - ownerId: demo-kai
     displayName: Kai
     villageName: Palm Harbour
+    cultureId: spain
     tier: 3
     houses: 3
     decorations: 6
@@ -38,6 +40,7 @@ MonoBehaviour:
   - ownerId: demo-marina
     displayName: Marina
     villageName: Marina Bay
+    cultureId: italy
     tier: 5
     houses: 5
     decorations: 10

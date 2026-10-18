@@ -71,7 +71,8 @@ namespace BeachTycoon.Gameplay
             var economy = new EconomyService(data.wallet);
             ServiceLocator.Register<IEconomyService>(economy);
             var settings = Add(new SettingsService(data.meta.settings));
-            var village = Add(new VillageService(database.village, data.meta, analytics));
+            var culture = Add(new CultureService(database, data.meta));
+            var village = Add(new VillageService(database.village, data.meta, analytics, culture.IsKnown));
             var boost = Add(new IncomeBoost(monetization, data.meta));
             var season = Add(new SeasonService(database.economy, data, analytics, Reboot));
 
@@ -122,7 +123,7 @@ namespace BeachTycoon.Gameplay
             ServiceLocator.Register<ISocialService>(social);
             DemoIslands.Seed(database, islands, clock.UtcNow);
 
-            IslandSnapshot CaptureHome() => IslandSnapshotFactory.Capture(auth.PlayerId, auth.DisplayName, village.Name, data.lots,
+            IslandSnapshot CaptureHome() => IslandSnapshotFactory.Capture(auth.PlayerId, auth.DisplayName, village.Name, village.CultureId, data.lots,
                 data.stands, data.decorations, placement, popularity.Value, clock.UtcNow);
             var ledger = new VisitBonusLedger(data.meta, database.online.maxBonusesPerDay);
             Add(new VisitService(database, auth, islands, social, CaptureHome, ledger, clock, estimator.IncomePerSecond,

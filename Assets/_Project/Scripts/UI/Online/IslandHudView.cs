@@ -8,11 +8,12 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Island scene HUD: whose island it is, the visit bonus, Like and Gift (friends only) and Home.</summary>
+    /// <summary>Island scene HUD: whose island it is and its flag, the visit bonus, Like and Gift (friends only) and Home.</summary>
     public sealed class IslandHudView : MonoBehaviour
     {
         [SerializeField] private TMP_Text title = null;
         [SerializeField] private TMP_Text details = null;
+        [SerializeField] private RawImage flag = null;
         [SerializeField] private TMP_Text bonusLabel = null;
         [SerializeField] private Button likeButton = null;
         [SerializeField] private TMP_Text likeLabel = null;
@@ -23,6 +24,7 @@ namespace BeachTycoon.UI
         private VisitService _visits;
 
         public string TitleText => title.text;
+        public Texture Flag => flag.gameObject.activeSelf ? flag.texture : null;
         private ISocialService _social;
 
         private void Start()
@@ -32,6 +34,10 @@ namespace BeachTycoon.UI
             IslandSnapshot island = _visits.Current;
             TierDefinition tier = ServiceLocator.Get<GameDatabase>().GetTier(island.tier);
             title.text = Title(island, _visits.IsOwnIsland);
+            ServiceLocator.TryGet(out CultureService cultures);
+            CultureDefinition culture = cultures?.Find(island.cultureId);
+            flag.texture = culture != null ? cultures.Flag(culture) : null;
+            flag.gameObject.SetActive(culture != null);
             string owner = _visits.IsOwnIsland || string.IsNullOrEmpty(island.villageName) ? string.Empty : $"{island.ownerName}  -  ";
             details.text = $"{owner}{(tier != null ? tier.displayName : "Empty beach")}  -  Popularity {island.popularity:0.00}";
             bonusLabel.text = _visits.LastBonus > 0

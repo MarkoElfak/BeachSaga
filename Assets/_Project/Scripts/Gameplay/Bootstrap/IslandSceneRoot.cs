@@ -63,7 +63,8 @@ namespace BeachTycoon.Gameplay
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
 
-            props.Spawn(database, _layout, ground);
+            ServiceLocator.TryGet(out CultureService cultures);
+            props.Spawn(database, _layout, ground, cultures, cultures?.Find(snapshot.cultureId));
             _navigation = new WorldNavigation(database.world, database.visitors, placement);
             crowd.Initialize(database, snapshot.tier, _navigation, _layout, ground);
         }

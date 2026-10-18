@@ -2,13 +2,18 @@ using UnityEngine;
 
 namespace BeachTycoon.Gameplay
 {
-    /// <summary>Marker on a building prefab: where its stands and rent coins go. Swap the art freely around it.</summary>
+    /// <summary>Marker on a building prefab: where its stands, rent coins and flag go. Swap the art freely around it.</summary>
     public sealed class BuildingView : MonoBehaviour
     {
         [SerializeField] private Transform[] standAnchors = new Transform[0];
 
         [Tooltip("Where rent coins appear (houses). Falls back to the building's position.")]
         [SerializeField] private Transform coinAnchor = null;
+
+        [Tooltip("Foot of the culture flagpole on the main building. Empty = no flag.")]
+        [SerializeField] private Transform flagAnchor = null;
+
+        public Transform FlagAnchor => flagAnchor;
 
         public Vector3 CoinPosition => coinAnchor != null ? coinAnchor.position : transform.position + Vector3.up;
 

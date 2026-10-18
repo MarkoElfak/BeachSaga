@@ -46,6 +46,17 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>The village's culture was picked (once per game).</summary>
+    public readonly struct CultureChosen
+    {
+        public readonly string CultureId;
+
+        public CultureChosen(string cultureId)
+        {
+            CultureId = cultureId;
+        }
+    }
+
     /// <summary>Sound or music settings changed.</summary>
     public readonly struct SettingsChanged
     {

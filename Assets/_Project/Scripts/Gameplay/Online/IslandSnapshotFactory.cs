@@ -9,7 +9,7 @@ namespace BeachTycoon.Gameplay
     public static class IslandSnapshotFactory
     {
         /// <summary>The main building is always included (tier 0 before the tent); houses once they are built.</summary>
-        public static IslandSnapshot Capture(string ownerId, string ownerName, string villageName, IReadOnlyList<LotModel> lots,
+        public static IslandSnapshot Capture(string ownerId, string ownerName, string villageName, string cultureId, IReadOnlyList<LotModel> lots,
             IReadOnlyList<StandModel> stands, IReadOnlyList<DecorationModel> decorations, PlacementService placement,
             float popularity, DateTime utcNow)
         {
@@ -18,6 +18,7 @@ namespace BeachTycoon.Gameplay
                 ownerId = ownerId,
                 ownerName = ownerName,
                 villageName = villageName ?? string.Empty,
+                cultureId = cultureId ?? string.Empty,
                 popularity = popularity,
                 timestampUtc = utcNow.ToString("o", CultureInfo.InvariantCulture),
             };

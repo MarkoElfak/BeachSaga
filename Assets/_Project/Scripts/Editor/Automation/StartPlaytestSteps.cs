@@ -10,9 +10,9 @@ using UnityEngine.SceneManagement;
 namespace BeachTycoon.EditorTools
 {
     /// <summary>
-    /// Milestone 13 playtest (start screen): a new game asks for the village name and cannot skip it; bad names
-    /// are refused with a message, the Idea button suggests one, and the name lands in the HUD, on the welcome
-    /// sign and in the save. The next start greets the player with the name and a Play button (once per app
+    /// Milestone 13 playtest (start screen): a new game asks for the village name and a culture and cannot skip
+    /// them; bad names are refused with a message, the Idea button suggests one, and the name lands in the HUD, on
+    /// the welcome sign and in the save. The next start greets the player with the name and a Play button (once per app
     /// start), Settings renames the village while the culture stays, and a visit shows the name on the island.
     /// </summary>
     internal static class StartPlaytestSteps
@@ -53,7 +53,7 @@ namespace BeachTycoon.EditorTools
         {
             StartScreenView screen = Screen;
             Check(!Village.IsFounded && screen.IsNamePage, "a new game opens the start screen on the name page");
-            Check(!screen.CanClose && screen.HeadingText == "Name your village", "it has no close button: the village must be named");
+            Check(!screen.CanClose && screen.HeadingText == "Found your village", "it has no close button: the village must be founded");
             PlaytestTools.CapturePortraitWithHud("m13_1_name.png");
 
             screen.InputText = "A";
@@ -70,9 +70,12 @@ namespace BeachTycoon.EditorTools
 
             screen.InputText = "  Sunny    Bay ";
             PlaytestTools.Click(screen, "ConfirmButton");
+            Check(screen.IsOpen && screen.ErrorText == "Pick a culture." && !Village.IsFounded, "a good name still needs a culture");
+            screen.Picker.Pick("greece");
+            PlaytestTools.Click(screen, "ConfirmButton");
             Check(!screen.IsOpen && Village.Name == FirstName, $"the village is founded as '{Village.Name}' (spaces tidied)");
             Check(HudName == FirstName && SignName == FirstName, "the name shows in the HUD and on the welcome sign");
-            Check(Village.CultureId == string.Empty, "no culture yet (they come in Milestone 14)");
+            Check(Village.CultureId == "greece", "Greece is its culture");
 
             ISaveService save = ServiceLocator.Get<ISaveService>();
             save.Save();
@@ -94,13 +97,13 @@ namespace BeachTycoon.EditorTools
             PlaytestTools.Click(PlaytestTools.Find<Canvas>(), "SettingsButton");
             SettingsPanelView settings = PlaytestTools.Find<SettingsPanelView>();
             PlaytestTools.Click(settings, "RenameButton");
-            Check(screen.IsNamePage && screen.CanClose && screen.HeadingText == "Rename your village" && screen.InputText == FirstName,
-                "Rename village in Settings opens the name page with the current name and a close button");
+            Check(screen.IsNamePage && screen.CanClose && screen.HeadingText == "Rename your village" && screen.InputText == FirstName && !screen.ShowsCultures,
+                "Rename village in Settings opens the name page with the current name and a close button, without cultures");
             PlaytestTools.CapturePortraitWithHud("m13_5_rename.png");
             screen.InputText = NewName;
             PlaytestTools.Click(screen, "ConfirmButton");
             Check(!screen.IsOpen && settings.IsOpen && Village.Name == NewName, "Save renames it and goes back to Settings");
-            Check(HudName == NewName && SignName == NewName && Village.CultureId == string.Empty, "HUD and sign follow; the culture is unchanged");
+            Check(HudName == NewName && SignName == NewName && Village.CultureId == "greece", "HUD and sign follow; the culture is unchanged");
             settings.Close();
             Visits.StartVisit(Visits.PlayerId);
         }

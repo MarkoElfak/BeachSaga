@@ -85,3 +85,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8d70236be52b942d8bb55e63a579bbca, type: 2}
   - {fileID: 11400000, guid: 2d493a31085474d8aa64ec27a5461d98, type: 2}
   - {fileID: 11400000, guid: 302389ee59d6f484181e88329ad44417, type: 2}
+  cultures:
+  - {fileID: 11400000, guid: de883c0f0d3124c60ae6f4ce4b132361, type: 2}
+  - {fileID: 11400000, guid: 015de3e064fe4491b93fdb9303b7a37e, type: 2}
+  - {fileID: 11400000, guid: 21afbf727dd1e4bf3aa073640fe1a011, type: 2}

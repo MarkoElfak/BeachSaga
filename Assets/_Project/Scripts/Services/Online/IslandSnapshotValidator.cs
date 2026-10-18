@@ -29,6 +29,7 @@ namespace BeachTycoon.Services
                 ownerId = raw.ownerId,
                 ownerName = Truncate(raw.ownerName),
                 villageName = Truncate(raw.villageName),
+                cultureId = database.FindCulture(raw.cultureId) != null ? raw.cultureId : string.Empty,
                 popularity = IsFinite(raw.popularity) ? Mathf.Clamp(raw.popularity, 0f, MaxPopularity) : 0f,
                 timestampUtc = raw.timestampUtc ?? string.Empty,
             };

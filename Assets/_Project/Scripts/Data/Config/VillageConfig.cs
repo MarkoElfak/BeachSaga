@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace BeachTycoon.Data
 {
-    /// <summary>The village the player founds on first launch: name rules, name ideas and the welcome sign.</summary>
+    /// <summary>The village the player founds on first launch: name rules, name ideas, the welcome sign and the flag.</summary>
     [CreateAssetMenu(menuName = "Beach Tycoon/Config/Village", fileName = "VillageConfig")]
     public sealed class VillageConfig : ScriptableObject
     {
@@ -21,5 +21,11 @@ namespace BeachTycoon.Data
         public Vector2 signPosition = new Vector2(3.6f, -17.2f);
         [Tooltip("Turn in degrees; 0 faces the camera.")]
         public float signYaw = -12f;
+
+        [Header("Flag")]
+        [Tooltip("Raised on the main building's flag anchor; needs a FlagView.")]
+        public GameObject flagpolePrefab;
+        [Tooltip("Pixels of the generated flag images (3:2 like most flags).")]
+        public Vector2Int flagPixels = new Vector2Int(60, 40);
     }
 }

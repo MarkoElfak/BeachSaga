@@ -8,6 +8,9 @@ namespace BeachTycoon.EditorTools
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 14 (cultures)", priority = 28)]
+        private static void RequestCulture() => File.WriteAllText(RequestPath, SuiteCulture);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 13 (start screen)", priority = 29)]
         private static void RequestStart() => File.WriteAllText(RequestPath, SuiteStart);
 
@@ -60,11 +63,12 @@ namespace BeachTycoon.EditorTools
         private const string SuiteFeel = "feel";
         private const string SuiteRelease = "release";
         private const string SuiteStart = "start";
+        private const string SuiteCulture = "culture";
 
         private static bool IsKnownSuite(string suite) =>
             suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
             || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames
-            || suite == SuiteFeel || suite == SuiteRelease || suite == SuiteStart;
+            || suite == SuiteFeel || suite == SuiteRelease || suite == SuiteStart || suite == SuiteCulture;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -83,6 +87,7 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteFeel) return "M11 sound and feel";
                 if (Suite == SuiteRelease) return "M12 release";
                 if (Suite == SuiteStart) return "M13 start screen";
+                if (Suite == SuiteCulture) return "M14 cultures";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -100,6 +105,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteFeel) return FeelPlaytestSteps.IsReady(step);
             if (Suite == SuiteRelease) return ReleasePlaytestSteps.IsReady(step);
             if (Suite == SuiteStart) return StartPlaytestSteps.IsReady(step);
+            if (Suite == SuiteCulture) return CulturePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -116,6 +122,7 @@ namespace BeachTycoon.EditorTools
             else if (Suite == SuiteFeel) FeelPlaytestSteps.Run(step);
             else if (Suite == SuiteRelease) ReleasePlaytestSteps.Run(step);
             else if (Suite == SuiteStart) StartPlaytestSteps.Run(step);
+            else if (Suite == SuiteCulture) CulturePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
         }

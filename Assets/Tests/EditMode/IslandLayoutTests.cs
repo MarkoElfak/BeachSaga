@@ -45,7 +45,7 @@ namespace BeachTycoon.Tests
             home.Stands.Add(new StandModel { productId = "towels", slotIndex = 1, placed = true, x = -6f, z = -4f });
             home.Decorations.Add(new DecorationModel { decorationId = "umbrella", spotIndex = 1 });
 
-            IslandSnapshot snapshot = IslandSnapshotFactory.Capture("me", "Me", "Test Bay", home.Lots, home.Stands, home.Decorations,
+            IslandSnapshot snapshot = IslandSnapshotFactory.Capture("me", "Me", "Test Bay", "greece", home.Lots, home.Stands, home.Decorations,
                 home.Placement, 0.8f, Now);
             Assert.AreEqual(2, snapshot.tier);
             Assert.AreEqual(2, snapshot.buildings.Count, "main building and the finished house");

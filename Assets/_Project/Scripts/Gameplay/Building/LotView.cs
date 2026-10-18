@@ -7,8 +7,8 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Displays one lot: the empty marker (main lot only), the construction crate, the building or house and its
-    /// stands. Forwards taps (build, select, house info) and drops rent coins. Long-press moves the building
-    /// alone: stands are separate objects (StandView) next to it. Holds no game state.
+    /// stands, dressed in the player's culture. Forwards taps (build, select, house info) and drops rent coins.
+    /// Long-press moves the building alone: stands are separate objects (StandView) next to it. Holds no game state.
     /// </summary>
     public sealed class LotView : MonoBehaviour, ITappable, IMovable
     {
@@ -26,6 +26,7 @@ namespace BeachTycoon.Gameplay
         private StandService _stands;
         private GameDatabase _database;
         private CoinSpawner _coinSpawner;
+        private CultureService _culture;
         private BuildingView _buildingView;
         private int _shownTier;
         private bool _bound;
@@ -46,12 +47,14 @@ namespace BeachTycoon.Gameplay
             _stands = ServiceLocator.Get<StandService>();
             _database = ServiceLocator.Get<GameDatabase>();
             _placement = ServiceLocator.Get<PlacementService>();
+            ServiceLocator.TryGet(out _culture);
             SnapToPlacement();
 
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
             EventBus.Subscribe<RentDue>(OnRentDue);
+            EventBus.Subscribe<CultureChosen>(OnCultureChosen);
 
             Refresh();
             for (int i = 0; i < _stands.Count; i++)
@@ -96,6 +99,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<LotStateChanged>(OnLotStateChanged);
             EventBus.Unsubscribe<StandCreated>(OnStandCreated);
             EventBus.Unsubscribe<RentDue>(OnRentDue);
+            EventBus.Unsubscribe<CultureChosen>(OnCultureChosen);
         }
 
         private void OnObjectMoved(ObjectMoved evt)
@@ -125,6 +129,13 @@ namespace BeachTycoon.Gameplay
         private void OnLotStateChanged(LotStateChanged evt)
         {
             if (evt.LotIndex == _lotIndex) Refresh();
+        }
+
+        // An older village picking its culture: the building is shown again, now in that culture.
+        private void OnCultureChosen(CultureChosen evt)
+        {
+            _shownTier = -1;
+            Refresh();
         }
 
         private void OnStandCreated(StandCreated evt)
@@ -162,13 +173,17 @@ namespace BeachTycoon.Gameplay
             }
 
             _shownTier = lot.tier;
-            GameObject prefab = IsHouse ? HousePrefab(lot.variant) : TierPrefab(lot.tier);
+            CultureDefinition culture = _culture?.Current;
+            GameObject prefab = Resolve(IsHouse ? HousePrefab(lot.variant) : TierPrefab(lot.tier), culture);
             if (prefab == null || lot.tier == 0) return;
 
             GameObject instance = Instantiate(prefab, buildingRoot, false);
+            _culture?.Dress(instance, culture, !IsHouse);
             _buildingView = instance.GetComponent<BuildingView>();
             if (_bound) Punch(instance.transform); // a building that just finished, not one loaded with the save
         }
+
+        private GameObject Resolve(GameObject prefab, CultureDefinition culture) => _culture != null ? _culture.Resolve(prefab, culture) : prefab;
 
         private GameObject TierPrefab(int tier)
         {
@@ -192,7 +207,7 @@ namespace BeachTycoon.Gameplay
                 return null;
             }
 
-            GameObject instance = Instantiate(stand.Product.standPrefab, transform.parent, false);
+            GameObject instance = Instantiate(Resolve(stand.Product.standPrefab, _culture?.Current), transform.parent, false);
             var view = instance.GetComponent<StandView>();
             view.Bind(stand, _coinSpawner);
             _standViews.Add(view);

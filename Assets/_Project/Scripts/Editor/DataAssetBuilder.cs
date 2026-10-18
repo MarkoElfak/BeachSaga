@@ -28,7 +28,7 @@ namespace BeachTycoon.EditorTools
             database.placement = LoadOrCreate<PlacementConfig>(ProjectPaths.Config + "/PlacementConfig.asset", out _);
             database.dailyRewards = LoadOrCreate<DailyRewardConfig>(ProjectPaths.Config + "/DailyRewardConfig.asset", out _);
             database.online = LoadOrCreate<OnlineConfig>(ProjectPaths.Config + "/OnlineConfig.asset", out _);
-            database.village = LoadOrCreate<VillageConfig>(ProjectPaths.Config + "/VillageConfig.asset", out _);
+            database.village = BuildVillage();
             database.world = BuildWorld();
             database.terrain = BuildTerrain(palette);
             database.palette = palette;
@@ -38,6 +38,7 @@ namespace BeachTycoon.EditorTools
             AchievementAssetBuilder.Fill(database);
             EventAssetBuilder.Fill(database);
             MiniGameAssetBuilder.Fill(database);
+            CultureAssetBuilder.Fill(database);
             FootprintMeasure.Bake(database);
 
             EditorUtility.SetDirty(database);
@@ -70,6 +71,18 @@ namespace BeachTycoon.EditorTools
 
             EditorUtility.SetDirty(world);
             return world;
+        }
+
+        private static VillageConfig BuildVillage()
+        {
+            var village = LoadOrCreate<VillageConfig>(ProjectPaths.Config + "/VillageConfig.asset", out _);
+            if (village.flagpolePrefab == null)
+            {
+                village.flagpolePrefab = PlaceholderPrefabBuilder.Load<GameObject>(PlaceholderPrefabBuilder.FlagpolePath);
+                EditorUtility.SetDirty(village);
+            }
+
+            return village;
         }
 
         // A slot per sound hook, filled with generated placeholder clips; assign your own clips any time.
