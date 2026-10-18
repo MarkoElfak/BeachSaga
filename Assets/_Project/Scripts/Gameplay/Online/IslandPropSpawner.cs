@@ -5,21 +5,32 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Shows a visited island's buildings, houses, stands and decorations as plain props: the same prefabs as at
-    /// home, but nothing is bound to game state, so tapping or long-pressing them does nothing.
+    /// home dressed in the owner's culture, but nothing is bound to game state, so tapping or long-pressing them
+    /// does nothing.
     /// </summary>
     public sealed class IslandPropSpawner : MonoBehaviour
     {
+        private CultureService _cultures;
+        private CultureDefinition _culture;
+
         public int SpawnedCount { get; private set; }
 
-        public void Spawn(GameDatabase database, IslandLayout layout, TerrainShape ground)
+        /// <summary>The visited island's culture (null when it has none).</summary>
+        public CultureDefinition Culture => _culture;
+
+        public void Spawn(GameDatabase database, IslandLayout layout, TerrainShape ground, CultureService cultures, CultureDefinition culture)
         {
+            _cultures = cultures;
+            _culture = culture;
             PlacementService placement = layout.Placement;
             for (int i = 0; i < layout.Buildings.LotCount; i++)
             {
                 LotModel lot = layout.Buildings.GetLot(i);
                 if (lot.state != LotState.Built) continue;
                 Vector2 at = placement.GetLotPosition(i);
-                Add(BuildingManager.IsHouseLot(i) ? HousePrefab(database, lot.variant) : TierPrefab(database, lot.tier), at, 0f, lot.yaw);
+                bool house = BuildingManager.IsHouseLot(i);
+                GameObject building = Add(house ? HousePrefab(database, lot.variant) : TierPrefab(database, lot.tier), at, 0f, lot.yaw);
+                _cultures?.Dress(building, _culture, !house);
             }
 
             for (int i = 0; i < layout.Stands.Count; i++)
@@ -41,6 +52,7 @@ namespace BeachTycoon.Gameplay
         private GameObject Add(GameObject prefab, Vector2 at, float height, float yaw)
         {
             if (prefab == null) return null;
+            if (_cultures != null) prefab = _cultures.Resolve(prefab, _culture);
             GameObject instance = Instantiate(prefab, new Vector3(at.x, height, at.y), Quaternion.Euler(0f, yaw, 0f), transform);
             SpawnedCount++;
             return instance;

@@ -28,6 +28,8 @@ namespace BeachTycoon.Services
             {
                 ownerId = raw.ownerId,
                 ownerName = Truncate(raw.ownerName),
+                villageName = Truncate(raw.villageName),
+                cultureId = database.FindCulture(raw.cultureId) != null ? raw.cultureId : string.Empty,
                 popularity = IsFinite(raw.popularity) ? Mathf.Clamp(raw.popularity, 0f, MaxPopularity) : 0f,
                 timestampUtc = raw.timestampUtc ?? string.Empty,
             };
@@ -72,7 +74,8 @@ namespace BeachTycoon.Services
 
         private static string Truncate(string name)
         {
-            string trimmed = (name ?? string.Empty).Trim();
+            // No angle brackets: names are shown in rich text labels.
+            string trimmed = (name ?? string.Empty).Replace("<", string.Empty).Replace(">", string.Empty).Trim();
             return trimmed.Length > MaxNameLength ? trimmed.Substring(0, MaxNameLength) : trimmed;
         }
 

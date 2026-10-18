@@ -20,6 +20,11 @@ namespace BeachTycoon.Data
 
         [Min(1f)] public float raycastMaxDistance = 500f;
 
+        [Tooltip("Two taps on open ground within this time make a double tap (whole map / close-up).")]
+        [Min(0.05f)] public float doubleTapSeconds = 0.3f;
+        [Tooltip("The second tap of a double tap lands within this many inches of the first.")]
+        [Min(0f)] public float doubleTapMaxInches = 0.4f;
+
         [Tooltip("Press and hold this long on a building or decoration to pick it up and move it.")]
         [Min(0.1f)] public float holdToMoveSeconds = 0.45f;
     }

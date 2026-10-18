@@ -19,5 +19,3 @@ MonoBehaviour:
   farClip: 250
   startDistance: 34
   minDistance: 18
-  maxDistance: 60
-  focusBoundsInset: 2

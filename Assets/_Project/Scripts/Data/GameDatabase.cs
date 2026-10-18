@@ -24,6 +24,7 @@ namespace BeachTycoon.Data
         public OnlineConfig online;
         public DayNightConfig dayNight;
         public BeachEventConfig beachEvents;
+        public VillageConfig village;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]
@@ -34,6 +35,8 @@ namespace BeachTycoon.Data
         public DecorationDefinition[] decorations;
         public AchievementDefinition[] achievements;
         public MiniGameDefinition[] miniGames;
+        [Tooltip("Filled by Setup from the Cultures folder, in start-screen order.")]
+        public CultureDefinition[] cultures;
 
         public int MaxTier => tiers != null ? tiers.Length : 0;
 
@@ -56,6 +59,18 @@ namespace BeachTycoon.Data
                 {
                     if (quest != null && quest.id == questId) return quest;
                 }
+            }
+
+            return null;
+        }
+
+        /// <summary>Null for an empty or unknown id (a save or snapshot from before cultures, or a removed one).</summary>
+        public CultureDefinition FindCulture(string cultureId)
+        {
+            if (cultures == null || string.IsNullOrEmpty(cultureId)) return null;
+            for (int i = 0; i < cultures.Length; i++)
+            {
+                if (cultures[i] != null && cultures[i].id == cultureId) return cultures[i];
             }
 
             return null;

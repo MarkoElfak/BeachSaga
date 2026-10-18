@@ -448,3 +448,10 @@ MonoBehaviour:
     texture: {fileID: 0}
     tiling: {x: 1, y: 1}
     material: {fileID: 2100000, guid: c27a6305333624f0288e2be085edde90, type: 2}
+  - key: flag
+    color: {r: 1, g: 1, b: 1, a: 1}
+    smoothness: 0.1
+    metallic: 0
+    texture: {fileID: 0}
+    tiling: {x: 1, y: 1}
+    material: {fileID: 2100000, guid: a5ac68e7ae32e473bbd4ddb8e16075c0, type: 2}

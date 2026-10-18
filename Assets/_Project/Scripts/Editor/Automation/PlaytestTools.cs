@@ -160,6 +160,15 @@ namespace BeachTycoon.EditorTools
             return text.ToString();
         }
 
+        /// <summary>The collider a tap at this world point would hit first, for failure messages.</summary>
+        public static string HitName(Vector3 world)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Camera.main.WorldToScreenPoint(world));
+            return Physics.Raycast(ray, out RaycastHit hit, 500f, ~0, QueryTriggerInteraction.Collide)
+                ? $"{hit.collider.transform.root.name}/{hit.collider.name} (layer {hit.collider.gameObject.layer})"
+                : "nothing";
+        }
+
         /// <summary>Moves the camera to frame a world point at the current angle (test framing only).</summary>
         public static void FocusCamera(Vector3 focus, float distance)
         {

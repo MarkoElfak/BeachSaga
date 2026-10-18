@@ -53,6 +53,13 @@ namespace BeachTycoon.EditorTools
             RectTransform banner = UiKit.Rect("Banner", safe, new Vector2(0f, 1f), Vector2.one, new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(-60f, 270f));
             UiKit.AddImage(banner, UiKit.PanelColor, false);
             TextMeshProUGUI title = Line(banner, "Title", 0.62f, 1f, 56f, Color.white, FontStyles.Bold);
+            title.rectTransform.sizeDelta = new Vector2(-280f, 0f); // clear of the flag on the left
+            title.enableAutoSizing = true;
+            title.fontSizeMin = 34f;
+            title.fontSizeMax = 56f;
+            RectTransform flagRect = UiKit.Rect("Flag", banner, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(26f, -22f), new Vector2(96f, 64f));
+            var flag = flagRect.gameObject.AddComponent<RawImage>();
+            flag.raycastTarget = false;
             TextMeshProUGUI details = Line(banner, "Details", 0.34f, 0.62f, 38f, Color.white, FontStyles.Normal);
             TextMeshProUGUI bonus = Line(banner, "Bonus", 0.04f, 0.34f, 40f, Gold, FontStyles.Bold);
 
@@ -64,6 +71,7 @@ namespace BeachTycoon.EditorTools
             var view = safe.gameObject.AddComponent<IslandHudView>();
             PrimitiveKit.SetReference(view, "title", title);
             PrimitiveKit.SetReference(view, "details", details);
+            PrimitiveKit.SetReference(view, "flag", flag);
             PrimitiveKit.SetReference(view, "bonusLabel", bonus);
             PrimitiveKit.SetReference(view, "likeButton", like);
             PrimitiveKit.SetReference(view, "likeLabel", likeLabel);

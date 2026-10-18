@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f5233211023458bb95f9f94d0aed4d, type: 3}
+  m_Name: VillageConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.VillageConfig
+  minNameLength: 2
+  maxNameLength: 20
+  suggestedNames:
+  - Sunny Bay
+  - Coral Cove
+  - Palm Harbour
+  - Seashell Point
+  - Golden Sands
+  - Driftwood Bay
+  - Blue Lagoon
+  - Starfish Beach
+  - Sandy Hollow
+  - Breezy Shore
+  - Turtle Cove
+  - Pebble Bay
+  signPosition: {x: 3.6, y: -17.2}
+  signYaw: -12
+  flagpolePrefab: {fileID: 233430143727392793, guid: 22d926beea99942d3984df45b15a916b, type: 3}
+  flagPixels: {x: 60, y: 40}
