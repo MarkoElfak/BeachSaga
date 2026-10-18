@@ -53,21 +53,20 @@ namespace BeachTycoon.EditorTools
             database.visitorTypes = types.ToArray();
         }
 
-        // Land per tier: (half width, bottom z, zoom-out limit). The top edge stays at the wet sand.
+        // Land per tier: (half width, bottom z). The top edge stays at the wet sand.
         private const float LandTopZ = 6.5f;
-        private static readonly Vector3[] Land =
+        private static readonly Vector2[] Land =
         {
-            new Vector3(11.8f, -15.6f, 44f), new Vector3(13.8f, -16f, 50f), new Vector3(15.8f, -16.3f, 56f),
-            new Vector3(17.6f, -16.6f, 62f), new Vector3(19.2f, -16.9f, 70f),
+            new Vector2(11.8f, -15.6f), new Vector2(13.8f, -16f), new Vector2(15.8f, -16.3f),
+            new Vector2(17.6f, -16.6f), new Vector2(19.2f, -16.9f),
         };
 
         // Only fills land that was never set, so tuned areas survive re-running Setup.
         private static void SetLand(TierDefinition tier, int index)
         {
             if (tier.buildArea.width > 0f || index >= Land.Length) return;
-            Vector3 land = Land[index];
+            Vector2 land = Land[index];
             tier.buildArea = Rect.MinMaxRect(-land.x, land.y, land.x, LandTopZ);
-            tier.maxZoomDistance = land.z;
             EditorUtility.SetDirty(tier);
         }
 

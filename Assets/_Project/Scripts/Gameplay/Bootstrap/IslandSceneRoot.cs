@@ -56,10 +56,8 @@ namespace BeachTycoon.Gameplay
             worldBuilder.RefreshPlacement(_flats, _occupied, false);
 
             Vector2 focus = placement.GetLotPosition(BuildingManager.MainLotIndex);
-            TierDefinition tier = database.GetTier(Mathf.Max(1, snapshot.tier));
             Color sea = database.palette.GetColor(database.world.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, placement.UnlockedArea, tier != null ? tier.maxZoomDistance : 0f,
-                new Vector3(focus.x, 0f, focus.y), sea);
+            cameraController.Initialize(database.cameraConfig, placement.UnlockedArea, new Vector3(focus.x, 0f, focus.y), sea);
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
 

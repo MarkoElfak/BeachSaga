@@ -62,7 +62,7 @@ namespace BeachTycoon.Gameplay
             worldBuilder.ShowLandBoundary(_placement.UnlockedArea, MoreLandToUnlock());
             Vector3 startFocus = LotPosition(0);
             Color seaColor = database.palette.GetColor(layout.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, _placement.UnlockedArea, MaxZoom(), startFocus, seaColor);
+            cameraController.Initialize(database.cameraConfig, _placement.UnlockedArea, startFocus, seaColor);
 
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
@@ -94,24 +94,17 @@ namespace BeachTycoon.Gameplay
             worldBuilder.RefreshPlacement(_flats, _occupied, lotsChanged);
         }
 
-        // An upgrade opened more land: move the boundary fence and let the camera roam and zoom out further.
+        // An upgrade opened more land: move the boundary fence; the camera roams it and full zoom-out shows it all.
         private void OnAreaUnlocked(AreaUnlocked evt)
         {
             worldBuilder.ShowLandBoundary(evt.Area, MoreLandToUnlock());
-            cameraController.SetLimits(evt.Area, MaxZoom());
+            cameraController.SetLimits(evt.Area);
         }
 
         private bool MoreLandToUnlock()
         {
             int tier = ServiceLocator.Get<BuildingManager>().MainTier;
             return _placement.AreaForTier(tier) != _placement.AreaForTier(ServiceLocator.Get<GameDatabase>().MaxTier);
-        }
-
-        private float MaxZoom()
-        {
-            GameDatabase database = ServiceLocator.Get<GameDatabase>();
-            TierDefinition tier = database.GetTier(Mathf.Max(1, ServiceLocator.Get<BuildingManager>().MainTier));
-            return tier != null ? tier.maxZoomDistance : 0f;
         }
 
         private void SpawnLots()
