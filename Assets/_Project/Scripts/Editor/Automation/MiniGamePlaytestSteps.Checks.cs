@@ -79,6 +79,7 @@ namespace BeachTycoon.EditorTools
             StandView view = ViewFor(product);
             PlaytestTools.FocusCamera(view.transform.position, 14f);
             Vector3 point = view.transform.position + Vector3.up * 0.8f;
+            Selection.Clear(); // a tap on what is already selected deselects it
             PlaytestTools.TapWorld(point);
             bool selected = Selection.HasSelection && Selection.Selected.Equals(view.Placeable);
             Check(selected, selected ? $"tapping the {product} stand selects it"

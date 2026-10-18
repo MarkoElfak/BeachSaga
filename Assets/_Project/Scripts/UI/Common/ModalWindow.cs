@@ -46,7 +46,11 @@ namespace BeachTycoon.UI
             Vector2 size = window.rect.size;
             if (size.x <= 0f || size.y <= 0f || space.x <= 0f || space.y <= 0f) return;
 
-            float scale = Mathf.Min(1f, space.x / size.x, space.y / size.y);
+            // A window placed off centre needs room for its offset too.
+            Vector2 offset = window.anchoredPosition;
+            float fitX = (space.x - 2f * Mathf.Abs(offset.x)) / size.x;
+            float fitY = (space.y - 2f * Mathf.Abs(offset.y)) / size.y;
+            float scale = Mathf.Clamp(Mathf.Min(fitX, fitY), 0.1f, 1f);
             window.localScale = new Vector3(scale, scale, 1f);
         }
     }
