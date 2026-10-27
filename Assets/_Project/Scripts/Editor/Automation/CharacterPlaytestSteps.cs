@@ -19,6 +19,7 @@ namespace BeachTycoon.EditorTools
         private const float TestTimeScale = 8f;
         private const float Boosted = 1.25f;
 
+        private static float Unstaffed => ServiceLocator.Get<StaffService>().Config.unstaffedServeSpeed;
         private static CharacterService Characters => ServiceLocator.Get<CharacterService>();
         private static StandService Stands => ServiceLocator.Get<StandService>();
         private static BuildingManager Buildings => ServiceLocator.Get<BuildingManager>();
@@ -106,13 +107,12 @@ namespace BeachTycoon.EditorTools
             Check(FindButton(bar, "WorkButton").gameObject.activeSelf, $"the towel stand offers Work here ({PlaytestTools.HitName(towels + Vector3.up)})");
             PlaytestTools.CapturePortraitWithHud("m17_4_work_here.png");
             PlaytestTools.Click(bar, "WorkButton");
-            Check(Characters.StandIndex == 1 && Characters.IsWalking && Stands.Get(0).ServeSpeed == 1f, "she walks over and the donut stand is back to normal");
-
+            Check(Characters.StandIndex == 1 && Characters.IsWalking && Stands.Get(0).ServeSpeed == Unstaffed, "she walks over and the empty donut stand drops to half speed");
         }
 
         private static void CheckMoved()
         {
-            Check(Stands.Get(1).ServeSpeed == Boosted && Stands.Get(0).ServeSpeed == 1f, "the towel stand now serves 25% faster");
+            Check(Stands.Get(1).ServeSpeed == Boosted && Stands.Get(0).ServeSpeed == Unstaffed, "the towel stand now serves 25% faster");
             PlaytestTools.FocusCamera(View.transform.position, 8f);
             PlaytestTools.CapturePortrait("m17_5_towels.png");
             PlaytestTools.Click(Card.transform.parent, "CharacterButton");

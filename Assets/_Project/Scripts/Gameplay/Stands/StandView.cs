@@ -5,8 +5,8 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Shows a stand's serve progress and drops coins on sales (they collect themselves once a manager is hired,
-    /// shown by a hat) and wears one more decoration per mini-game level passed. Tapping selects it (rotate,
+    /// Shows a stand's serve progress and drops coins on sales (they collect themselves while a level 3 worker runs
+    /// it, shown by a hat) and wears one more decoration per mini-game level passed. Tapping selects it (rotate,
     /// upgrade, play); long-pressing moves it on its own. Tells WorldNavigation where its queue starts.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
@@ -17,7 +17,7 @@ namespace BeachTycoon.Gameplay
         [Tooltip("First queue position; the line grows along this transform's forward axis.")]
         [SerializeField] private Transform queueAnchor = null;
 
-        [Tooltip("Shown while the stand has a manager.")]
+        [Tooltip("Shown while a level 3 worker runs the stand and collects its coins.")]
         [SerializeField] private GameObject managerHat = null;
 
         [Tooltip("Shown one by one as the stand's mini-game levels are passed.")]
@@ -41,6 +41,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<ManagerHired>(OnManagerHired);
+            EventBus.Subscribe<ManagerLeft>(OnManagerLeft);
             EventBus.Subscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
             EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
             ShowManager(stand.Model.manager);
@@ -75,6 +76,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<SaleCompleted>(OnSaleCompleted);
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<ManagerHired>(OnManagerHired);
+            EventBus.Unsubscribe<ManagerLeft>(OnManagerLeft);
             EventBus.Unsubscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
             EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
         }
@@ -117,13 +119,18 @@ namespace BeachTycoon.Gameplay
             ScalePunch.On(this, config.punchScale, config.punchSeconds);
         }
 
-        // The new manager picks up whatever is already lying at the stand.
+        // A worker reached the collecting level here: they pick up whatever is already lying at the stand.
         private void OnManagerHired(ManagerHired evt)
         {
             if (Stand == null || evt.StandIndex != Stand.Index) return;
             ShowManager(true);
             Punch();
             _coinSpawner.AutoCollectSource(Stand.Index);
+        }
+
+        private void OnManagerLeft(ManagerLeft evt)
+        {
+            if (Stand != null && evt.StandIndex == Stand.Index) ShowManager(false);
         }
 
         // Its own move, or its lot changing size (stands in the default row slide along).

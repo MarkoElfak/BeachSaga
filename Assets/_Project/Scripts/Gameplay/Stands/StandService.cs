@@ -8,7 +8,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Owns every stand: restores them from the save, creates free products when a tier is reached,
-    /// unlocks paid products, upgrades stand levels, hires managers and ticks serving.
+    /// unlocks paid products, upgrades stand levels and ticks serving.
     /// </summary>
     public sealed class StandService : ITickable, IDisposable
     {
@@ -90,7 +90,7 @@ namespace BeachTycoon.Gameplay
             return true;
         }
 
-        /// <summary>Stands with a hired manager.</summary>
+        /// <summary>Stands whose coins collect themselves (a level 3 worker runs them).</summary>
         public int ManagerCount
         {
             get
@@ -99,18 +99,6 @@ namespace BeachTycoon.Gameplay
                 for (int i = 0; i < _stands.Count; i++) if (_stands[i].Model.manager) count++;
                 return count;
             }
-        }
-
-        public bool CanHireManager(StandController stand) =>
-            !stand.Model.manager && _economy.CanAfford(stand.Product.managerCost);
-
-        /// <summary>Pays the product's manager cost once; from then on the stand's coins collect themselves.</summary>
-        public bool TryHireManager(StandController stand)
-        {
-            if (stand.Model.manager || !_economy.TrySpend(stand.Product.managerCost)) return false;
-            stand.Model.manager = true;
-            EventBus.Publish(new ManagerHired(stand.Index, stand.Product.id));
-            return true;
         }
 
         public void Tick(float deltaTime)

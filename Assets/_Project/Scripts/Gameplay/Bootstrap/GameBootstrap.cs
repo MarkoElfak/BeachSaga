@@ -90,14 +90,15 @@ namespace BeachTycoon.Gameplay
             Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
             var navigation = Add(new WorldNavigation(database.world, database.visitors, placement));
             Add(new VisitorService(database, buildings, stands, popularity, navigation, events));
-            Add(new CharacterService(database, culture, stands, placement, navigation, data.meta));
+            var characters = Add(new CharacterService(database, culture, stands, placement, navigation, data.meta));
+            var staff = Add(new StaffService(database, data, stands, buildings, culture, characters, placement, navigation, economy));
             var neighbours = Add(new NeighbourService(database, buildings, progression, data.neighbours, season));
             neighbours.AttachPlacement(placement);
             Add(new QuestService(database, neighbours, stands, economy, progression));
 
             // Meta systems read the restored island, so they come last.
             var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours, season, miniGames));
-            Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics));
+            Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics, staff.WagesPerSecond));
             Add(new TutorialService(database.tutorial, data.meta, buildings));
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,
                 boost, ads, analytics));

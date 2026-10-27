@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 17;
+        public const int CurrentVersion = 18;
 
         public int version = CurrentVersion;
 
@@ -35,6 +35,10 @@ namespace BeachTycoon.Data
         // Version 12: mini-game levels passed, per game.
         public List<MiniGameProgress> miniGames = new List<MiniGameProgress>();
 
+        // Version 18: hired workers and the job seekers waiting on the beach.
+        public List<WorkerModel> staff = new List<WorkerModel>();
+        public List<WorkerModel> jobSeekers = new List<WorkerModel>();
+
         // Version 9: lots, stands and decorations have a yaw (see LotModel.yaw).
         // Version 10: stands can have a manager (StandModel.manager).
         // Version 11: seasons (MetaModel.seashells, seasonsCompleted; WalletModel.seasonEarned).
@@ -43,6 +47,8 @@ namespace BeachTycoon.Data
         // Version 14: privacy choice (SettingsModel.privacy).
         // Version 15: village name and culture (MetaModel.villageName, cultureId).
         // Version 16: bigger map; house lots 5-12 moved, so old houses there were pinned (LotModel.placed).
+        // Version 17: the player's character (MetaModel.characterStand).
+        // Version 18: staff and job seekers; each hired manager became a level 3 worker at their stand.
 
         public static GameSaveData CreateNew(long startingCoins)
         {

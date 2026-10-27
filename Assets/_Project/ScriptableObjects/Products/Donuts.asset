@@ -19,7 +19,7 @@ MonoBehaviour:
   price: 500
   serveSeconds: 3
   upgradeBaseCost: 25
-  managerCost: 500
+  skill: 0
   requiredTier: 1
   standPrefab: {fileID: 2223461675506333066, guid: 527534597ff734c0f91a1666d4605190, type: 3}
   standFootprint:

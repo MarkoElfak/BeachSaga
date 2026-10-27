@@ -77,6 +77,24 @@ namespace BeachTycoon.Gameplay
             return -1;
         }
 
+        /// <summary>Reserves the free relax spot on open land nearest to a point; -1 when the beach is full.</summary>
+        public int ReserveSpotNear(Vector3 point)
+        {
+            int best = -1;
+            float bestDistance = float.MaxValue;
+            for (int i = 0; i < _spots.Count; i++)
+            {
+                if (_spotTaken[i] || (_spotPiece[i] >= 0 && !_placement.IsPieceOpen(_spotPiece[i]))) continue;
+                float distance = (_spots[i] - point).sqrMagnitude;
+                if (distance >= bestDistance) continue;
+                bestDistance = distance;
+                best = i;
+            }
+
+            if (best >= 0) _spotTaken[best] = true;
+            return best;
+        }
+
         public void ReleaseSpot(int index)
         {
             if (index >= 0 && index < _spotTaken.Count)
