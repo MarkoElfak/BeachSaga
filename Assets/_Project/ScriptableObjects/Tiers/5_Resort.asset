@@ -31,8 +31,7 @@ MonoBehaviour:
   autoFootprint: 1
   buildArea:
     serializedVersion: 2
-    x: -19.2
-    y: -16.9
-    width: 38.4
-    height: 23.4
-  maxZoomDistance: 70
+    x: 0
+    y: 0
+    width: 0
+    height: 0

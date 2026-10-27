@@ -79,16 +79,27 @@ namespace BeachTycoon.Tests
         [Test]
         public void EveryTierHasAFootprintAndMoreLand()
         {
+            MapConfig map = _database.map;
+            Assert.IsNotNull(map, "map");
+            Assert.IsNotNull(map.fogMaterial, "fog material");
+            Assert.IsNotNull(map.signPrefab, "sign prefab");
             Rect previous = new Rect();
             for (int tier = 1; tier <= _database.MaxTier; tier++)
             {
                 TierDefinition definition = _database.GetTier(tier);
                 Assert.Greater(definition.footprint.width, 0f, $"tier {tier} footprint");
-                Assert.Greater(definition.buildArea.width, 0f, $"tier {tier} land");
-                Assert.IsTrue(tier == 1 || BeachTycoon.Gameplay.PlacementRules.Inside(previous, definition.buildArea, 0f),
+                Assert.IsTrue(BeachTycoon.Gameplay.LandMap.TryMainland(map, tier, out Rect land), $"tier {tier} land");
+                Assert.IsTrue(tier == 1 || BeachTycoon.Gameplay.PlacementRules.Inside(previous, land, 0f),
                     $"tier {tier} land contains the previous tier's");
-                Assert.GreaterOrEqual(definition.buildArea.width, previous.width, $"tier {tier} land grows");
-                previous = definition.buildArea;
+                previous = land;
+            }
+
+            var ids = new HashSet<string>();
+            foreach (LandPiece piece in map.pieces)
+            {
+                Assert.IsTrue(ids.Add(piece.id), $"duplicate land id {piece.id}");
+                Assert.IsFalse(string.IsNullOrEmpty(piece.displayName), piece.id);
+                Assert.That(piece.unlockTier, Is.InRange(1, _database.MaxTier), piece.id);
             }
         }
 

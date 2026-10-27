@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Fog
+  m_Shader: {fileID: 4800000, guid: 12947e1be51a9470cb6c20dc5015dd9a, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3020
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 724b7959d7e7f43faa02d50e679fd70f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Billow: 0.55
+    - _Density: 0.86
+    - _Layer: 0
+    - _Reveal: 0
+    - _Scale: 0.045
+    m_Colors:
+    - _Drift: {r: 0.012, g: 0.006, b: -0.008, a: 0.01}
+    - _LightColor: {r: 0.96999997, g: 0.97999996, b: 1, a: 1}
+    - _ShadeColor: {r: 0.74, g: 0.78999996, b: 0.86, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -30,12 +30,10 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.Part(t, PrimitiveType.Cube, "StripeFront", new Vector3(0f, 0f, -1.05f), new Vector3(2.25f, 2.25f, 0.35f), stripe, new Vector3(0f, 0f, 45f));
             PrimitiveKit.Part(t, PrimitiveType.Cube, "StripeBack", new Vector3(0f, 0f, 1.05f), new Vector3(2.25f, 2.25f, 0.35f), stripe, new Vector3(0f, 0f, 45f));
             PrimitiveKit.Part(t, PrimitiveType.Cube, "Door", new Vector3(0f, 0.45f, -1.52f), new Vector3(0.7f, 0.9f, 0.05f), wood);
-            PrimitiveKit.Part(t, PrimitiveType.Cylinder, "FlagPole", new Vector3(0f, 1.9f, 0f), new Vector3(0.05f, 0.45f, 0.05f), wood);
-            PrimitiveKit.Part(t, PrimitiveType.Cube, "Flag", new Vector3(0.25f, 2.2f, 0f), new Vector3(0.45f, 0.28f, 0.03f), stripe);
             PrimitiveKit.Part(t, PrimitiveType.Cylinder, "Peg0", new Vector3(-1.5f, 0.1f, -1.4f), new Vector3(0.05f, 0.1f, 0.05f), wood);
             PrimitiveKit.Part(t, PrimitiveType.Cylinder, "Peg1", new Vector3(1.5f, 0.1f, -1.4f), new Vector3(0.05f, 0.1f, 0.05f), wood);
             PrimitiveKit.AddBox(root, new Vector3(0f, 0.8f, 0f), new Vector3(3.2f, 1.6f, 3.1f));
-            AddView(root);
+            AddView(root, flagAnchor: new Vector3(0f, 1.5f, 0f)); // on the ridge
             return root;
         }
 
@@ -55,7 +53,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.Part(t, PrimitiveType.Cube, "Porch", new Vector3(0f, 0.1f, -1.85f), new Vector3(2.4f, 0.12f, 0.9f), wood);
             PrimitiveKit.Part(t, PrimitiveType.Cube, "Chimney", new Vector3(1f, 2.6f, 0.6f), new Vector3(0.35f, 1f, 0.35f), p.GetMaterial("stone"));
             PrimitiveKit.AddBox(root, new Vector3(0f, 1.5f, 0f), new Vector3(3.6f, 3f, 3f));
-            AddView(root);
+            AddView(root, flagAnchor: new Vector3(0f, 3.6f, 1.2f)); // back end of the ridge
             return root;
         }
 
@@ -87,7 +85,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.Part(t, PrimitiveType.Cube, "Step0", new Vector3(0f, 0.18f, -1.62f), new Vector3(1f, 0.12f, 0.3f), wood);
             PrimitiveKit.Part(t, PrimitiveType.Cube, "Step1", new Vector3(0f, 0.4f, -1.38f), new Vector3(1f, 0.12f, 0.3f), wood);
             PrimitiveKit.AddBox(root, new Vector3(0f, 1.6f, 0.3f), new Vector3(4.3f, 3.2f, 3.6f));
-            AddView(root);
+            AddView(root, flagAnchor: new Vector3(0f, 3.65f, 0.6f)); // roof peak
             return root;
         }
 
@@ -97,7 +95,7 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.Part(parent, PrimitiveType.Cube, name, position + new Vector3(0f, 0f, -0.015f), new Vector3(width, height, 0.04f), p.GetMaterial("glass"));
         }
 
-        public static void AddView(GameObject root, Vector3? coinAnchor = null)
+        public static void AddView(GameObject root, Vector3? coinAnchor = null, Vector3? flagAnchor = null)
         {
             var anchors = new Transform[StandAnchors.Length];
             for (int i = 0; i < anchors.Length; i++)
@@ -110,6 +108,11 @@ namespace BeachTycoon.EditorTools
             if (coinAnchor.HasValue)
             {
                 PrimitiveKit.SetReference(view, "coinAnchor", PrimitiveKit.Empty("CoinAnchor", root.transform, coinAnchor.Value).transform);
+            }
+
+            if (flagAnchor.HasValue)
+            {
+                PrimitiveKit.SetReference(view, "flagAnchor", PrimitiveKit.Empty("FlagAnchor", root.transform, flagAnchor.Value).transform);
             }
         }
     }

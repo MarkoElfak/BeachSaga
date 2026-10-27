@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5205302634d342918ef06dba56d1034, type: 3}
+  m_Name: MapConfig
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.MapConfig
+  dataVersion: 1
+  pieces:
+  - id: home_beach
+    displayName: Home Beach
+    unlockTier: 1
+    area:
+      serializedVersion: 2
+      x: -19.2
+      y: -16.9
+      width: 38.4
+      height: 23.4
+    island: 0
+    towelArea:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    signPosition: {x: 0, y: 0}
+    boardwalkFrom: {x: 0, y: 0}
+    boardwalkTo: {x: 0, y: 0}
+  - id: west_cove
+    displayName: West Cove
+    unlockTier: 2
+    area:
+      serializedVersion: 2
+      x: -28.8
+      y: -16.9
+      width: 9.599998
+      height: 23.4
+    island: 0
+    towelArea:
+      serializedVersion: 2
+      x: -27.6
+      y: 1.9
+      width: 7.200001
+      height: 3
+    signPosition: {x: -21, y: -1}
+    boardwalkFrom: {x: 0, y: 0}
+    boardwalkTo: {x: 0, y: 0}
+  - id: east_point
+    displayName: East Point
+    unlockTier: 3
+    area:
+      serializedVersion: 2
+      x: 19.2
+      y: -16.9
+      width: 9.599998
+      height: 23.4
+    island: 0
+    towelArea:
+      serializedVersion: 2
+      x: 20.4
+      y: 1.9
+      width: 7.200001
+      height: 3
+    signPosition: {x: 21, y: -1}
+    boardwalkFrom: {x: 0, y: 0}
+    boardwalkTo: {x: 0, y: 0}
+  - id: hillside
+    displayName: Hillside
+    unlockTier: 4
+    area:
+      serializedVersion: 2
+      x: -28.8
+      y: -20.8
+      width: 57.6
+      height: 3.8999996
+    island: 0
+    towelArea:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    signPosition: {x: -6.5, y: -18.4}
+    boardwalkFrom: {x: 0, y: 0}
+    boardwalkTo: {x: 0, y: 0}
+  - id: lagoon_islet
+    displayName: Lagoon Islet
+    unlockTier: 5
+    area:
+      serializedVersion: 2
+      x: -7.5
+      y: 15.5
+      width: 15
+      height: 15
+    island: 1
+    towelArea:
+      serializedVersion: 2
+      x: -5.5
+      y: 26.6
+      width: 11
+      height: 3
+    signPosition: {x: 3.4, y: 16.6}
+    boardwalkFrom: {x: 0, y: 5.2}
+    boardwalkTo: {x: 0, y: 15.9}
+  islandBeach: 2.5
+  islandElevation: 0.08
+  boardwalkWidth: 2
+  boardwalkHeight: 0.3
+  boardwalkMaterial: {fileID: 2100000, guid: 447a7d2e6996f485b800a71e20fcf196, type: 2}
+  boardwalkMesh: {fileID: 4300000, guid: d5413034a0695454884e403cfd4b5313, type: 2}
+  fogMaterial: {fileID: 2100000, guid: 37ed1de9835a64486a5d5323444ae15c, type: 2}
+  fogFadeInside: 2
+  fogFadeOutside: 1
+  fogHeight: 1.4
+  fogLayers: 2
+  fogLayerGap: 1
+  fogCellSize: 1.5
+  revealSeconds: 1.8
+  signPrefab: {fileID: 62080922336217748, guid: 62bc517a9439f46e89157776d73846dd, type: 3}

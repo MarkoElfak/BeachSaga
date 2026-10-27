@@ -6,7 +6,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Bakes the island's colour (RGB) + smoothness (A) texture and a fine detail normal map (sand ripples,
     /// grass bumps) over TerrainShape.TerrainRect. Colours: palette band colours by z, wet sand near the
-    /// waterline, tinted sand under water, a footpath, and subtle noise variation.
+    /// waterline, tinted sand under water, a footpath, islands, and subtle noise variation.
     /// </summary>
     public static class TerrainTextureBaker
     {
@@ -46,6 +46,8 @@ namespace BeachTycoon.Gameplay
                     float x = rect.xMin + (px + 0.5f) / size * rect.width;
                     float h = shape.Height(x, z, false);
                     Color c = BandColor(z, bandTops, bandColors, config.bandBlend);
+                    float island = shape.IslandLand(x, z, false); // islands: sand with a grassy middle
+                    if (island > 0f) c = Color.Lerp(c, Color.Lerp(dry, grass, shape.IslandLand(x, z, true)), island);
                     float grassWeight = Similarity(c, grass, dry);
                     float n = Mathf.PerlinNoise(x * 0.55f + 31f, z * 0.55f + 17f);
                     float n2 = Mathf.PerlinNoise(x * 2.3f + 5f, z * 2.3f + 9f);

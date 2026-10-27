@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BeachTycoon.Core;
+using BeachTycoon.Data;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
@@ -18,6 +19,29 @@ namespace BeachTycoon.Gameplay
         public void AppendPath(Vector3 from, Vector3 to, List<Vector3> path)
         {
             RefreshObstacles();
+            MapConfig map = _placement.Map;
+            int fromIsland = LandMap.IslandAt(map, new Vector2(from.x, from.z));
+            int toIsland = LandMap.IslandAt(map, new Vector2(to.x, to.z));
+            if (fromIsland != toIsland)
+            {
+                // Islands are reached only over their boardwalk.
+                if (fromIsland >= 0) from = CrossBoardwalk(from, map.pieces[fromIsland].boardwalkTo, map.pieces[fromIsland].boardwalkFrom, path);
+                if (toIsland >= 0) from = CrossBoardwalk(from, map.pieces[toIsland].boardwalkFrom, map.pieces[toIsland].boardwalkTo, path);
+            }
+
+            Walk(from, to, path);
+        }
+
+        private Vector3 CrossBoardwalk(Vector3 from, Vector2 start, Vector2 end, List<Vector3> path)
+        {
+            Walk(from, new Vector3(start.x, 0f, start.y), path);
+            var far = new Vector3(end.x, 0f, end.y);
+            path.Add(far);
+            return far;
+        }
+
+        private void Walk(Vector3 from, Vector3 to, List<Vector3> path)
+        {
             Vector3 current = from;
             for (int detour = 0; detour < MaxDetours; detour++)
             {

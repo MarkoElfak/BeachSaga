@@ -39,7 +39,7 @@ namespace BeachTycoon.Core
         }
     }
 
-    /// <summary>A main-building upgrade opened more land. Area is the whole buildable rectangle (x, z).</summary>
+    /// <summary>A main-building upgrade opened more land. Area holds all open land, islands included (x, z).</summary>
     public readonly struct AreaUnlocked
     {
         public readonly int Tier;
@@ -49,6 +49,30 @@ namespace BeachTycoon.Core
         {
             Tier = tier;
             Area = area;
+        }
+    }
+
+    /// <summary>A piece of the map (MapConfig.pieces[Piece]) opened: its fog rolls away and the camera flies over it.</summary>
+    public readonly struct LandOpened
+    {
+        public readonly int Piece;
+        public readonly Rect Area;
+
+        public LandOpened(int piece, Rect area)
+        {
+            Piece = piece;
+            Area = area;
+        }
+    }
+
+    /// <summary>The player tapped the fog over a locked piece of the map.</summary>
+    public readonly struct LockedLandTapped
+    {
+        public readonly int Piece;
+
+        public LockedLandTapped(int piece)
+        {
+            Piece = piece;
         }
     }
 

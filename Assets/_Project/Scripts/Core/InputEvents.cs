@@ -72,6 +72,17 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>Two quick taps on open ground: the camera switches between the whole map and a close-up.</summary>
+    public readonly struct DoubleTapEvent
+    {
+        public readonly Vector2 ScreenPosition;
+
+        public DoubleTapEvent(Vector2 screenPosition)
+        {
+            ScreenPosition = screenPosition;
+        }
+    }
+
     /// <summary>A tap hit nothing tappable in the world (open ground or water).</summary>
     public readonly struct GroundTapped
     {

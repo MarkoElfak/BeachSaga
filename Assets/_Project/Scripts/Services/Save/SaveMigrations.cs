@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BeachTycoon.Data;
 
 namespace BeachTycoon.Services
 {
@@ -20,6 +21,8 @@ namespace BeachTycoon.Services
             new AddMiniGames(),
             new AddVolumes(),
             new AddPrivacy(),
+            new AddVillage(),
+            new MoveHouseLots(),
         };
 
         /// <summary>
@@ -124,6 +127,48 @@ namespace BeachTycoon.Services
         {
             public int FromVersion => 13;
             public string Migrate(string json) => json.Replace("\"version\":13", "\"version\":14");
+        }
+
+        /// <summary>v14 -> v15: village name and culture; old saves have neither, so the start screen asks once.</summary>
+        private sealed class AddVillage : ISaveMigration
+        {
+            public int FromVersion => 14;
+            public string Migrate(string json) => json.Replace("\"version\":14", "\"version\":15");
+        }
+
+        /// <summary>
+        /// v15 -> v16: the map grew (M16) and house lots 5 to 12 moved to the new land. Houses already standing
+        /// on those lots at their old default spots are pinned there, so nothing on a saved beach moves.
+        /// </summary>
+        private sealed class MoveHouseLots : ISaveMigration
+        {
+            private const int FirstMovedLot = 5;
+
+            private static readonly UnityEngine.Vector2[] OldPositions =
+            {
+                new UnityEngine.Vector2(-10.5f, -10f), new UnityEngine.Vector2(10.5f, -10f),
+                new UnityEngine.Vector2(-5.5f, -12.2f), new UnityEngine.Vector2(5.5f, -12.2f),
+                new UnityEngine.Vector2(-8f, -12.2f), new UnityEngine.Vector2(8f, -12.2f),
+                new UnityEngine.Vector2(-10.5f, -12.2f), new UnityEngine.Vector2(10.5f, -12.2f),
+            };
+
+            public int FromVersion => 15;
+
+            public string Migrate(string json)
+            {
+                GameSaveData data = UnityEngine.JsonUtility.FromJson<GameSaveData>(json);
+                foreach (LotModel lot in data.lots)
+                {
+                    int moved = lot.index - FirstMovedLot;
+                    if (moved < 0 || moved >= OldPositions.Length || lot.placed || lot.state == LotState.Empty) continue;
+                    lot.placed = true;
+                    lot.x = OldPositions[moved].x;
+                    lot.z = OldPositions[moved].y;
+                }
+
+                data.version = 16;
+                return UnityEngine.JsonUtility.ToJson(data);
+            }
         }
     }
 }

@@ -8,14 +8,19 @@ using UnityEngine;
 
 namespace BeachTycoon.Tests
 {
-    /// <summary>Placement rules on the default layout, with a two-tier test database (no terrain).</summary>
+    /// <summary>
+    /// Placement rules on the default layout and map, with a two-tier test database (no terrain): the first tier
+    /// opens the first beach, the second opens every later piece at once.
+    /// </summary>
     public sealed partial class PlacementServiceTests
     {
         private const string DecorationId = "test_deco";
         private static readonly Rect TentFootprint = new Rect(-1.6f, -1.55f, 3.2f, 3.1f);
         private static readonly Rect ResortFootprint = new Rect(-2.2f, -2.6f, 4.4f, 5.1f);
-        private static readonly Rect FirstArea = Rect.MinMaxRect(-11.8f, -15.6f, 11.8f, 6.5f);
+        private static readonly Rect FirstArea = Rect.MinMaxRect(-11.8f, -15.6f, 11.8f, 6.5f); // tiers without a map
         private static readonly Rect LastArea = Rect.MinMaxRect(-19.2f, -16.9f, 19.2f, 6.5f);
+        private static readonly Rect HomeBeach = Rect.MinMaxRect(-19.2f, -16.9f, 19.2f, 6.5f);
+        private static readonly Rect WholeMainland = Rect.MinMaxRect(-28.8f, -20.8f, 28.8f, 6.5f);
 
         private readonly List<Object> _assets = new List<Object>();
         private GameDatabase _database;
@@ -36,6 +41,12 @@ namespace BeachTycoon.Tests
             _database.placement = Asset<PlacementConfig>();
             _database.economy = Asset<EconomyConfig>();
             _database.visitors = Asset<VisitorConfig>();
+            _database.map = Asset<MapConfig>();
+            for (int i = 0; i < _database.map.pieces.Length; i++)
+            {
+                _database.map.pieces[i].unlockTier = Mathf.Min(_database.map.pieces[i].unlockTier, 2);
+            }
+
             _database.tiers = new[] { Tier(TentFootprint, FirstArea), Tier(ResortFootprint, LastArea) };
             _database.products = new[] { Product("donuts"), Product("towels"), Product("surf_lessons") };
             var decoration = Asset<DecorationDefinition>();
@@ -139,19 +150,34 @@ namespace BeachTycoon.Tests
         [Test]
         public void FirstTier_KeepsObjectsInsideTheUnlockedArea()
         {
-            Assert.AreEqual(FirstArea, _placement.UnlockedArea);
+            Assert.AreEqual(HomeBeach, _placement.UnlockedArea);
             int decoration = AddDecoration(0);
-            Assert.IsFalse(_placement.CanPlace(PlaceableId.Decoration(decoration), new Vector2(15f, -2f)), "locked land");
+            Assert.IsTrue(_placement.CanPlace(PlaceableId.Decoration(decoration), new Vector2(15f, -2f)), "the whole first beach");
+            Assert.IsFalse(_placement.CanPlace(PlaceableId.Decoration(decoration), new Vector2(-24f, -2f)), "locked land");
             SetMain(LotState.Built, 2);
-            Assert.IsTrue(_placement.CanPlace(PlaceableId.Decoration(decoration), new Vector2(15f, -2f)), "unlocked by the upgrade");
+            Assert.AreEqual(WholeMainland, _placement.UnlockedArea);
+            Assert.IsTrue(_placement.CanPlace(PlaceableId.Decoration(decoration), new Vector2(-24f, -2f)), "unlocked by the upgrade");
         }
 
         [Test]
-        public void Upgrade_PublishesTheNewArea()
+        public void WithoutAMap_TiersUseTheirOwnLand()
         {
+            _database.map = null;
+            Assert.AreEqual(FirstArea, _placement.UnlockedArea);
+            Assert.AreEqual(FirstArea, _placement.UnlockedBounds);
+            SetMain(LotState.Built, 2);
+            Assert.AreEqual(LastArea, _placement.UnlockedArea);
+        }
+
+        [Test]
+        public void Upgrade_PublishesTheNewAreaAndEachOpenedPiece()
+        {
+            var opened = new List<int>();
+            EventBus.Subscribe<LandOpened>(evt => opened.Add(evt.Piece));
             SetMain(LotState.Built, 2);
             EventBus.Publish(new TierUpgraded(0, 2));
-            Assert.AreEqual(LastArea, _unlocked);
+            Assert.AreEqual(Rect.MinMaxRect(-28.8f, -20.8f, 28.8f, 30.5f), _unlocked, "mainland and islet");
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, opened);
         }
 
         [Test]

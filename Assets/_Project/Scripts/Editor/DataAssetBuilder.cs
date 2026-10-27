@@ -28,8 +28,10 @@ namespace BeachTycoon.EditorTools
             database.placement = LoadOrCreate<PlacementConfig>(ProjectPaths.Config + "/PlacementConfig.asset", out _);
             database.dailyRewards = LoadOrCreate<DailyRewardConfig>(ProjectPaths.Config + "/DailyRewardConfig.asset", out _);
             database.online = LoadOrCreate<OnlineConfig>(ProjectPaths.Config + "/OnlineConfig.asset", out _);
+            database.village = BuildVillage();
             database.world = BuildWorld();
             database.terrain = BuildTerrain(palette);
+            database.map = BuildMap(palette);
             database.palette = palette;
 
             ContentAssetBuilder.Fill(database);
@@ -37,6 +39,7 @@ namespace BeachTycoon.EditorTools
             AchievementAssetBuilder.Fill(database);
             EventAssetBuilder.Fill(database);
             MiniGameAssetBuilder.Fill(database);
+            CultureAssetBuilder.Fill(database);
             FootprintMeasure.Bake(database);
 
             EditorUtility.SetDirty(database);
@@ -71,6 +74,39 @@ namespace BeachTycoon.EditorTools
             return world;
         }
 
+        // Pieces and fog settings come from the code defaults until the map is tuned by hand (M16).
+        private static MapConfig BuildMap(PaletteDefinition palette)
+        {
+            var map = LoadOrCreate<MapConfig>(ProjectPaths.Config + "/MapConfig.asset", out _);
+            if (map.dataVersion < MapConfig.CurrentDataVersion)
+            {
+                var defaults = ScriptableObject.CreateInstance<MapConfig>();
+                EditorUtility.CopySerialized(defaults, map);
+                Object.DestroyImmediate(defaults);
+                map.name = "MapConfig";
+                map.dataVersion = MapConfig.CurrentDataVersion;
+            }
+
+            map.fogMaterial = RenderingAssets.FogMaterial();
+            map.boardwalkMaterial = palette.GetMaterial("wood");
+            map.boardwalkMesh = LowPolyPrimitives.For(PrimitiveType.Cube);
+            map.signPrefab = PlaceholderPrefabBuilder.Load<GameObject>(PlaceholderPrefabBuilder.LandSignPath);
+            EditorUtility.SetDirty(map);
+            return map;
+        }
+
+        private static VillageConfig BuildVillage()
+        {
+            var village = LoadOrCreate<VillageConfig>(ProjectPaths.Config + "/VillageConfig.asset", out _);
+            if (village.flagpolePrefab == null)
+            {
+                village.flagpolePrefab = PlaceholderPrefabBuilder.Load<GameObject>(PlaceholderPrefabBuilder.FlagpolePath);
+                EditorUtility.SetDirty(village);
+            }
+
+            return village;
+        }
+
         // A slot per sound hook, filled with generated placeholder clips; assign your own clips any time.
         private static SoundLibrary BuildSoundLibrary()
         {
@@ -85,9 +121,10 @@ namespace BeachTycoon.EditorTools
             var terrain = LoadOrCreate<TerrainConfig>(ProjectPaths.Config + "/TerrainConfig.asset", out _);
             if (terrain.dataVersion < TerrainConfig.CurrentDataVersion)
             {
-                // The island grew: longer footpath and more scenery. Other terrain tuning is kept.
+                // The island grew (M4.1, M16): longer footpath, more scenery, a finer texture. Other tuning is kept.
                 var defaults = ScriptableObject.CreateInstance<TerrainConfig>();
                 terrain.path = defaults.path;
+                terrain.textureSize = defaults.textureSize;
                 terrain.rockCount = defaults.rockCount;
                 terrain.grassTuftCount = defaults.grassTuftCount;
                 Object.DestroyImmediate(defaults);

@@ -66,8 +66,7 @@ namespace BeachTycoon.EditorTools
 
         private static void CheckLandUnlocked()
         {
-            TierDefinition cabin = ServiceLocator.Get<GameDatabase>().GetTier(2);
-            Check(Placement.UnlockedArea == cabin.buildArea && Placement.UnlockedArea.width > Placement.AreaForTier(1).width,
+            Check(Placement.UnlockedArea == Placement.AreaForTier(2) && Placement.UnlockedArea.width > Placement.AreaForTier(1).width,
                 $"cabin unlocked more land ({Placement.UnlockedArea.width:0.0} m wide)");
             Check(CameraRig().MaxDistance > _zoomAtFirstTier, $"camera can zoom out further ({_zoomAtFirstTier:0} -> {CameraRig().MaxDistance:0})");
         }

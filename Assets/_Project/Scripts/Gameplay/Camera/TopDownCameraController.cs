@@ -5,76 +5,92 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Fixed-angle camera orbiting a focus point on the ground. Drag pans so the ground stays under the
-    /// finger; pinch or mouse wheel changes distance. The focus point is clamped to the unlocked land, and the
-    /// zoom-out limit grows with the main building's tier. A CameraShakeRequested wobbles it briefly (unscaled
-    /// time) around the same pose.
+    /// Fixed-angle camera orbiting a focus point on the ground. Drag pans so the ground stays under the finger;
+    /// pinch or mouse wheel zooms, stretching softly past the limits and springing back. Full zoom-out is worked
+    /// out from the unlocked land and the screen's shape, so it always shows the whole map; a double tap on open
+    /// ground glides between that view and a close-up. Haze, shadows and draw distance follow the zoom.
     /// </summary>
     [RequireComponent(typeof(Camera))]
-    public sealed class TopDownCameraController : MonoBehaviour
+    public sealed partial class TopDownCameraController : MonoBehaviour
     {
         private static readonly Plane Ground = new Plane(Vector3.up, Vector3.zero);
+        private const float PinchSettleDelay = 0.12f;
 
         private Camera _camera;
         private CameraConfig _config;
-        private Rect _focusBounds;
+        private Quaternion _rotation;
+        private Rect _area;
         private Vector3 _focus;
         private float _distance;
+        private float _pinchDistance; // unsoftened distance while a pinch runs
         private float _maxDistance;
+        private float _aspect;
+        private float _lastPinchTime = float.NegativeInfinity;
         private bool _initialized;
-        private float _shakeLeft;
-        private float _shakeStrength;
 
-        /// <param name="area">Land the focus point may move over (the unlocked area).</param>
-        /// <param name="maxDistance">How far the player may zoom out for now.</param>
-        /// <summary>Current zoom-out limit (grows as land is unlocked).</summary>
+        /// <summary>Current zoom-out limit: the whole unlocked land fits the screen there.</summary>
         public float MaxDistance => _maxDistance;
+        public float MinDistance => _config.minDistance;
+        public float Distance => _distance;
+        public Vector3 Focus => _focus;
+        public Rect Area => _area;
 
-        public bool IsShaking => _shakeLeft > 0f;
-
-        /// <summary>Shakes requested so far (tests).</summary>
-        public int ShakeCount { get; private set; }
-
-        public void Initialize(CameraConfig config, Rect area, float maxDistance, Vector3 startFocus, Color background)
+        /// <param name="area">The unlocked land: the focus roams over it and full zoom-out shows all of it.</param>
+        public void Initialize(CameraConfig config, Rect area, Vector3 startFocus, Color background)
         {
             _camera = GetComponent<Camera>();
             _config = config;
+            _rotation = Quaternion.Euler(config.pitchDegrees, config.yawDegrees, 0f);
             _camera.fieldOfView = config.fieldOfView;
             _camera.nearClipPlane = config.nearClip;
             _camera.farClipPlane = config.farClip;
             _camera.clearFlags = CameraClearFlags.SolidColor;
             _camera.backgroundColor = background;
+            RememberShadowDistance();
 
-            SetBounds(area, maxDistance);
+            _area = area;
+            Refit();
             _distance = Mathf.Clamp(config.startDistance, config.minDistance, _maxDistance);
-            _focus = ClampFocus(startFocus);
+            _focus = ClampFocus(startFocus, _distance);
             _initialized = true;
             ApplyPose();
         }
 
         /// <summary>New land was unlocked: the camera may roam over it and zoom out further.</summary>
-        public void SetLimits(Rect area, float maxDistance)
+        public void SetLimits(Rect area)
         {
-            SetBounds(area, maxDistance);
+            _area = area;
             if (!_initialized) return;
-            _distance = Mathf.Clamp(_distance, _config.minDistance, _maxDistance);
-            _focus = ClampFocus(_focus);
+            Refit();
             ApplyPose();
         }
 
-        private void SetBounds(Rect area, float maxDistance)
+        /// <summary>The farthest zoom that shows the whole unlocked land on a screen of this shape.</summary>
+        public float FitDistanceFor(float aspect) => FitDistance(_area, aspect);
+
+        // The zoom that shows this ground rectangle (plus the fit margin) on a screen of this shape.
+        private float FitDistance(Rect area, float aspect)
         {
-            float inset = _config.focusBoundsInset;
-            float insetX = Mathf.Min(inset, area.width * 0.5f);
-            float insetZ = Mathf.Min(inset, area.height * 0.5f);
-            _focusBounds = Rect.MinMaxRect(area.xMin + insetX, area.yMin + insetZ, area.xMax - insetX, area.yMax - insetZ);
-            _maxDistance = Mathf.Max(_config.minDistance, maxDistance > 0f ? maxDistance : _config.maxDistance);
+            float margin = _config.fitMargin;
+            Rect padded = Rect.MinMaxRect(area.xMin - margin, area.yMin - margin, area.xMax + margin, area.yMax + margin);
+            float fit = CameraFraming.FitDistance(padded, _rotation, _config.fieldOfView, aspect, _config.fitHeight);
+            return Mathf.Max(_config.minDistance, fit);
+        }
+
+        private void Refit()
+        {
+            _aspect = _camera.aspect;
+            _maxDistance = FitDistanceFor(_aspect);
+            _distance = Mathf.Clamp(_distance, _config.minDistance, _maxDistance);
+            _pinchDistance = _distance;
+            _focus = ClampFocus(_focus, _distance);
         }
 
         private void OnEnable()
         {
             EventBus.Subscribe<DragEvent>(OnDrag);
             EventBus.Subscribe<PinchEvent>(OnPinch);
+            EventBus.Subscribe<DoubleTapEvent>(OnDoubleTap);
             EventBus.Subscribe<CameraShakeRequested>(OnShake);
         }
 
@@ -82,46 +98,35 @@ namespace BeachTycoon.Gameplay
         {
             EventBus.Unsubscribe<DragEvent>(OnDrag);
             EventBus.Unsubscribe<PinchEvent>(OnPinch);
+            EventBus.Unsubscribe<DoubleTapEvent>(OnDoubleTap);
             EventBus.Unsubscribe<CameraShakeRequested>(OnShake);
-        }
-
-        private void OnShake(CameraShakeRequested evt)
-        {
-            if (!_initialized || evt.Strength <= 0f) return;
-            ShakeCount++;
-            _shakeStrength = IsShaking ? Mathf.Max(_shakeStrength, evt.Strength) : evt.Strength;
-            _shakeLeft = _config.shakeSeconds;
-        }
-
-        private void LateUpdate()
-        {
-            if (!IsShaking) return;
-            _shakeLeft = Mathf.Max(0f, _shakeLeft - Time.unscaledDeltaTime);
-            ApplyPose(); // the last call, with no shake left, settles back on the exact pose
+            RestoreShadowDistance();
         }
 
         private void OnDrag(DragEvent evt)
         {
-            if (!_initialized)
-            {
-                return;
-            }
-
+            if (!_initialized) return;
             if (TryGetGroundPoint(evt.From, out Vector3 from) && TryGetGroundPoint(evt.To, out Vector3 to))
             {
-                _focus = ClampFocus(_focus + (from - to));
+                StopFlying();
+                _focus = ClampFocus(_focus + (from - to), _distance);
                 ApplyPose();
             }
         }
 
+        // Past a limit the zoom stretches less and less (it eases to a stop), then springs back in LateUpdate.
         private void OnPinch(PinchEvent evt)
         {
-            if (!_initialized || evt.Ratio <= 0f)
-            {
-                return;
-            }
+            if (!_initialized || evt.Ratio <= 0f) return;
+            StopFlying();
+            if (Time.unscaledTime - _lastPinchTime > PinchSettleDelay) _pinchDistance = _distance;
+            _lastPinchTime = Time.unscaledTime;
 
-            _distance = Mathf.Clamp(_distance / evt.Ratio, _config.minDistance, _maxDistance);
+            float min = _config.minDistance;
+            float give = _config.zoomGive;
+            _pinchDistance = Mathf.Clamp(_pinchDistance / evt.Ratio, min * 0.5f, _maxDistance * 2f);
+            _distance = CameraFraming.Soften(_pinchDistance, min, _maxDistance, min * give, _maxDistance * give);
+            _focus = ClampFocus(_focus, _distance);
             ApplyPose();
         }
 
@@ -138,29 +143,19 @@ namespace BeachTycoon.Gameplay
             return false;
         }
 
-        private Vector3 ClampFocus(Vector3 focus)
+        private Vector3 ClampFocus(Vector3 focus, float distance)
         {
-            return new Vector3(
-                Mathf.Clamp(focus.x, _focusBounds.xMin, _focusBounds.xMax),
-                0f,
-                Mathf.Clamp(focus.z, _focusBounds.yMin, _focusBounds.yMax));
+            float zoomOut = Mathf.InverseLerp(_config.minDistance, _maxDistance, distance);
+            Rect bounds = CameraFraming.FocusBounds(_area, _config.edgeLook, zoomOut);
+            return new Vector3(Mathf.Clamp(focus.x, bounds.xMin, bounds.xMax), 0f, Mathf.Clamp(focus.z, bounds.yMin, bounds.yMax));
         }
 
         private void ApplyPose()
         {
-            Quaternion rotation = Quaternion.Euler(_config.pitchDegrees, _config.yawDegrees, 0f);
-            Vector3 position = _focus - rotation * Vector3.forward * _distance;
-            if (IsShaking) position += rotation * ShakeOffset();
-            transform.SetPositionAndRotation(position, rotation);
-        }
-
-        // Smooth noise on the screen's x and y, fading out over the shake.
-        private Vector3 ShakeOffset()
-        {
-            float fade = _shakeLeft / _config.shakeSeconds;
-            float amplitude = _config.shakeAmplitude * _shakeStrength * fade * 2f;
-            float time = Time.unscaledTime * _config.shakeFrequency;
-            return new Vector3(Mathf.PerlinNoise(time, 0.3f) - 0.5f, Mathf.PerlinNoise(0.7f, time) - 0.5f, 0f) * amplitude;
+            Vector3 position = _focus - _rotation * Vector3.forward * _distance;
+            if (IsShaking) position += _rotation * ShakeOffset();
+            transform.SetPositionAndRotation(position, _rotation);
+            FollowZoom();
         }
     }
 }

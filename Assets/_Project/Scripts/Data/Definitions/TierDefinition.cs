@@ -31,9 +31,7 @@ namespace BeachTycoon.Data
         public bool autoFootprint = true;
 
         [Header("Land")]
-        [Tooltip("Buildable area (x, z, width, depth) once this tier is reached. Each upgrade opens more land.")]
+        [Tooltip("Older layouts only: buildable area at this tier. With a MapConfig the land pieces decide instead.")]
         public Rect buildArea;
-        [Tooltip("How far the camera may zoom out at this tier (0 = CameraConfig.maxDistance).")]
-        [Min(0f)] public float maxZoomDistance;
     }
 }

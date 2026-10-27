@@ -6,20 +6,20 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>The HUD Settings button and window (sliders, vibration, Remove ads, Privacy, Restore) and the privacy window.</summary>
+    /// <summary>The HUD Settings button and window (sliders, vibration, Remove ads, Privacy, Restore, Rename) and the privacy window.</summary>
     internal static class SettingsUiBuilder
     {
         private static readonly Color Track = new Color(0.82f, 0.78f, 0.7f);
         private static readonly Color Fill = new Color(0.35f, 0.7f, 0.95f);
 
-        public static void Build(Transform parent)
+        public static void Build(Transform parent, StartScreenView startScreen)
         {
             RectTransform openRect = UiKit.Rect("SettingsButton", parent, Vector2.one, Vector2.one, Vector2.one, new Vector2(-30f, -265f), new Vector2(200f, 90f));
             Button open = UiKit.AddButton(openRect, UiKit.PanelColor, out _);
             UiKit.ChildText(openRect, "Label", "Settings", 36f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
 
             RectTransform host = UiKit.Stretch("SettingsPanel", parent);
-            RectTransform root = MetaUiBuilder.Modal(host, "Settings", new Vector2(820f, 1100f), out RectTransform window, out Button close);
+            RectTransform root = MetaUiBuilder.Modal(host, "Settings", new Vector2(820f, 1250f), out RectTransform window, out Button close);
             Slider sound = VolumeSlider(window, "Sound", -170f, out TextMeshProUGUI soundLabel);
             Slider music = VolumeSlider(window, "Music", -360f, out TextMeshProUGUI musicLabel);
             Button vibration = MetaUiBuilder.Row(window, "VibrationButton", 3, MetaUiBuilder.Secondary, out TextMeshProUGUI vibrationLabel);
@@ -27,6 +27,8 @@ namespace BeachTycoon.EditorTools
             Button privacy = HalfRow(window, "PrivacyButton", 5, -165f, out TextMeshProUGUI privacyLabel);
             privacyLabel.text = "Privacy";
             Button restore = HalfRow(window, "RestoreButton", 5, 165f, out TextMeshProUGUI restoreLabel);
+            Button rename = MetaUiBuilder.Row(window, "RenameButton", 6, MetaUiBuilder.Secondary, out TextMeshProUGUI renameLabel);
+            renameLabel.text = "Rename village";
 
             var view = host.gameObject.AddComponent<SettingsPanelView>();
             PrimitiveKit.SetReference(view, "openButton", open);
@@ -43,6 +45,8 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "privacyPanel", BuildPrivacy(parent));
             PrimitiveKit.SetReference(view, "restoreButton", restore);
             PrimitiveKit.SetReference(view, "restoreLabel", restoreLabel);
+            PrimitiveKit.SetReference(view, "renameButton", rename);
+            PrimitiveKit.SetReference(view, "startScreen", startScreen);
             PrimitiveKit.SetReference(view, "closeButton", close);
             root.gameObject.SetActive(false);
         }

@@ -8,9 +8,9 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Builds the island at runtime from WorldLayoutConfig + TerrainConfig: a height-field terrain with a baked
     /// texture, a water surface with shore foam, palms and instanced rocks and grass. Editing the configs
-    /// reshapes the beach without code changes.
+    /// reshapes the beach without code changes. Locked land, fog and boardwalks live in BeachWorldBuilder.Land.
     /// </summary>
-    public sealed class BeachWorldBuilder : MonoBehaviour
+    public sealed partial class BeachWorldBuilder : MonoBehaviour
     {
         private const int MaxPlacementAttempts = 40;
         private const float ScatterClearance = 0.2f; // rocks and grass this close to an object are hidden too
@@ -21,11 +21,11 @@ namespace BeachTycoon.Gameplay
 
         private readonly List<Transform> _palms = new List<Transform>();
         private readonly List<ScatterRenderer> _scatters = new List<ScatterRenderer>();
+        private readonly List<Rect> _occupied = new List<Rect>();
+        private GameDatabase _database;
         private WorldLayoutConfig _layout;
         private TerrainConfig _terrain;
         private MeshFilter _terrainFilter;
-
-        private LandFence _fence;
 
         public TerrainShape Shape { get; private set; }
         public bool PalmsStaticBatched { get; private set; }
@@ -37,9 +37,10 @@ namespace BeachTycoon.Gameplay
             Transform root = worldRoot != null ? worldRoot : transform;
             WorldLayoutConfig layout = database.world;
             TerrainConfig config = database.terrain;
+            _database = database;
             _layout = layout;
             _terrain = config;
-            Shape = new TerrainShape(layout, config, lotFlats);
+            Shape = new TerrainShape(layout, config, lotFlats, database.map);
 
             TerrainTextureBaker.Bake(Shape, layout, config, database.palette, out Texture2D albedo, out Texture2D normal);
             var terrainMaterial = new Material(config.terrainMaterial) { name = "Terrain (runtime)" };
@@ -57,16 +58,8 @@ namespace BeachTycoon.Gameplay
                 config.rockScaleRange, random, true, IsRockSpot);
             Scatter(root, "GrassTufts", ProceduralMeshes.GrassTuft(layout.palmSeed), config.grassTuftMaterial,
                 config.grassTuftCount, config.tuftScaleRange, random, false, IsTuftSpot);
-            _fence = new GameObject("LandFence").AddComponent<LandFence>();
-            _fence.transform.SetParent(root, false);
-            _fence.Initialize(Shape, config);
+            CreateLandLayers(root, config);
             return Shape.LandRect;
-        }
-
-        /// <summary>Fences the edge of the unlocked land (no fence once everything is unlocked).</summary>
-        public void ShowLandBoundary(Rect area, bool moreToUnlock)
-        {
-            if (_fence != null) _fence.Show(area, moreToUnlock);
         }
 
         /// <summary>
@@ -83,9 +76,20 @@ namespace BeachTycoon.Gameplay
                 Destroy(old);
             }
 
-            for (int i = 0; i < _palms.Count; i++) _palms[i].gameObject.SetActive(!IsPalmHidden(occupied, _palms[i].position));
-
+            _occupied.Clear();
+            for (int i = 0; i < occupied.Count; i++) _occupied.Add(occupied[i]);
+            RefreshPalms();
             for (int i = 0; i < _scatters.Count; i++) _scatters[i].SetHidden(occupied, ScatterClearance);
+        }
+
+        // Palms by objects and under fog are hidden.
+        private void RefreshPalms()
+        {
+            for (int i = 0; i < _palms.Count; i++)
+            {
+                Vector3 p = _palms[i].position;
+                _palms[i].gameObject.SetActive(!IsPalmHidden(_occupied, p) && !IsUnderFog(p));
+            }
         }
 
         // Crowns are wide and tall: a palm beside an object or just in front of it (the camera looks north) would
@@ -171,10 +175,12 @@ namespace BeachTycoon.Gameplay
             return false;
         }
 
+        // From the top of the palm band to the back of the island.
         private bool IsPalmSpot(Vector3 p)
         {
             WorldLayoutConfig layout = _layout;
-            float grassTop = Shape.BottomZ + layout.bands[Mathf.Min(layout.palmBandIndex, layout.bands.Length - 1)].depth;
+            float grassTop = layout.landTopZ;
+            for (int i = 0; i < Mathf.Min(layout.palmBandIndex, layout.bands.Length - 1); i++) grassTop -= layout.bands[i].depth;
             bool onGrass = p.z < grassTop && p.y > Shape.WaterLevel + 0.05f;
             return onGrass && !NearLotOrPath(p, layout.palmClearance);
         }
@@ -183,7 +189,7 @@ namespace BeachTycoon.Gameplay
         {
             float aboveWater = p.y - Shape.WaterLevel;
             bool shoreline = aboveWater > -0.35f && aboveWater < 0.12f;
-            return shoreline && !_layout.relaxArea.Contains(new Vector2(p.x, p.z)) && !NearLotOrPath(p, 1f);
+            return shoreline && !IsTowelArea(new Vector2(p.x, p.z)) && !NearLotOrPath(p, 1f);
         }
 
         private bool IsTuftSpot(Vector3 p)

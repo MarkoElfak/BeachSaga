@@ -72,6 +72,7 @@ namespace BeachTycoon.EditorTools
                 PaletteDefinition palette = PaletteBuilder.BuildOrSync();
                 RenderingAssets.TuneUrpAssets();
                 ReportShaderErrors(RenderingAssets.WaterShader);
+                ReportShaderErrors(RenderingAssets.FogShader);
 
                 EditorUtility.DisplayProgressBar("Beach Tycoon", "Placeholder prefabs", 0.3f);
                 PlaceholderPrefabBuilder.BuildAll(palette, overwritePlaceholders);

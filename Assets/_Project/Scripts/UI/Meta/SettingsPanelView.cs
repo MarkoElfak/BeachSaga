@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Settings: sound and music sliders, vibration, Remove ads with its store price, privacy and restore purchases.</summary>
+    /// <summary>Settings: sound and music sliders, vibration, Remove ads with its store price, privacy, restore purchases and renaming the village.</summary>
     public sealed class SettingsPanelView : MonoBehaviour
     {
         [SerializeField] private Button openButton = null;
@@ -25,6 +25,8 @@ namespace BeachTycoon.UI
         [SerializeField] private PrivacyPanelView privacyPanel = null;
         [SerializeField] private Button restoreButton = null;
         [SerializeField] private TMP_Text restoreLabel = null;
+        [SerializeField] private Button renameButton = null;
+        [SerializeField] private StartScreenView startScreen = null;
         [SerializeField] private Button closeButton = null;
 
         private SettingsService _settings;
@@ -55,6 +57,7 @@ namespace BeachTycoon.UI
             removeAdsButton.onClick.AddListener(BuyRemoveAds);
             privacyButton.onClick.AddListener(privacyPanel.Open);
             restoreButton.onClick.AddListener(Restore);
+            renameButton.onClick.AddListener(startScreen.OpenRename);
         }
 
         private void OnDestroy()
@@ -67,6 +70,7 @@ namespace BeachTycoon.UI
             removeAdsButton.onClick.RemoveListener(BuyRemoveAds);
             privacyButton.onClick.RemoveListener(privacyPanel.Open);
             restoreButton.onClick.RemoveListener(Restore);
+            renameButton.onClick.RemoveListener(startScreen.OpenRename);
         }
 
         public void Open()

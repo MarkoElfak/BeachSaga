@@ -10,7 +10,7 @@ namespace BeachTycoon.Data
     public sealed class TerrainConfig : ScriptableObject
     {
         /// <summary>Setup refreshes the island-size values (path, scatter counts) on older assets.</summary>
-        public const int CurrentDataVersion = 1;
+        public const int CurrentDataVersion = 2;
 
         [Tooltip("0 = never upgraded. Setup sets it to CurrentDataVersion.")]
         public int dataVersion;
@@ -42,7 +42,7 @@ namespace BeachTycoon.Data
         public int noiseSeed = 11;
 
         [Header("Baked texture")]
-        [Min(64)] public int textureSize = 512;
+        [Min(64)] public int textureSize = 768;
         [Tooltip("Width of the colour blend between neighbouring bands.")]
         [Min(0.01f)] public float bandBlend = 1.4f;
         [Range(0f, 0.3f)] public float colorNoise = 0.07f;
@@ -52,7 +52,7 @@ namespace BeachTycoon.Data
         public Color grassVariation = new Color(0.62f, 0.74f, 0.4f);
         public Color pathColor = new Color(0.86f, 0.76f, 0.56f);
         [Tooltip("Sandy footpath from the entry points to the beach (x, z, width, depth).")]
-        public Rect path = new Rect(-2.4f, -18f, 4.8f, 10f);
+        public Rect path = new Rect(-2.4f, -22f, 4.8f, 14f);
         [Range(0f, 1f)] public float drySmoothness = 0.08f;
         [Range(0f, 1f)] public float wetSmoothness = 0.55f;
         [Range(0f, 1f)] public float grassSmoothness = 0.04f;
@@ -67,8 +67,8 @@ namespace BeachTycoon.Data
         [Min(0f)] public float waterExtent = 160f;
 
         [Header("Scatter (GPU instanced)")]
-        [Min(0)] public int rockCount = 40;
-        [Min(0)] public int grassTuftCount = 360;
+        [Min(0)] public int rockCount = 64;
+        [Min(0)] public int grassTuftCount = 620;
         public Vector2 rockScaleRange = new Vector2(0.25f, 0.8f);
         public Vector2 tuftScaleRange = new Vector2(0.6f, 1.3f);
 

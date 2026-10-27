@@ -13,11 +13,13 @@ namespace BeachTycoon.Gameplay
     {
         private const int MaxDetours = 6;
         private const float CornerMargin = 0.1f;
+        private const float LaneMargin = 0.45f; // about half a towel: towels stay clear of a boardwalk's line
 
         private readonly WorldLayoutConfig _layout;
         private readonly PlacementService _placement;
         private readonly List<Vector3> _spots = new List<Vector3>();
         private readonly List<bool> _spotTaken = new List<bool>();
+        private readonly List<int> _spotPiece = new List<int>(); // the land piece a spot lies on, -1 for the first beach
         private readonly Dictionary<int, Pose> _queueAnchors = new Dictionary<int, Pose>();
         private readonly Dictionary<int, Vector3> _standPositions = new Dictionary<int, Vector3>();
         private readonly VisitorConfig _visitors;
@@ -29,7 +31,7 @@ namespace BeachTycoon.Gameplay
             _layout = layout;
             _placement = placement;
             _visitors = visitors;
-            CreateRelaxSpots(layout, visitors.randomSeed);
+            CreateRelaxSpots(layout, placement.Map, visitors.randomSeed);
             EventBus.Subscribe<ObjectMoved>(OnPlacementChanged);
             EventBus.Subscribe<DecorationPlaced>(OnDecorationPlaced);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
@@ -57,7 +59,7 @@ namespace BeachTycoon.Gameplay
 
         public Vector3 GetSpot(int index) => _spots[index];
 
-        /// <summary>Reserves a random free relax spot; returns -1 when the beach is full.</summary>
+        /// <summary>Reserves a random free relax spot on open land; returns -1 when the beach is full.</summary>
         public int ReserveSpot(System.Random random)
         {
             int count = _spots.Count;
@@ -65,7 +67,7 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < count; i++)
             {
                 int index = (start + i) % count;
-                if (!_spotTaken[index])
+                if (!_spotTaken[index] && (_spotPiece[index] < 0 || _placement.IsPieceOpen(_spotPiece[index])))
                 {
                     _spotTaken[index] = true;
                     return index;
@@ -110,10 +112,37 @@ namespace BeachTycoon.Gameplay
             return false;
         }
 
-        private void CreateRelaxSpots(WorldLayoutConfig layout, int seed)
+        // The first beach's towel rows (with a lane left free up to each boardwalk), then each later piece's
+        // (used once that piece opens).
+        private void CreateRelaxSpots(WorldLayoutConfig layout, MapConfig map, int seed)
         {
             var random = new System.Random(seed);
-            Rect area = layout.relaxArea;
+            AddSpots(layout, layout.relaxArea, -1, random);
+            if (!LandMap.HasPieces(map)) return;
+            for (int i = 0; i < map.pieces.Length; i++)
+            {
+                if (LandMap.HasBoardwalk(map.pieces[i])) FreeLane(map.pieces[i].boardwalkFrom.x, map.boardwalkWidth * 0.5f + LaneMargin);
+            }
+
+            for (int i = 0; i < map.pieces.Length; i++)
+            {
+                if (map.pieces[i].towelArea.width > 0f) AddSpots(layout, map.pieces[i].towelArea, i, random);
+            }
+        }
+
+        private void FreeLane(float x, float halfWidth)
+        {
+            for (int i = _spots.Count - 1; i >= 0; i--)
+            {
+                if (_spotPiece[i] >= 0 || Mathf.Abs(_spots[i].x - x) >= halfWidth) continue;
+                _spots.RemoveAt(i);
+                _spotTaken.RemoveAt(i);
+                _spotPiece.RemoveAt(i);
+            }
+        }
+
+        private void AddSpots(WorldLayoutConfig layout, Rect area, int piece, System.Random random)
+        {
             float step = layout.relaxSpotSpacing;
             for (float z = area.yMin + step * 0.5f; z < area.yMax; z += step)
             {
@@ -123,6 +152,7 @@ namespace BeachTycoon.Gameplay
                     float jz = ((float)random.NextDouble() * 2f - 1f) * layout.relaxSpotJitter;
                     _spots.Add(new Vector3(x + jx, 0f, z + jz));
                     _spotTaken.Add(false);
+                    _spotPiece.Add(piece);
                 }
             }
         }

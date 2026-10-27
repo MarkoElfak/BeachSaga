@@ -11,7 +11,7 @@ namespace BeachTycoon.Data
     public sealed class GameSaveData
     {
         /// <summary>Bump when the layout changes and add an ISaveMigration from the previous version.</summary>
-        public const int CurrentVersion = 14;
+        public const int CurrentVersion = 16;
 
         public int version = CurrentVersion;
 
@@ -41,6 +41,8 @@ namespace BeachTycoon.Data
         // Version 12: mini-games (miniGames).
         // Version 13: sound and music volumes, vibration (SettingsModel).
         // Version 14: privacy choice (SettingsModel.privacy).
+        // Version 15: village name and culture (MetaModel.villageName, cultureId).
+        // Version 16: bigger map; house lots 5-12 moved, so old houses there were pinned (LotModel.placed).
 
         public static GameSaveData CreateNew(long startingCoins)
         {

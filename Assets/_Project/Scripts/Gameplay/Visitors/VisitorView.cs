@@ -73,7 +73,7 @@ namespace BeachTycoon.Gameplay
         private Vector3 GroundPosition()
         {
             Vector3 p = _agent.Position;
-            p.y = _ground != null ? _ground.Height(p.x, p.z) : 0f;
+            p.y = _ground != null ? _ground.WalkHeight(p.x, p.z) : 0f; // boardwalk decks too
             return p;
         }
 

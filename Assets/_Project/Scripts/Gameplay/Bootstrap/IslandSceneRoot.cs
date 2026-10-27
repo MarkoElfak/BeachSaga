@@ -52,18 +52,18 @@ namespace BeachTycoon.Gameplay
             placement.AttachTerrain(ground);
             bool moreLand = placement.AreaForTier(snapshot.tier) != placement.AreaForTier(database.MaxTier);
             worldBuilder.ShowLandBoundary(placement.UnlockedArea, moreLand);
+            worldBuilder.ShowLand(snapshot.tier);
             placement.GetOccupiedRects(_occupied);
             worldBuilder.RefreshPlacement(_flats, _occupied, false);
 
             Vector2 focus = placement.GetLotPosition(BuildingManager.MainLotIndex);
-            TierDefinition tier = database.GetTier(Mathf.Max(1, snapshot.tier));
             Color sea = database.palette.GetColor(database.world.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, placement.UnlockedArea, tier != null ? tier.maxZoomDistance : 0f,
-                new Vector3(focus.x, 0f, focus.y), sea);
+            cameraController.Initialize(database.cameraConfig, placement.UnlockedBounds, new Vector3(focus.x, 0f, focus.y), sea);
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
 
-            props.Spawn(database, _layout, ground);
+            ServiceLocator.TryGet(out CultureService cultures);
+            props.Spawn(database, _layout, ground, cultures, cultures?.Find(snapshot.cultureId));
             _navigation = new WorldNavigation(database.world, database.visitors, placement);
             crowd.Initialize(database, snapshot.tier, _navigation, _layout, ground);
         }

@@ -54,7 +54,8 @@ namespace BeachTycoon.Gameplay
 
             // The tap box is fitted to the unturned prefab (like its footprint), then the saved yaw is applied.
             Vector2 position = _placement.GetDecorationPosition(index);
-            GameObject instance = Instantiate(definition.prefab, _ground.Ground(position.x, position.y), Quaternion.identity, transform);
+            GameObject prefab = ServiceLocator.TryGet(out CultureService culture) ? culture.Resolve(definition.prefab, culture.Current) : definition.prefab;
+            GameObject instance = Instantiate(prefab, _ground.Ground(position.x, position.y), Quaternion.identity, transform);
             instance.AddComponent<DecorationView>().Bind(index);
             instance.transform.rotation = _placement.GetRotation(PlaceableId.Decoration(index));
             _instances[index] = instance.transform;

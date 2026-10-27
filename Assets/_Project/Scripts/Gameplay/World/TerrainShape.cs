@@ -8,9 +8,10 @@ namespace BeachTycoon.Gameplay
     /// Height function of the island, shared by the terrain mesh, the water shore mask, scatter placement and
     /// anything that needs to stand on the ground. Heights blend between band centre elevations, then a noisy
     /// coast drops into the sea, dunes ripple the sand and occupied lots are flattened to height 0.
-    /// The flat areas follow the buildings: SetFlatRects is called again whenever one is moved.
+    /// The flat areas follow the buildings: SetFlatRects is called again whenever one is moved. Islands from the
+    /// MapConfig rise out of the sea on their own (TerrainShape.Islands), with boardwalk decks to walk on.
     /// </summary>
-    public sealed class TerrainShape
+    public sealed partial class TerrainShape
     {
         private readonly WorldLayoutConfig _layout;
         private readonly TerrainConfig _config;
@@ -20,11 +21,13 @@ namespace BeachTycoon.Gameplay
         private readonly float _shoreStartZ;
 
         /// <param name="lotFlats">Footprints (XZ) to flatten, normally from PlacementService.GetFlatRects.</param>
-        public TerrainShape(WorldLayoutConfig layout, TerrainConfig config, IReadOnlyList<Rect> lotFlats)
+        /// <param name="map">Adds the map's islands and boardwalks (optional).</param>
+        public TerrainShape(WorldLayoutConfig layout, TerrainConfig config, IReadOnlyList<Rect> lotFlats, MapConfig map = null)
         {
             _layout = layout;
             _config = config;
             _noiseOffset = config.noiseSeed * 17.31f;
+            AddIslands(map);
 
             float top = layout.landTopZ;
             float z = top;
@@ -45,8 +48,8 @@ namespace BeachTycoon.Gameplay
 
             float halfWidth = layout.width * 0.5f;
             LandRect = Rect.MinMaxRect(-halfWidth, BottomZ, halfWidth, top);
-            TerrainRect = Rect.MinMaxRect(-halfWidth - config.sideMargin, BottomZ - config.backMargin,
-                halfWidth + config.sideMargin, top + config.seaMargin);
+            TerrainRect = WithIslands(Rect.MinMaxRect(-halfWidth - config.sideMargin, BottomZ - config.backMargin,
+                halfWidth + config.sideMargin, top + config.seaMargin));
             SetFlatRects(lotFlats);
         }
 
@@ -74,6 +77,8 @@ namespace BeachTycoon.Gameplay
             float edgeNoise = (Mathf.PerlinNoise(z * _config.coastNoiseScale + _noiseOffset, 7.7f) - 0.5f) * 2f;
             float over = Mathf.Abs(x) - (_layout.width * 0.5f + edgeNoise * _config.coastNoiseAmplitude);
             h = Mathf.Lerp(h, _config.seaFloorHeight, Smooth(-0.5f, _config.coastFalloff, over));
+
+            h = Mathf.Max(h, IslandHeight(x, z));
 
             // Dunes only on dry land.
             float land = Smooth(_config.waterLevel + 0.02f, _config.waterLevel + 0.12f, h);

@@ -78,8 +78,12 @@ namespace BeachTycoon.EditorTools
         {
             StandView view = ViewFor(product);
             PlaytestTools.FocusCamera(view.transform.position, 14f);
-            PlaytestTools.TapWorld(view.transform.position + Vector3.up * 0.8f);
-            Check(Selection.HasSelection && Selection.Selected.Equals(view.Placeable), $"tapping the {product} stand selects it");
+            Vector3 point = view.transform.position + Vector3.up * 0.8f;
+            Selection.Clear(); // a tap on what is already selected deselects it
+            PlaytestTools.TapWorld(point);
+            bool selected = Selection.HasSelection && Selection.Selected.Equals(view.Placeable);
+            Check(selected, selected ? $"tapping the {product} stand selects it"
+                : $"tapping the {product} stand selects it (the tap hit {PlaytestTools.HitName(point)}, selection: {Selection.HasSelection})");
             GameObject play = PlaytestTools.Find<SelectionArrowsView>().transform.Find("Bar/PlayButton").gameObject;
             Check(play.activeSelf, "the Play button shows over it");
             PlaytestTools.Click(PlaytestTools.Find<SelectionArrowsView>(), "PlayButton");

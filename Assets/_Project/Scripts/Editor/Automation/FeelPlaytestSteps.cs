@@ -39,7 +39,7 @@ namespace BeachTycoon.EditorTools
                 case 1: return Buildings.GetLot(0).state == LotState.Built && PlaytestTools.Find<StandView>() != null && !Rig.IsShaking;
                 case 2: return TestCoin() != null && !TestCoin().IsPopping;
                 case 3: return Buildings.MainTier == 2;
-                case 4: return !Rig.IsShaking;
+                case 4: return !Rig.IsShaking && !Rig.IsFlying;
                 case 5: return CloseFeel().CurrentScale < 0.95f;
                 case 6: return !CloseFeel().IsHeld && CloseFeel().CurrentScale == 1f; // settles on exactly 1
                 case 7: return Music.NightMix >= 1f;
