@@ -92,6 +92,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<PinchEvent>(OnPinch);
             EventBus.Subscribe<DoubleTapEvent>(OnDoubleTap);
             EventBus.Subscribe<CameraShakeRequested>(OnShake);
+            EventBus.Subscribe<CameraFocusRequested>(OnFocusRequested);
         }
 
         private void OnDisable()
@@ -100,6 +101,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<PinchEvent>(OnPinch);
             EventBus.Unsubscribe<DoubleTapEvent>(OnDoubleTap);
             EventBus.Unsubscribe<CameraShakeRequested>(OnShake);
+            EventBus.Unsubscribe<CameraFocusRequested>(OnFocusRequested);
             RestoreShadowDistance();
         }
 

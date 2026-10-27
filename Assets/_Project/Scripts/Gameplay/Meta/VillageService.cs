@@ -47,7 +47,7 @@ namespace BeachTycoon.Gameplay
         public bool TryFound(string raw, string cultureId, out string error)
         {
             error = Check(raw, out string clean);
-            if (error == null && !HasCulture && !_isCulture(cultureId)) error = "Pick a culture.";
+            if (error == null && !HasCulture && !_isCulture(cultureId)) error = "Pick a character.";
             if (error != null) return false;
 
             bool first = !IsFounded;
@@ -61,8 +61,8 @@ namespace BeachTycoon.Gameplay
         public bool TryChooseCulture(string cultureId, out string error)
         {
             error = !IsFounded ? "Found the village first."
-                : HasCulture ? "Your culture is already chosen."
-                : !_isCulture(cultureId) ? "Pick a culture."
+                : HasCulture ? "Your character is already chosen."
+                : !_isCulture(cultureId) ? "Pick a character."
                 : null;
             if (error != null) return false;
             SetCulture(cultureId);

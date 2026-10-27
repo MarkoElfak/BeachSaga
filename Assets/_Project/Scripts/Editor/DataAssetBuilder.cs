@@ -40,6 +40,7 @@ namespace BeachTycoon.EditorTools
             EventAssetBuilder.Fill(database);
             MiniGameAssetBuilder.Fill(database);
             CultureAssetBuilder.Fill(database);
+            CharacterAssetBuilder.Fill(database);
             FootprintMeasure.Bake(database);
 
             EditorUtility.SetDirty(database);

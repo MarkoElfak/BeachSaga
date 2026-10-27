@@ -47,7 +47,7 @@ namespace BeachTycoon.EditorTools
         // Older suites play an already founded village and skip the greeting, so the start screen stays away.
         private static void AnswerStartScreen()
         {
-            if (Suite == SuiteStart || Suite == SuiteCulture || !ServiceLocator.TryGet(out VillageService village)) return;
+            if (Suite == SuiteStart || Suite == SuiteCulture || Suite == SuiteCharacter || !ServiceLocator.TryGet(out VillageService village)) return;
             StartScreenView.SkipGreetingThisRun();
             string culture = ServiceLocator.Get<GameDatabase>().cultures[0].id;
             if (!village.IsFounded) village.TryFound("Test Bay", culture, out _);

@@ -58,6 +58,8 @@ namespace BeachTycoon.Data
         public string[] villageNames = new string[0];
         [Tooltip("Culture versions of buildings, stands and decorations. Anything not listed uses the shared prefab.")]
         public PrefabSwap[] prefabSwaps = new PrefabSwap[0];
+        [Tooltip("The hero picked with this culture: they run the beach and work at a stand.")]
+        public CharacterDefinition character;
 
         /// <summary>This culture's version of a prefab, or the prefab itself when it has none.</summary>
         public GameObject Resolve(GameObject prefab)

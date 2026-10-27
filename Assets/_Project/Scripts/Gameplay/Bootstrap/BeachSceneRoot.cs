@@ -28,6 +28,7 @@ namespace BeachTycoon.Gameplay
         private readonly List<Rect> _occupied = new List<Rect>();
         private PlacementService _placement;
         private SelectionService _selection;
+        private CharacterView _character;
 
         private void Awake()
         {
@@ -71,12 +72,14 @@ namespace BeachTycoon.Gameplay
 
             SpawnLots();
             visitorViews.Initialize(database, ServiceLocator.Get<VisitorService>(), ground);
+            ShowCharacter();
             decorations.Initialize(database, ServiceLocator.Get<DecorationService>(), _placement, ground);
             moveController.Initialize(_placement, database.input);
             RefreshPlacement(false);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
             EventBus.Subscribe<LandOpened>(OnLandOpened);
+            EventBus.Subscribe<CharacterJoined>(OnCharacterJoined);
         }
 
         private void OnDestroy()
@@ -85,6 +88,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
             EventBus.Unsubscribe<LandOpened>(OnLandOpened);
+            EventBus.Unsubscribe<CharacterJoined>(OnCharacterJoined);
         }
 
         private void OnObjectMoved(ObjectMoved evt) => RefreshPlacement(evt.Kind != PlaceableKind.Decoration);
@@ -109,6 +113,18 @@ namespace BeachTycoon.Gameplay
         {
             worldBuilder.OpenLand(evt.Piece);
             cameraController.FlyToArea(evt.Area);
+        }
+
+        private void OnCharacterJoined(CharacterJoined evt) => ShowCharacter();
+
+        // The player's character walks among the visitors once a culture (and with it a character) is picked.
+        private void ShowCharacter()
+        {
+            var characters = ServiceLocator.Get<CharacterService>();
+            if (_character != null || !characters.HasJoined || characters.Character.prefab == null) return;
+            _character = Instantiate(characters.Character.prefab, visitorViews.transform, false).GetComponent<CharacterView>();
+            _character.Bind(characters, ServiceLocator.Get<StandService>(), ServiceLocator.Get<GameDatabase>().presentation,
+                ServiceLocator.Get<TerrainShape>());
         }
 
         private bool MoreLandToUnlock()

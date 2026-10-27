@@ -35,6 +35,7 @@ namespace BeachTycoon.EditorTools
             CommunityUiBuilder.BuildNeighbourRequest(safe);
             CommunityUiBuilder.BuildToast(safe);
             MetaUiBuilder.BuildBoostButton(safe);
+            CharacterUiBuilder.Build(safe);
             MetaUiBuilder.BuildTutorial(safe, worldCamera, coins, buildBar);
             PlacementSceneBuilder.BuildMoveHint(safe);
             PlacementSceneBuilder.BuildSelectionArrows(safe, worldCamera);

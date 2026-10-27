@@ -82,7 +82,7 @@ namespace BeachTycoon.Tests
             Assert.IsTrue(village.NeedsCulture);
 
             Assert.IsFalse(village.TryChooseCulture("atlantis", out string error));
-            Assert.AreEqual("Pick a culture.", error);
+            Assert.AreEqual("Pick a character.", error);
             Assert.IsTrue(village.TryChooseCulture("italy", out error));
             Assert.AreEqual("italy", village.CultureId);
             Assert.IsFalse(village.NeedsCulture);
@@ -91,7 +91,7 @@ namespace BeachTycoon.Tests
             Assert.AreEqual("italy", _chosen[0].CultureId);
 
             Assert.IsFalse(village.TryChooseCulture("greece", out error));
-            Assert.AreEqual("Your culture is already chosen.", error);
+            Assert.AreEqual("Your character is already chosen.", error);
             Assert.AreEqual("Old Bay", village.Name, "the name is kept");
         }
 
@@ -103,7 +103,7 @@ namespace BeachTycoon.Tests
             Assert.IsFalse(village.TryChooseCulture("spain", out string error));
             Assert.AreEqual("Found the village first.", error);
             Assert.IsFalse(village.TryFound("Sol Bay", string.Empty, out error));
-            Assert.AreEqual("Pick a culture.", error);
+            Assert.AreEqual("Pick a character.", error);
             Assert.IsFalse(village.TryFound("Sol Bay", "france", out _));
             Assert.IsFalse(village.IsFounded, "nothing is set until both are good");
 

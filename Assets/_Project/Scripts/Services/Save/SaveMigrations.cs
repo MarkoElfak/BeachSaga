@@ -23,6 +23,7 @@ namespace BeachTycoon.Services
             new AddPrivacy(),
             new AddVillage(),
             new MoveHouseLots(),
+            new AddCharacter(),
         };
 
         /// <summary>
@@ -169,6 +170,16 @@ namespace BeachTycoon.Services
                 data.version = 16;
                 return UnityEngine.JsonUtility.ToJson(data);
             }
+        }
+
+        /// <summary>
+        /// v16 -> v17: the player's character (M17). characterStand defaults to -1, so the character of the
+        /// culture already picked starts at the first stand.
+        /// </summary>
+        private sealed class AddCharacter : ISaveMigration
+        {
+            public int FromVersion => 16;
+            public string Migrate(string json) => json.Replace("\"version\":16", "\"version\":17");
         }
     }
 }

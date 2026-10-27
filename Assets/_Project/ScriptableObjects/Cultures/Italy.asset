@@ -58,3 +58,4 @@ MonoBehaviour:
   - Isola Bella
   - Punta Rosa
   prefabSwaps: []
+  character: {fileID: 11400000, guid: 14a7072f01ed5404cbc59c0847438c9d, type: 2}
