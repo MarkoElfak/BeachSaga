@@ -33,7 +33,7 @@ namespace BeachTycoon.EditorTools
 
             RectTransform hireRect = UiKit.Rect("HireButton", window, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 210f), new Vector2(620f, 120f));
             Button hire = UiKit.AddButton(hireRect, new Color(0.55f, 0.8f, 0.95f), out _);
-            TextMeshProUGUI hireLabel = UiKit.ChildText(hireRect, "Label", "Hire manager", 46f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            TextMeshProUGUI hireLabel = UiKit.ChildText(hireRect, "Label", "Staff", 46f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
 
             RectTransform closeRect = UiKit.Rect("CloseButton", window, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-24f, -24f), new Vector2(110f, 110f));
             Button close = UiKit.AddButton(closeRect, new Color(0.85f, 0.35f, 0.3f), out _);

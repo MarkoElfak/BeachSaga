@@ -4,7 +4,7 @@ using BeachTycoon.Data;
 namespace BeachTycoon.Services
 {
     /// <summary>Every save migration step, oldest first. SaveService uses this list by default.</summary>
-    public static class SaveMigrations
+    public static partial class SaveMigrations
     {
         public static IEnumerable<ISaveMigration> All => new ISaveMigration[]
         {
@@ -24,6 +24,7 @@ namespace BeachTycoon.Services
             new AddVillage(),
             new MoveHouseLots(),
             new AddCharacter(),
+            new AddStaff(),
         };
 
         /// <summary>

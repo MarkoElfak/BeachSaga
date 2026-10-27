@@ -15,15 +15,11 @@ namespace BeachTycoon.Gameplay
     public sealed class CharacterService : ITickable, IDisposable
     {
         private const int PortraitPixels = 128;
-        private const float SpotGap = 0.35f;     // from the counter's side to the character
-        private const float ApproachGap = 1.1f;  // where the walk ends before the last straight step in
-        private static readonly Vector3 WorkFacing = new Vector3(0.45f, 0f, -1f).normalized; // the queue, mostly the camera
 
         private readonly GameDatabase _database;
         private readonly CultureService _cultures;
         private readonly StandService _stands;
-        private readonly PlacementService _placement;
-        private readonly WorldNavigation _navigation;
+        private readonly StandSpots _spots;
         private readonly MetaModel _meta;
         private readonly Dictionary<CharacterDefinition, Texture2D> _portraits = new Dictionary<CharacterDefinition, Texture2D>();
         private Vector3 _arriveFacing = Vector3.back;
@@ -34,8 +30,7 @@ namespace BeachTycoon.Gameplay
             _database = database;
             _cultures = cultures;
             _stands = stands;
-            _placement = placement;
-            _navigation = navigation;
+            _spots = new StandSpots(stands, placement, navigation, database.world);
             _meta = meta;
             EventBus.Subscribe<CultureChosen>(OnCultureChosen);
             EventBus.Subscribe<StandCreated>(OnStandCreated);
@@ -119,7 +114,7 @@ namespace BeachTycoon.Gameplay
             HasJoined = true;
             if (_meta.characterStand >= _stands.Count) _meta.characterStand = -1;
             if (_meta.characterStand < 0 && _stands.Count > 0) _meta.characterStand = 0;
-            Agent.Position = StandIndex >= 0 ? WorkSpot(StandIndex, out _arriveFacing) : WaitingSpot();
+            Agent.Position = StandIndex >= 0 ? _spots.Work(StandIndex, out _arriveFacing) : _spots.Waiting();
             Agent.Facing = StandIndex >= 0 ? _arriveFacing : Vector3.back;
             if (StandIndex >= 0) StartWork();
             EventBus.Publish(new CharacterJoined());
@@ -136,21 +131,12 @@ namespace BeachTycoon.Gameplay
         // Their stand moved (on its own, or with its lot's default row): walk to its new side.
         private void OnObjectMoved(ObjectMoved evt)
         {
-            if (!HasJoined || StandIndex < 0) return;
-            StandModel model = _stands.Get(StandIndex).Model;
-            bool mine = evt.Kind == PlaceableKind.Stand && evt.Index == StandIndex;
-            bool myLot = evt.Kind == PlaceableKind.Lot && evt.Index == model.lotIndex && !model.placed;
-            if (!mine && !myLot) return;
+            if (!HasJoined || StandIndex < 0 || !StandSpots.Moves(evt, _stands.Get(StandIndex))) return;
             StopWork();
             WalkToWork();
         }
 
-        private void WalkToWork()
-        {
-            Vector3 spot = WorkSpot(StandIndex, out _arriveFacing);
-            _navigation.BuildPath(Agent.Position, Approach(StandIndex), Agent.Path);
-            Agent.Path.Add(spot);
-        }
+        private void WalkToWork() => _spots.BuildWalk(Agent.Position, StandIndex, Agent.Path, out _arriveFacing);
 
         private void StartWork()
         {
@@ -161,40 +147,8 @@ namespace BeachTycoon.Gameplay
 
         private void StopWork()
         {
-            if (IsWorking && StandIndex >= 0) _stands.Get(StandIndex).ServeSpeed = 1f;
+            if (IsWorking && StandIndex >= 0) _stands.Get(StandIndex).ServeSpeed = _stands.Get(StandIndex).UnstaffedSpeed;
             IsWorking = false;
-        }
-
-        // Beside the counter on the stand's left, facing the queue.
-        private Vector3 WorkSpot(int standIndex, out Vector3 facing)
-        {
-            Rect footprint = _stands.Get(standIndex).Product.standFootprint;
-            Quaternion rotation = _placement.GetRotation(PlaceableId.Stand(standIndex));
-            facing = rotation * WorkFacing;
-            return StandPoint(standIndex, rotation, new Vector3(footprint.xMin - SpotGap, 0f, footprint.center.y - 0.1f));
-        }
-
-        // Further out on the same side, clear of the stand, so the last step never cuts through the counter.
-        private Vector3 Approach(int standIndex)
-        {
-            Rect footprint = _stands.Get(standIndex).Product.standFootprint;
-            Quaternion rotation = _placement.GetRotation(PlaceableId.Stand(standIndex));
-            float side = footprint.xMin - SpotGap - _database.world.pathClearance - ApproachGap;
-            return StandPoint(standIndex, rotation, new Vector3(side, 0f, footprint.center.y - 0.1f));
-        }
-
-        private Vector3 StandPoint(int standIndex, Quaternion rotation, Vector3 local)
-        {
-            Vector2 at = _placement.GetStandPosition(standIndex);
-            return new Vector3(at.x, 0f, at.y) + rotation * local;
-        }
-
-        // No stand yet: wait in front of the main building.
-        private Vector3 WaitingSpot()
-        {
-            var main = PlaceableId.Lot(BuildingManager.MainLotIndex);
-            Rect footprint = _placement.GetFootprint(main, _placement.GetLotPosition(BuildingManager.MainLotIndex));
-            return new Vector3(footprint.xMin - SpotGap, 0f, footprint.yMin - SpotGap);
         }
     }
 }

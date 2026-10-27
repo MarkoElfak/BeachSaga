@@ -10,9 +10,9 @@ using UnityEngine.SceneManagement;
 namespace BeachTycoon.EditorTools
 {
     /// <summary>
-    /// Milestone 10 playtest: plays a full season (earn, every tier up to the Resort, all stands, a manager,
+    /// Milestone 10 playtest: plays a full season (earn, every tier up to the Resort, all stands, a worker,
     /// decorations and a neighbour), opens the New season panel from the HUD and starts a new season. The game
-    /// reboots: coins, the main building and the stands start over, seashells are paid, neighbours and
+    /// reboots: coins, the main building, the stands and the staff start over, seashells are paid, neighbours and
     /// decorations stay, and a real sale, rent and the panel all include the seashell bonus. A restart keeps it.
     /// </summary>
     internal static partial class SeasonPlaytestSteps
@@ -110,13 +110,14 @@ namespace BeachTycoon.EditorTools
             }
         }
 
-        // Everything a season builds up: all stands, a manager, decorations and a neighbour moving in.
+        // Everything a season builds up: all stands, a worker, decorations and a neighbour moving in.
         private static void PlaySeason()
         {
             UnlockProducts();
             StandController donuts = Stands.FindByProduct("donuts");
             while (donuts.Model.level < 5 && Stands.TryUpgradeStand(donuts)) { }
-            Check(Stands.TryHireManager(donuts), "donut manager hired");
+            var staff = ServiceLocator.Get<StaffService>();
+            Check(staff.Seekers.Count > 0 && staff.TryHire(staff.Seekers[0].Id, Stands.FindByProduct("drinks").Index), "a worker hired for drinks");
             foreach (DecorationDefinition decoration in ServiceLocator.Get<GameDatabase>().decorations)
             {
                 if (Decorations.CanBuy(decoration)) Decorations.TryBuy(decoration);

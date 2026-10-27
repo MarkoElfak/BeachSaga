@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, new land, locked land, house info.</summary>
-    public sealed class ToastView : MonoBehaviour
+    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, new land, locked land, house info, staff.</summary>
+    public sealed partial class ToastView : MonoBehaviour
     {
         private const float ShowSeconds = 2.6f;
         private const float FadeSeconds = 0.35f;
@@ -37,6 +37,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
+            SubscribeStaff(true);
             if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
         }
 
@@ -59,6 +60,7 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
+            SubscribeStaff(false);
         }
 
         /// <summary>Queues a message; one already showing or waiting is not repeated.</summary>

@@ -73,6 +73,7 @@ namespace BeachTycoon.Gameplay
             SpawnLots();
             visitorViews.Initialize(database, ServiceLocator.Get<VisitorService>(), ground);
             ShowCharacter();
+            ShowStaff(database, ground);
             decorations.Initialize(database, ServiceLocator.Get<DecorationService>(), _placement, ground);
             moveController.Initialize(_placement, database.input);
             RefreshPlacement(false);
@@ -125,6 +126,14 @@ namespace BeachTycoon.Gameplay
             _character = Instantiate(characters.Character.prefab, visitorViews.transform, false).GetComponent<CharacterView>();
             _character.Bind(characters, ServiceLocator.Get<StandService>(), ServiceLocator.Get<GameDatabase>().presentation,
                 ServiceLocator.Get<TerrainShape>());
+        }
+
+        // Workers and job seekers walk among the visitors too.
+        private void ShowStaff(GameDatabase database, TerrainShape ground)
+        {
+            var layer = new GameObject("Staff").AddComponent<WorkerViewLayer>();
+            layer.transform.SetParent(visitorViews.transform, false);
+            layer.Initialize(database, ServiceLocator.Get<StaffService>(), ServiceLocator.Get<StandService>(), ground);
         }
 
         private bool MoreLandToUnlock()

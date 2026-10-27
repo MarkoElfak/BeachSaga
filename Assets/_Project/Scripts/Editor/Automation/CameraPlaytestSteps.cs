@@ -39,7 +39,7 @@ namespace BeachTycoon.EditorTools
 
             switch (step)
             {
-                case 1: return BeachReady() && Buildings.GetLot(0).state == LotState.Built && Fitted(Portrait);
+                case 1: return BeachReady() && Buildings.GetLot(0).state == LotState.Built && Fitted(Portrait) && !Rig.IsFlying;
                 case 2: case 3: case 10: case 14: return !Rig.IsFlying;
                 case 4: return Mathf.Approximately(Rig.Distance, Rig.MaxDistance);
                 case 5: return Mathf.Approximately(Rig.Distance, Rig.MinDistance);
@@ -81,12 +81,17 @@ namespace BeachTycoon.EditorTools
             Time.timeScale = TestTimeScale;
             Camera.main.aspect = Portrait; // a phone held upright, whatever shape the Game view has
             ServiceLocator.Get<IEconomyService>().Earn(500000);
+            Check(!Rig.ShowsWholeMap && Rig.Distance < Rig.MaxDistance, $"the game starts close up ({Rig.Distance:0} m, whole map at {Rig.MaxDistance:0} m)");
             Check(Buildings.TryBuild(0), "tent started");
         }
 
         private static void DoubleTapToWholeMap()
         {
-            Check(!Rig.ShowsWholeMap && Rig.Distance < Rig.MaxDistance, $"the game starts close up ({Rig.Distance:0} m, whole map at {Rig.MaxDistance:0} m)");
+            // The finished tent opens the first land and the camera flies out over it; pinch back to the close-up.
+            Check(Rig.ShowsWholeMap, $"building the tent flies out over the land it opened ({Rig.Distance:0} m)");
+            float startDistance = ServiceLocator.Get<GameDatabase>().cameraConfig.startDistance;
+            EventBus.Publish(new PinchEvent(Rig.Distance / startDistance, Vector2.zero));
+            Check(!Rig.ShowsWholeMap && Mathf.Abs(Rig.Distance - startDistance) < 0.01f, $"a pinch brings it back to the close-up ({Rig.Distance:0} m)");
             _previousMax = Rig.MaxDistance;
             _previousArea = Rig.Area.width * Rig.Area.height;
             DoubleTapSea();

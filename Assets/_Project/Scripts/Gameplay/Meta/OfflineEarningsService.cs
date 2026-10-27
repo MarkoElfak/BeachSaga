@@ -7,8 +7,8 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// On boot, converts the time since the last save into pending coins (income rate x capped hours x
-    /// efficiency; each stand manager raises the efficiency a little). The reward waits in the save until
-    /// claimed, optionally doubled by a rewarded ad.
+    /// efficiency; each stand whose coins collect themselves raises the efficiency a little). Staff wages are paid
+    /// from it at the same efficiency. The reward waits in the save until claimed, optionally doubled by a rewarded ad.
     /// </summary>
     public sealed class OfflineEarningsService
     {
@@ -21,14 +21,15 @@ namespace BeachTycoon.Gameplay
         private readonly MonetizationConfig _monetization;
 
         public OfflineEarningsService(GameDatabase database, ISaveService save, ITimeProvider clock,
-            IncomeEstimator estimator, IEconomyService economy, IAdsService ads, IAnalyticsService analytics)
+            IncomeEstimator estimator, IEconomyService economy, IAdsService ads, IAnalyticsService analytics,
+            double wagesPerSecond = 0.0)
         {
             _meta = save.Data.meta;
             _economy = economy;
             _ads = ads;
             _analytics = analytics;
             _monetization = database.monetization;
-            IncomePerSecond = estimator.IncomePerSecond();
+            IncomePerSecond = Math.Max(0.0, estimator.IncomePerSecond() - wagesPerSecond);
             EconomyConfig config = database.economy;
             Efficiency = OfflineEarnings.Efficiency(config.offlineEfficiency, config.offlineEfficiencyPerManager,
                 CountManagers(save.Data.stands), config.offlineEfficiencyMax);
@@ -39,7 +40,7 @@ namespace BeachTycoon.Gameplay
             }
         }
 
-        /// <summary>Income rate used for the estimate (coins per second at full efficiency).</summary>
+        /// <summary>Income rate used for the estimate, wages taken off (coins per second at full efficiency).</summary>
         public double IncomePerSecond { get; }
 
         /// <summary>Share of the income rate paid while away.</summary>
