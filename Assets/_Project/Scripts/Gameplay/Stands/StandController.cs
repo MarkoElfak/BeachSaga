@@ -39,6 +39,9 @@ namespace BeachTycoon.Gameplay
         public float ServeProgress => IsServing ? 1f - _serveRemaining / Product.serveSeconds : 0f;
         public int ServingVisitorId => IsServing ? _orders[0].VisitorId : NoVisitor;
 
+        /// <summary>How fast orders are served (1 = normal); the player's character working here raises it.</summary>
+        public float ServeSpeed { get; set; } = 1f;
+
         /// <summary>Orders taken since launch (not saved); playtests use it to measure demand.</summary>
         public int TotalOrders { get; private set; }
 
@@ -97,7 +100,7 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            _serveRemaining -= deltaTime;
+            _serveRemaining -= deltaTime * ServeSpeed;
             if (_serveRemaining > 0f)
             {
                 return;

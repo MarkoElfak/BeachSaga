@@ -67,7 +67,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // A pivot with an upper part (clothes) and a lower part (skin) hanging below it.
-        private static Transform Limb(Transform body, string name, Vector3 pivot, Material upper, Material lower,
+        internal static Transform Limb(Transform body, string name, Vector3 pivot, Material upper, Material lower,
             float thickness, float upperLength)
         {
             Transform joint = PrimitiveKit.Empty(name, body, pivot).transform;

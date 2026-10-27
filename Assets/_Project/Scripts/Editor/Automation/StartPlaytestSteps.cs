@@ -70,7 +70,7 @@ namespace BeachTycoon.EditorTools
 
             screen.InputText = "  Sunny    Bay ";
             PlaytestTools.Click(screen, "ConfirmButton");
-            Check(screen.IsOpen && screen.ErrorText == "Pick a culture." && !Village.IsFounded, "a good name still needs a culture");
+            Check(screen.IsOpen && screen.ErrorText == "Pick a character." && !Village.IsFounded, "a good name still needs a culture");
             screen.Picker.Pick("greece");
             PlaytestTools.Click(screen, "ConfirmButton");
             Check(!screen.IsOpen && Village.Name == FirstName, $"the village is founded as '{Village.Name}' (spaces tidied)");

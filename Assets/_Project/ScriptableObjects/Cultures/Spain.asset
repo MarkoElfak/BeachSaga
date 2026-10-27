@@ -61,3 +61,4 @@ MonoBehaviour:
   - Bahia Bonita
   - Costa Luz
   prefabSwaps: []
+  character: {fileID: 11400000, guid: 203ef9f269d694903b7ff1c9d10493af, type: 2}

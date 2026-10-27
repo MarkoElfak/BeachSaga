@@ -8,9 +8,9 @@ using UnityEngine.UI;
 namespace BeachTycoon.UI
 {
     /// <summary>
-    /// The start screen over the beach. A new game asks for the village name and its culture; a village from before
-    /// cultures picks only the culture; later launches greet the player with the flag, the village name and a Play
-    /// button, once per app start. Settings reopens the name page to rename the village.
+    /// The start screen over the beach. A new game asks for the village name and its character (who comes with a
+    /// culture); a village from before cultures picks only the character; later launches greet the player with the
+    /// flag, the village name and a Play button, once per app start. Settings reopens the name page to rename the village.
     /// </summary>
     public sealed class StartScreenView : MonoBehaviour
     {
@@ -29,7 +29,7 @@ namespace BeachTycoon.UI
         [SerializeField] private Button ideaButton = null;
         [SerializeField] private CulturePickerView picker = null;
         [Tooltip("How far the culture cards move up when the name field is hidden.")]
-        [SerializeField] private float cultureOnlyLift = 250f;
+        [SerializeField] private float cultureOnlyLift = 190f;
         [SerializeField] private TMP_Text error = null;
         [SerializeField] private Button confirmButton = null;
         [SerializeField] private TMP_Text confirmLabel = null;
@@ -73,7 +73,8 @@ namespace BeachTycoon.UI
 
             nameInput.characterLimit = _village.MaxNameLength + 10; // room for spaces that are trimmed away
             _pickerHome = ((RectTransform)picker.transform).anchoredPosition;
-            picker.Build(_cultures);
+            ServiceLocator.TryGet(out CharacterService characters);
+            picker.Build(_cultures, characters);
             picker.Picked += OnPicked;
             playButton.onClick.AddListener(Close);
             ideaButton.onClick.AddListener(SuggestName);
@@ -119,8 +120,8 @@ namespace BeachTycoon.UI
         private void OpenNamePage(Mode mode)
         {
             _mode = mode;
-            heading.text = mode == Mode.Rename ? "Rename your village" : mode == Mode.Culture ? "Choose your culture" : "Found your village";
-            hint.text = mode == Mode.Culture ? "Pick once: it is for the whole game." : "Rename it any time. The culture is for good.";
+            heading.text = mode == Mode.Rename ? "Rename your village" : mode == Mode.Culture ? "Choose your character" : "Found your village";
+            hint.text = mode == Mode.Culture ? "Pick once: it is for the whole game." : "Rename it any time. Your character is for good.";
             hint.gameObject.SetActive(mode != Mode.Rename);
             confirmLabel.text = mode == Mode.Rename ? "Save" : mode == Mode.Culture ? "Confirm" : "Found village";
             closeButton.gameObject.SetActive(mode == Mode.Rename);

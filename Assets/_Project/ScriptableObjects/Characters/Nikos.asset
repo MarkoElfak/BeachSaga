@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bad45de0d0bb4b4eaae721e9366cf46, type: 3}
+  m_Name: Nikos
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.CharacterDefinition
+  id: nikos
+  displayName: Nikos
+  tagline: Fisherman from Naxos
+  ability: Their stand serves 25% faster.
+  serveSpeedBonus: 0.25
+  walkSpeed: 2.8
+  shirt: shirtBlue
+  shorts: shorts
+  skin: skinMid
+  hair: hairDark
+  longHair: 0
+  headwear: 1
+  headwearColor: shorts
+  portraitBackground: {r: 0.62352943, g: 0.7882353, b: 0.9411765, a: 1}
+  prefab: {fileID: 3294557068776967741, guid: 79fdda9ab720743609d143471d9ab226, type: 3}

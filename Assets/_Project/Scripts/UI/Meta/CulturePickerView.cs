@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>A row of culture cards made from the game data, so a new culture shows up without UI work.</summary>
+    /// <summary>A row of culture cards (each shown through its character) made from the game data, so a new culture shows up without UI work.</summary>
     public sealed class CulturePickerView : MonoBehaviour
     {
         [SerializeField] private CultureCardView cardTemplate = null;
         [SerializeField] private Transform cardRow = null;
-        [Tooltip("The \"Choose your culture\" line over the cards.")]
+        [Tooltip("The \"Choose your character\" line over the cards.")]
         [SerializeField] private GameObject label = null;
 
         private readonly List<CultureCardView> _cards = new List<CultureCardView>();
@@ -27,7 +27,7 @@ namespace BeachTycoon.UI
         /// <summary>Hidden when the page heading already asks for the culture.</summary>
         public void ShowLabel(bool show) => label.SetActive(show);
 
-        public void Build(CultureService cultures)
+        public void Build(CultureService cultures, CharacterService characters)
         {
             cardTemplate.gameObject.SetActive(false);
             if (_cards.Count > 0) return;
@@ -39,7 +39,7 @@ namespace BeachTycoon.UI
                 CultureCardView card = Instantiate(cardTemplate, cardRow, false);
                 card.name = "Card " + all[i].id;
                 card.gameObject.SetActive(true);
-                card.Show(all[i], cultures.Flag(all[i]));
+                card.Show(all[i], cultures.Flag(all[i]), characters != null ? characters.Portrait(all[i].character) : null);
                 string id = all[i].id;
                 card.Button.onClick.AddListener(() => Pick(id));
                 _cards.Add(card);

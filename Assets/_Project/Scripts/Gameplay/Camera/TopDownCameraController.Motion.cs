@@ -68,6 +68,11 @@ namespace BeachTycoon.Gameplay
             else if (TryGetGroundPoint(evt.ScreenPosition, out Vector3 point)) FlyToCloseUp(point);
         }
 
+        private void OnFocusRequested(CameraFocusRequested evt)
+        {
+            if (_initialized) FlyToCloseUp(evt.Point);
+        }
+
         private void OnShake(CameraShakeRequested evt)
         {
             if (!_initialized || evt.Strength <= 0f) return;

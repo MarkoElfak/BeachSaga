@@ -64,3 +64,4 @@ MonoBehaviour:
   - Kokkini Bay
   - Lefki Akti
   prefabSwaps: []
+  character: {fileID: 11400000, guid: 3181ca0ecffb543cf82472f3b2ad3fe3, type: 2}

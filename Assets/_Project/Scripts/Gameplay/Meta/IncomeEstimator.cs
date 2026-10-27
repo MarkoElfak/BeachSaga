@@ -59,7 +59,7 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < _stands.Count; i++)
             {
                 StandController stand = _stands.Get(i);
-                capacity += 1.0 / Math.Max(0.1f, stand.Product.serveSeconds);
+                capacity += stand.ServeSpeed / Math.Max(0.1f, stand.Product.serveSeconds);
                 double value = EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
                     _database.economy.standLevelIncomeBonus);
                 totalValue += _miniGames != null ? value * _miniGames.IncomeMultiplier(stand.Product) : value;
