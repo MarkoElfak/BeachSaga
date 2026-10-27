@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, land, house info.</summary>
+    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, new land, locked land, house info.</summary>
     public sealed class ToastView : MonoBehaviour
     {
         private const float ShowSeconds = 2.6f;
@@ -33,7 +33,8 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Subscribe<HouseTapped>(OnHouseTapped);
             EventBus.Subscribe<ProductUnlocked>(OnProductUnlocked);
-            EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Subscribe<LandOpened>(OnLandOpened);
+            EventBus.Subscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
             if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
@@ -54,7 +55,8 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
             EventBus.Unsubscribe<HouseTapped>(OnHouseTapped);
             EventBus.Unsubscribe<ProductUnlocked>(OnProductUnlocked);
-            EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Unsubscribe<LandOpened>(OnLandOpened);
+            EventBus.Unsubscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
         }
@@ -105,7 +107,14 @@ namespace BeachTycoon.UI
 
         private void OnRotateBlocked(RotateBlocked evt) => Show("No room to turn it here");
 
-        private void OnAreaUnlocked(AreaUnlocked evt) => Show("More beach unlocked! Zoom out to see it");
+        private void OnLandOpened(LandOpened evt) => Show($"{_database.map.pieces[evt.Piece].displayName} is open!");
+
+        private void OnLockedLandTapped(LockedLandTapped evt)
+        {
+            LandPiece piece = _database.map.pieces[evt.Piece];
+            TierDefinition tier = _database.GetTier(piece.unlockTier);
+            Show($"{piece.displayName} opens at {(tier != null ? tier.displayName : $"level {piece.unlockTier}")}. Keep upgrading!");
+        }
 
         private void OnAchievementCompleted(AchievementCompleted evt) =>
             Show($"Trophy unlocked: {_database.achievements[evt.Index].title}!");

@@ -52,12 +52,13 @@ namespace BeachTycoon.Gameplay
             placement.AttachTerrain(ground);
             bool moreLand = placement.AreaForTier(snapshot.tier) != placement.AreaForTier(database.MaxTier);
             worldBuilder.ShowLandBoundary(placement.UnlockedArea, moreLand);
+            worldBuilder.ShowLand(snapshot.tier);
             placement.GetOccupiedRects(_occupied);
             worldBuilder.RefreshPlacement(_flats, _occupied, false);
 
             Vector2 focus = placement.GetLotPosition(BuildingManager.MainLotIndex);
             Color sea = database.palette.GetColor(database.world.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, placement.UnlockedArea, new Vector3(focus.x, 0f, focus.y), sea);
+            cameraController.Initialize(database.cameraConfig, placement.UnlockedBounds, new Vector3(focus.x, 0f, focus.y), sea);
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
 

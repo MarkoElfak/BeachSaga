@@ -40,6 +40,14 @@ namespace BeachTycoon.Gameplay
             FlyTo(ClampFocus(point, distance), distance);
         }
 
+        /// <summary>Glides over newly opened land, zoomed out just enough to show all of it.</summary>
+        public void FlyToArea(Rect area)
+        {
+            if (!_initialized) return;
+            float distance = Mathf.Clamp(FitDistance(area, _aspect), Mathf.Min(_config.startDistance, _maxDistance), _maxDistance);
+            FlyTo(ClampFocus(new Vector3(area.center.x, 0f, area.center.y), distance), distance);
+        }
+
         private void FlyTo(Vector3 focus, float distance)
         {
             if (!_initialized) return;

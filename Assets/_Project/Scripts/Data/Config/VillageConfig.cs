@@ -18,7 +18,7 @@ namespace BeachTycoon.Data
 
         [Header("Welcome sign")]
         [Tooltip("Where the sign stands (x, z): beside the footpath where visitors walk in.")]
-        public Vector2 signPosition = new Vector2(3.6f, -17.2f);
+        public Vector2 signPosition = new Vector2(3.6f, -16.6f);
         [Tooltip("Turn in degrees; 0 faces the camera.")]
         public float signYaw = -12f;
 

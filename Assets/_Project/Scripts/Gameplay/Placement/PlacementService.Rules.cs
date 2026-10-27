@@ -5,8 +5,8 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Validity: a footprint must be inside the unlocked land (decorations also above the water), off the
-    /// footpath (up to where it meets the beach) and the towel area, and its blocking area (footprint plus a
+    /// Validity: a footprint must be on open land (decorations also above the water), off the footpath (up to
+    /// where it meets the beach), the towel areas and open boardwalks, and its blocking area (footprint plus a
     /// stand's queue) must keep 'gap' away from every other object's blocking area. Shore-only stands must touch the shore.
     /// </summary>
     public sealed partial class PlacementService
@@ -34,8 +34,7 @@ namespace BeachTycoon.Gameplay
             if (!IsOnLand(footprint, self.Kind == PlaceableKind.Decoration)) return false;
             if (IsShoreOnlyStand(self) && !TouchesShore(footprint)) return false;
 
-            WorldLayoutConfig layout = _database.world;
-            if (PlacementRules.Overlaps(blocking, layout.relaxArea, 0f)) return false;
+            if (OverlapsTowels(blocking) || OverlapsBoardwalk(blocking)) return false;
             if (PlacementRules.Overlaps(blocking, FootpathArea(), 0f)) return false;
 
             // New decorations also keep off empty house lots, so neighbours keep their reserved spots.
@@ -71,7 +70,7 @@ namespace BeachTycoon.Gameplay
         // Buildings and stands level the ground under them, so only decorations check the natural height.
         private bool IsOnLand(Rect rect, bool checkHeight)
         {
-            if (!PlacementRules.Inside(rect, UnlockedArea, 0f)) return false;
+            if (!IsOnOpenLand(rect)) return false;
             if (!checkHeight || _terrain == null) return true; // no terrain yet (boot, tests)
             return _terrain.Height(rect.center.x, rect.center.y, false) >= _terrain.WaterLevel + _config.minHeightAboveWater;
         }

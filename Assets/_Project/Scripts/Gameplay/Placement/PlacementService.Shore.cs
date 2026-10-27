@@ -22,8 +22,9 @@ namespace BeachTycoon.Gameplay
             return false;
         }
 
-        /// <summary>The footprint reaches the water line closely enough.</summary>
-        public bool TouchesShore(Rect footprint) => footprint.yMax >= UnlockedArea.yMax - _config.shoreDistance;
+        /// <summary>The footprint reaches the water line closely enough (the mainland's sea side, or an island's edge).</summary>
+        public bool TouchesShore(Rect footprint) =>
+            footprint.yMax >= UnlockedArea.yMax - _config.shoreDistance || TouchesIslandShore(footprint);
 
         /// <summary>Shore-only stands standing inland (older saves) move to the nearest free shore spot.</summary>
         public void EnsureShoreStands()

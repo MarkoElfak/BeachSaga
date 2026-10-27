@@ -12,7 +12,7 @@ namespace BeachTycoon.EditorTools
     /// <summary>The sound and feel playtest's checks.</summary>
     internal static partial class FeelPlaytestSteps
     {
-        private static Vector3 _restPosition, _coinFrom;
+        private static Vector3 _coinFrom;
         private static Quaternion _restRotation;
         private static int _wins, _hits, _shakes;
 
@@ -68,7 +68,6 @@ namespace BeachTycoon.EditorTools
         {
             Check(Audio.TimesPlayed(SoundId.TierUpgrade) == 1 && Haptics.PulseCount > 0,
                 $"the finished tent plays the fanfare and vibrates ({Haptics.PulseCount} pulses so far)");
-            _restPosition = Camera.main.transform.position;
             _restRotation = Camera.main.transform.rotation;
 
             _shakes = Rig.ShakeCount;
@@ -105,10 +104,12 @@ namespace BeachTycoon.EditorTools
 
         private static void CheckCameraRestsAndSettings()
         {
+            // The upgrade also flies the camera over the land it opened, so the rest pose is the glide's end.
             Transform camera = Camera.main.transform;
-            float moved = Vector3.Distance(camera.position, _restPosition);
+            Vector3 pose = Rig.Focus - _restRotation * Vector3.forward * Rig.Distance;
+            float moved = Vector3.Distance(camera.position, pose);
             Check(moved < 0.001f && Quaternion.Angle(camera.rotation, _restRotation) < 0.01f,
-                $"after the shake the camera rests exactly where it was ({moved:0.0000} m off)");
+                $"after the shake the camera rests exactly on its pose ({moved:0.0000} m off)");
 
             PlaytestTools.Click(PlaytestTools.Find<Canvas>(), "SettingsButton");
             SettingsPanelView panel = SettingsPanel;

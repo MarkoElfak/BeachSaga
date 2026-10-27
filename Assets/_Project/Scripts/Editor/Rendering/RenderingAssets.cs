@@ -6,13 +6,14 @@ using UnityEngine.Rendering.Universal;
 namespace BeachTycoon.EditorTools
 {
     /// <summary>
-    /// Creates the terrain, water and scatter materials, the post-processing profile, and tunes the
+    /// Creates the terrain, water, fog and scatter materials, the post-processing profile, and tunes the
     /// project's URP assets (softer, longer shadows on mobile too).
     /// </summary>
     internal static class RenderingAssets
     {
         public const string LitShader = "Universal Render Pipeline/Lit";
         public const string WaterShader = "BeachTycoon/Water";
+        public const string FogShader = "BeachTycoon/Fog";
         private const string Folder = ProjectPaths.Root + "/Art/Rendering";
         private const string ProfilePath = Folder + "/BeachVolumeProfile.asset";
 
@@ -39,6 +40,16 @@ namespace BeachTycoon.EditorTools
             material.SetTexture("_NoiseTex", TextureFactory.Noise);
             material.renderQueue = (int)RenderQueue.Transparent;
             return Finish(material);
+        }
+
+        /// <summary>Fog over locked land (each layer copies it at runtime with its own noise offset).</summary>
+        public static Material FogMaterial()
+        {
+            Material material = LoadOrCreate("M_Fog", FogShader);
+            material.SetTexture("_NoiseTex", TextureFactory.Noise);
+            material.renderQueue = (int)RenderQueue.Transparent + 20;
+            EditorUtility.SetDirty(material);
+            return material;
         }
 
         public static Material RockMaterial()

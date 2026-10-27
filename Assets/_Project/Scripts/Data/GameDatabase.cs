@@ -25,6 +25,7 @@ namespace BeachTycoon.Data
         public DayNightConfig dayNight;
         public BeachEventConfig beachEvents;
         public VillageConfig village;
+        public MapConfig map;
 
         [Header("Content")]
         [Tooltip("Ordered: element 0 is tier 1 (Tent).")]

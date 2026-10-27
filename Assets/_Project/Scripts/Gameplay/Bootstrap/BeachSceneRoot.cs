@@ -60,9 +60,10 @@ namespace BeachTycoon.Gameplay
             ServiceLocator.Register(ground);
             _placement.AttachTerrain(ground);
             worldBuilder.ShowLandBoundary(_placement.UnlockedArea, MoreLandToUnlock());
+            worldBuilder.ShowLand(ServiceLocator.Get<BuildingManager>().MainTier);
             Vector3 startFocus = LotPosition(0);
             Color seaColor = database.palette.GetColor(layout.seaPaletteKey);
-            cameraController.Initialize(database.cameraConfig, _placement.UnlockedArea, startFocus, seaColor);
+            cameraController.Initialize(database.cameraConfig, _placement.UnlockedBounds, startFocus, seaColor);
 
             gestureSource.Initialize(database.input);
             tapRouter.Initialize(database.input);
@@ -75,6 +76,7 @@ namespace BeachTycoon.Gameplay
             RefreshPlacement(false);
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Subscribe<LandOpened>(OnLandOpened);
         }
 
         private void OnDestroy()
@@ -82,6 +84,7 @@ namespace BeachTycoon.Gameplay
             _selection?.Dispose();
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<AreaUnlocked>(OnAreaUnlocked);
+            EventBus.Unsubscribe<LandOpened>(OnLandOpened);
         }
 
         private void OnObjectMoved(ObjectMoved evt) => RefreshPlacement(evt.Kind != PlaceableKind.Decoration);
@@ -97,8 +100,15 @@ namespace BeachTycoon.Gameplay
         // An upgrade opened more land: move the boundary fence; the camera roams it and full zoom-out shows it all.
         private void OnAreaUnlocked(AreaUnlocked evt)
         {
-            worldBuilder.ShowLandBoundary(evt.Area, MoreLandToUnlock());
+            worldBuilder.ShowLandBoundary(_placement.UnlockedArea, MoreLandToUnlock());
             cameraController.SetLimits(evt.Area);
+        }
+
+        // The fog over the new piece rolls away while the camera flies over it.
+        private void OnLandOpened(LandOpened evt)
+        {
+            worldBuilder.OpenLand(evt.Piece);
+            cameraController.FlyToArea(evt.Area);
         }
 
         private bool MoreLandToUnlock()

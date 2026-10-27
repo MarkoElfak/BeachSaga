@@ -10,11 +10,12 @@ namespace BeachTycoon.Gameplay
     /// </summary>
     public sealed partial class PlacementService
     {
-        /// <summary>Buildable land at the current main-building tier (x, z, width, depth).</summary>
+        /// <summary>Buildable mainland at the current main-building tier (x, z, width, depth); islands come on top.</summary>
         public Rect UnlockedArea => AreaForTier(_buildings.MainTier);
 
         public Rect AreaForTier(int tierNumber)
         {
+            if (LandMap.TryMainland(_database.map, tierNumber, out Rect mainland)) return mainland;
             for (int tier = Mathf.Min(Mathf.Max(1, tierNumber), _database.MaxTier); tier >= 1; tier--)
             {
                 TierDefinition definition = _database.GetTier(tier);
@@ -92,11 +93,18 @@ namespace BeachTycoon.Gameplay
             EventBus.Publish(new ObjectMoved(PlaceableKind.Lot, evt.LotIndex));
         }
 
+        // New land first (camera limits), then each piece that opened (fog, fly-over, toast).
         private void OnTierUpgraded(TierUpgraded evt)
         {
             if (evt.LotIndex != BuildingManager.MainLotIndex) return;
-            Rect area = AreaForTier(evt.Tier);
-            if (area != AreaForTier(evt.Tier - 1)) EventBus.Publish(new AreaUnlocked(evt.Tier, area));
+            Rect area = BoundsForTier(evt.Tier);
+            if (area != BoundsForTier(evt.Tier - 1)) EventBus.Publish(new AreaUnlocked(evt.Tier, area));
+            MapConfig map = _database.map;
+            if (!LandMap.HasPieces(map)) return;
+            for (int i = 0; i < map.pieces.Length; i++)
+            {
+                if (map.pieces[i].unlockTier == evt.Tier) EventBus.Publish(new LandOpened(i, map.pieces[i].area));
+            }
         }
 
         /// <summary>
@@ -109,7 +117,7 @@ namespace BeachTycoon.Gameplay
             PlaceableId main = PlaceableId.Lot(BuildingManager.MainLotIndex);
             Vector2 at = GetLotPosition(main.Index);
             Rect footprint = GetFootprint(main, at);
-            bool fitsLand = IsOnLand(footprint, false) && !PlacementRules.Overlaps(footprint, _database.world.relaxArea, 0f)
+            bool fitsLand = IsOnLand(footprint, false) && !OverlapsTowels(footprint)
                 && !PlacementRules.Overlaps(footprint, FootpathArea(), 0f);
             if (!fitsLand && TryFindFreeSpot(main, at, out Vector2 spot))
             {

@@ -31,6 +31,7 @@ namespace BeachTycoon.EditorTools
             database.village = BuildVillage();
             database.world = BuildWorld();
             database.terrain = BuildTerrain(palette);
+            database.map = BuildMap(palette);
             database.palette = palette;
 
             ContentAssetBuilder.Fill(database);
@@ -73,6 +74,27 @@ namespace BeachTycoon.EditorTools
             return world;
         }
 
+        // Pieces and fog settings come from the code defaults until the map is tuned by hand (M16).
+        private static MapConfig BuildMap(PaletteDefinition palette)
+        {
+            var map = LoadOrCreate<MapConfig>(ProjectPaths.Config + "/MapConfig.asset", out _);
+            if (map.dataVersion < MapConfig.CurrentDataVersion)
+            {
+                var defaults = ScriptableObject.CreateInstance<MapConfig>();
+                EditorUtility.CopySerialized(defaults, map);
+                Object.DestroyImmediate(defaults);
+                map.name = "MapConfig";
+                map.dataVersion = MapConfig.CurrentDataVersion;
+            }
+
+            map.fogMaterial = RenderingAssets.FogMaterial();
+            map.boardwalkMaterial = palette.GetMaterial("wood");
+            map.boardwalkMesh = LowPolyPrimitives.For(PrimitiveType.Cube);
+            map.signPrefab = PlaceholderPrefabBuilder.Load<GameObject>(PlaceholderPrefabBuilder.LandSignPath);
+            EditorUtility.SetDirty(map);
+            return map;
+        }
+
         private static VillageConfig BuildVillage()
         {
             var village = LoadOrCreate<VillageConfig>(ProjectPaths.Config + "/VillageConfig.asset", out _);
@@ -99,9 +121,10 @@ namespace BeachTycoon.EditorTools
             var terrain = LoadOrCreate<TerrainConfig>(ProjectPaths.Config + "/TerrainConfig.asset", out _);
             if (terrain.dataVersion < TerrainConfig.CurrentDataVersion)
             {
-                // The island grew: longer footpath and more scenery. Other terrain tuning is kept.
+                // The island grew (M4.1, M16): longer footpath, more scenery, a finer texture. Other tuning is kept.
                 var defaults = ScriptableObject.CreateInstance<TerrainConfig>();
                 terrain.path = defaults.path;
+                terrain.textureSize = defaults.textureSize;
                 terrain.rockCount = defaults.rockCount;
                 terrain.grassTuftCount = defaults.grassTuftCount;
                 Object.DestroyImmediate(defaults);

@@ -27,6 +27,7 @@ namespace BeachTycoon.EditorTools
         public const string PalmPath = ProjectPaths.Prefabs + "/World/Palm.prefab";
         public const string CoinPath = ProjectPaths.Prefabs + "/Effects/CoinPickup.prefab";
         public const string FlagpolePath = ProjectPaths.Prefabs + "/World/Flagpole.prefab";
+        public const string LandSignPath = ProjectPaths.Prefabs + "/World/LandSign.prefab";
         public const string VisitorFolder = ProjectPaths.Prefabs + "/Visitors";
         public const string HouseFolder = ProjectPaths.Prefabs + "/Houses";
         public const string DecorationFolder = ProjectPaths.Prefabs + "/Decorations";
@@ -56,6 +57,7 @@ namespace BeachTycoon.EditorTools
             Build(PalmPath, overwrite, () => WorldPrefabs.BuildPalm(p));
             Build(CoinPath, overwrite, () => WorldPrefabs.BuildCoin(p));
             Build(FlagpolePath, overwrite, () => FlagpoleBuilder.Build(p));
+            Build(LandSignPath, overwrite, () => LandSignBuilder.Build(p).gameObject);
             foreach (VisitorPrefabs.Look look in VisitorPrefabs.Looks)
             {
                 Build(VisitorPath(look.Name), overwrite, () => VisitorPrefabs.Build(look, p));

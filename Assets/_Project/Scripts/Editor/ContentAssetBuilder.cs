@@ -39,7 +39,6 @@ namespace BeachTycoon.EditorTools
                 Tier("4_Hotel", "hotel", "Hotel", PlaceholderPrefabBuilder.HotelPath, 9000, 8f, 40, surf, 8, 1f),
                 Tier("5_Resort", "resort", "Resort", PlaceholderPrefabBuilder.ResortPath, 60000, 10f, 100, houses, 20, 2f),
             };
-            for (int i = 0; i < database.tiers.Length; i++) SetLand(database.tiers[i], i);
 
             var types = new List<VisitorTypeDefinition>
             {
@@ -51,23 +50,6 @@ namespace BeachTycoon.EditorTools
                 Visitor("Investor", 1f, 1f, 45f, 5, houses),
             };
             database.visitorTypes = types.ToArray();
-        }
-
-        // Land per tier: (half width, bottom z). The top edge stays at the wet sand.
-        private const float LandTopZ = 6.5f;
-        private static readonly Vector2[] Land =
-        {
-            new Vector2(11.8f, -15.6f), new Vector2(13.8f, -16f), new Vector2(15.8f, -16.3f),
-            new Vector2(17.6f, -16.6f), new Vector2(19.2f, -16.9f),
-        };
-
-        // Only fills land that was never set, so tuned areas survive re-running Setup.
-        private static void SetLand(TierDefinition tier, int index)
-        {
-            if (tier.buildArea.width > 0f || index >= Land.Length) return;
-            Vector2 land = Land[index];
-            tier.buildArea = Rect.MinMaxRect(-land.x, land.y, land.x, LandTopZ);
-            EditorUtility.SetDirty(tier);
         }
 
         // Managers came later (M8): products without a manager cost get the default one.

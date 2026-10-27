@@ -24,6 +24,7 @@ namespace BeachTycoon.EditorTools
         private const int FirstUpgradeStep = 6; // steps 6..9 wait for tiers 2..5
 
         private static float _previousMax;
+        private static float _previousArea;
 
         private static BuildingManager Buildings => ServiceLocator.Get<BuildingManager>();
         private static TopDownCameraController Rig => Camera.main != null ? Camera.main.GetComponent<TopDownCameraController>() : null;
@@ -32,7 +33,8 @@ namespace BeachTycoon.EditorTools
         {
             if (step >= FirstUpgradeStep && step < FirstUpgradeStep + TopTier - 1)
             {
-                return BeachReady() && Buildings.MainTier == step - FirstUpgradeStep + 2 && Buildings.GetLot(0).state == LotState.Built;
+                return BeachReady() && Buildings.MainTier == step - FirstUpgradeStep + 2 && Buildings.GetLot(0).state == LotState.Built
+                    && !Rig.IsFlying; // the camera first flies over the land that opened
             }
 
             switch (step)
@@ -86,6 +88,7 @@ namespace BeachTycoon.EditorTools
         {
             Check(!Rig.ShowsWholeMap && Rig.Distance < Rig.MaxDistance, $"the game starts close up ({Rig.Distance:0} m, whole map at {Rig.MaxDistance:0} m)");
             _previousMax = Rig.MaxDistance;
+            _previousArea = Rig.Area.width * Rig.Area.height;
             DoubleTapSea();
         }
 
@@ -126,7 +129,10 @@ namespace BeachTycoon.EditorTools
 
         private static void CheckUpgrade(int tier)
         {
-            Check(Rig.MaxDistance > _previousMax + 0.5f, $"tier {tier} opens land and full zoom-out grows ({_previousMax:0} -> {Rig.MaxDistance:0} m)");
+            // A strip across the back adds depth, not width, so a width-bound portrait view need not zoom out further.
+            Check(Rig.MaxDistance > _previousMax - 0.01f && Rig.Area.width * Rig.Area.height > _previousArea + 1f,
+                $"tier {tier} opens land ({_previousArea:0} -> {Rig.Area.width * Rig.Area.height:0} m2) and full zoom-out never shrinks ({_previousMax:0} -> {Rig.MaxDistance:0} m)");
+            _previousArea = Rig.Area.width * Rig.Area.height;
             _previousMax = Rig.MaxDistance;
             if (tier < TopTier) Check(Buildings.TryUpgrade(0), $"tier {tier + 1} started");
             else DoubleTapSea();

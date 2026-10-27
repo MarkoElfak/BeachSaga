@@ -66,10 +66,13 @@ namespace BeachTycoon.Gameplay
         }
 
         /// <summary>The farthest zoom that shows the whole unlocked land on a screen of this shape.</summary>
-        public float FitDistanceFor(float aspect)
+        public float FitDistanceFor(float aspect) => FitDistance(_area, aspect);
+
+        // The zoom that shows this ground rectangle (plus the fit margin) on a screen of this shape.
+        private float FitDistance(Rect area, float aspect)
         {
             float margin = _config.fitMargin;
-            Rect padded = Rect.MinMaxRect(_area.xMin - margin, _area.yMin - margin, _area.xMax + margin, _area.yMax + margin);
+            Rect padded = Rect.MinMaxRect(area.xMin - margin, area.yMin - margin, area.xMax + margin, area.yMax + margin);
             float fit = CameraFraming.FitDistance(padded, _rotation, _config.fieldOfView, aspect, _config.fitHeight);
             return Mathf.Max(_config.minDistance, fit);
         }
