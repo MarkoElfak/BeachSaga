@@ -42,16 +42,25 @@ namespace BeachTycoon.UI
                 string who = WhoWorksAt(i, model);
                 standButtons[i].interactable = canHire && who == null;
                 var label = standButtons[i].GetComponentInChildren<TMP_Text>();
-                label.text = $"{stand.Product.displayName}\n<size=75%>{(who ?? $"{StaffSkills.Name(skill)} {model.Stars(skill)}/{StaffSkills.MaxStars}")}</size>";
+                label.text = $"{stand.Product.NameAt(_stands.MainTier)}\n<size=75%>{(who ?? $"{StaffSkills.Name(skill)} {model.Stars(skill)}/{StaffSkills.MaxStars}")}</size>";
             }
         }
 
+        // Null while the stand has room for them; otherwise who is already there (up to two at a restaurant).
         private string WhoWorksAt(int stand, WorkerModel model)
         {
             if (model.stand == stand) return "Works here";
-            if (_characters.HasJoined && _characters.StandIndex == stand) return $"{_characters.Character.displayName} is here";
-            StaffMember other = _staff.WorkerAt(stand);
-            return other != null ? $"{other.Model.name} is here" : null;
+            if (_staff.IsStandFree(stand)) return null;
+            string first = _characters.HasJoined && _characters.StandIndex == stand ? _characters.Character.displayName : null;
+            string second = null;
+            foreach (StaffMember other in _staff.Staff)
+            {
+                if (other.Model.stand != stand) continue;
+                if (first == null) first = other.Model.name;
+                else if (second == null) second = other.Model.name;
+            }
+
+            return second != null ? $"{first} and {second}" : $"{first ?? "Someone"} is here";
         }
 
         private void Subscribe(bool on)

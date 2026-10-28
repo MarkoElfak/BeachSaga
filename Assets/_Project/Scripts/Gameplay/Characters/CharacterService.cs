@@ -10,7 +10,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// The player's character: who they are (from the picked culture), the stand they work at and where they are
     /// on the beach. They stand beside their stand's counter; once there, that stand serves faster. Sent to another
-    /// stand, they walk over around everything in the way.
+    /// stand, they walk over around everything in the way. StaffService works out the speed when others work there too.
     /// </summary>
     public sealed class CharacterService : ITickable, IDisposable
     {
@@ -114,7 +114,7 @@ namespace BeachTycoon.Gameplay
             HasJoined = true;
             if (_meta.characterStand >= _stands.Count) _meta.characterStand = -1;
             if (_meta.characterStand < 0 && _stands.Count > 0) _meta.characterStand = 0;
-            Agent.Position = StandIndex >= 0 ? _spots.Work(StandIndex, out _arriveFacing) : _spots.Waiting();
+            Agent.Position = StandIndex >= 0 ? _spots.Work(StandIndex, Seat, out _arriveFacing) : _spots.Waiting();
             Agent.Facing = StandIndex >= 0 ? _arriveFacing : Vector3.back;
             if (StandIndex >= 0) StartWork();
             EventBus.Publish(new CharacterJoined());
@@ -136,7 +136,10 @@ namespace BeachTycoon.Gameplay
             WalkToWork();
         }
 
-        private void WalkToWork() => _spots.BuildWalk(Agent.Position, StandIndex, Agent.Path, out _arriveFacing);
+        private void WalkToWork() => _spots.BuildWalk(Agent.Position, StandIndex, Seat, Agent.Path, out _arriveFacing);
+
+        // The character takes a stand's last seat (the right side of a restaurant), so workers fill it from the left.
+        private int Seat => _spots.LastSeat(StandIndex);
 
         private void StartWork()
         {

@@ -54,7 +54,8 @@ namespace BeachTycoon.Tests
             {
                 Assert.IsNotNull(product);
                 Assert.IsTrue(ids.Add(product.id), $"duplicate product id {product.id}");
-                Assert.Greater(product.price, 0, product.id);
+                bool paysNothing = product.IsService && product.service.kind == ServiceKind.FirstAid; // first aid only helps
+                if (!paysNothing) Assert.Greater(product.price, 0, product.id);
                 Assert.Greater(product.serveSeconds, 0f, product.id);
                 Assert.IsNotNull(product.standPrefab, product.id);
                 Assert.IsTrue(System.Enum.IsDefined(typeof(StaffSkill), product.skill), $"{product.id} skill");

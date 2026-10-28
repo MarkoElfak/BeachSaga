@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae043bd4bca84682806cbd0bd605bfa, type: 3}
+  m_Name: Chapel
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
+  id: chapel
+  displayName: Chapel
+  description: weddings by the sea
+  icon: {fileID: 0}
+  category: 2
+  cultureId: 
+  unlockCost: 3000
+  price: 400
+  serveSeconds: 1
+  upgradeBaseCost: 150
+  skill: 4
+  workerSlots: 1
+  service:
+    kind: 1
+    reach: 9
+    amount: 0.15
+    eventSeconds: 180
+    popularity: 0.15
+    grownTier: 0
+    grownName: 
+    grownScale: 1.5
+  requiredTier: 3
+  standPrefab: {fileID: 8616521830520627945, guid: ae91f216b51a645158728c6fa59a2b48, type: 3}
+  standFootprint:
+    serializedVersion: 2
+    x: -1.1
+    y: -1.2
+    width: 2.2
+    height: 2.8000002
+  queueStart: {x: 0, y: 0}
+  autoFootprint: 1
+  freeStanding: 1

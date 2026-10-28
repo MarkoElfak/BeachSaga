@@ -37,6 +37,8 @@ namespace BeachTycoon.Data
         [Range(0f, 0.5f)] public float ownCountryBonus = 0.05f;
         [Tooltip("Serving speed is multiplied by this while a worker's wage is unpaid.")]
         [Range(0.1f, 1f)] public float unhappySpeedFactor = 0.75f;
+        [Tooltip("At a place with more than one seat, each extra person adds this share of their own speed.")]
+        [Range(0f, 1f)] public float extraWorkerShare = 0.5f;
         [Tooltip("Sales to reach the next level = this x the current level.")]
         [Min(1)] public int salesPerLevel = 30;
         [Min(1)] public int maxLevel = 5;

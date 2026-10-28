@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Milestone 2 HUD pieces: quest tracker, move-in request card, toast and the decorations shop.</summary>
+    /// <summary>Milestone 2 HUD pieces: quest tracker, move-in request card, toast and the decoration tiles of the build bar.</summary>
     internal static class CommunityUiBuilder
     {
         private const string DecorButtonPath = ProjectPaths.Prefabs + "/UI/DecorButton.prefab";
@@ -52,43 +52,6 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "label", label);
         }
 
-        public static DecorPanelView BuildDecorPanel(Transform parent)
-        {
-            DecorButtonView buttonPrefab = BuildDecorButtonPrefab();
-            RectTransform host = UiKit.Stretch("DecorPanel", parent);
-            RectTransform root = UiKit.Stretch("Root", host);
-            RectTransform backdropRect = UiKit.Stretch("Backdrop", root);
-            Button backdrop = UiKit.AddButton(backdropRect, new Color(0f, 0f, 0f, 0.55f), out _);
-            backdrop.transition = Selectable.Transition.None;
-
-            RectTransform window = UiKit.Rect("Window", root, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(920f, 1180f));
-            UiKit.AddImage(window, CardColor);
-            RectTransform titleRect = UiKit.Rect("Title", window, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(-160f, 100f));
-            UiKit.AddText(titleRect, "Beach decorations", 56f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
-
-            RectTransform list = UiKit.Rect("List", window, Vector2.zero, Vector2.one, new Vector2(0.5f, 1f), new Vector2(0f, -160f), new Vector2(-60f, -200f));
-            var layout = list.gameObject.AddComponent<VerticalLayoutGroup>();
-            layout.spacing = 16f;
-            layout.childControlWidth = true;
-            layout.childControlHeight = false;
-            layout.childForceExpandWidth = true;
-            layout.childForceExpandHeight = false;
-
-            RectTransform closeRect = UiKit.Rect("CloseButton", window, Vector2.one, Vector2.one, Vector2.one, new Vector2(-24f, -24f), new Vector2(110f, 110f));
-            Button close = UiKit.AddButton(closeRect, new Color(0.85f, 0.35f, 0.3f), out _);
-            UiKit.ChildText(closeRect, "Label", "X", 56f, TextAlignmentOptions.Center, Color.white, FontStyles.Bold);
-
-            MetaUiBuilder.AddModalWindow(root, window);
-            var view = host.gameObject.AddComponent<DecorPanelView>();
-            PrimitiveKit.SetReference(view, "root", root.gameObject);
-            PrimitiveKit.SetReference(view, "buttonPrefab", buttonPrefab);
-            PrimitiveKit.SetReference(view, "list", list);
-            PrimitiveKit.SetReference(view, "closeButton", close);
-            PrimitiveKit.SetReference(view, "backdropButton", backdrop);
-            root.gameObject.SetActive(false);
-            return view;
-        }
-
         private static Button CardButton(Transform parent, string name, string text, Vector2 anchor, Color color)
         {
             RectTransform rect = UiKit.Rect(name, parent, anchor, anchor, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(380f, 100f));
@@ -97,19 +60,22 @@ namespace BeachTycoon.EditorTools
             return button;
         }
 
-        private static DecorButtonView BuildDecorButtonPrefab()
+        /// <summary>A decoration in the build bar's Decor tab, the size of a product button: name, bonus and placed count, price.</summary>
+        public static DecorButtonView BuildDecorTilePrefab()
         {
             var root = new GameObject("DecorButton", typeof(RectTransform));
             var rect = (RectTransform)root.transform;
-            rect.sizeDelta = new Vector2(800f, 170f);
-            Button button = UiKit.AddButton(rect, Color.white, out _);
-            RectTransform nameRect = UiKit.Rect("Name", rect, new Vector2(0f, 0.5f), new Vector2(0.7f, 1f), new Vector2(0f, 0.5f), new Vector2(30f, 0f), new Vector2(-30f, 0f));
-            TextMeshProUGUI nameLabel = UiKit.AddText(nameRect, "Name", 44f, TextAlignmentOptions.MidlineLeft, UiKit.TextDark, FontStyles.Bold);
-            RectTransform detailRect = UiKit.Rect("Detail", rect, new Vector2(0f, 0f), new Vector2(0.7f, 0.5f), new Vector2(0f, 0.5f), new Vector2(30f, 0f), new Vector2(-30f, 0f));
-            TextMeshProUGUI detail = UiKit.AddText(detailRect, "Detail", 30f, TextAlignmentOptions.MidlineLeft, UiKit.TextDark);
-            RectTransform priceRect = UiKit.Rect("Price", rect, new Vector2(0.7f, 0.15f), new Vector2(1f, 0.85f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-30f, 0f));
+            rect.sizeDelta = new Vector2(190f, 190f);
+            Button button = UiKit.AddButton(rect, new Color(0.62f, 0.88f, 0.8f), out _);
+            TextMeshProUGUI nameLabel = Line(rect, "Name", 0.66f, 1f, 30f, FontStyles.Bold);
+            nameLabel.enableAutoSizing = true;
+            nameLabel.fontSizeMin = 20f;
+            nameLabel.fontSizeMax = 30f;
+            nameLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            TextMeshProUGUI detail = Line(rect, "Detail", 0.38f, 0.66f, 26f, FontStyles.Normal);
+            RectTransform priceRect = UiKit.Rect("Price", rect, new Vector2(0f, 0.06f), new Vector2(1f, 0.36f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-24f, 0f));
             UiKit.AddImage(priceRect, UiKit.ButtonColor, false);
-            TextMeshProUGUI price = UiKit.ChildText(priceRect, "Label", "0", 42f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            TextMeshProUGUI price = UiKit.ChildText(priceRect, "Label", "0", 30f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
 
             var view = root.AddComponent<DecorButtonView>();
             PrimitiveKit.SetReference(view, "button", button);
@@ -117,6 +83,12 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(view, "detailLabel", detail);
             PrimitiveKit.SetReference(view, "priceLabel", price);
             return PrimitiveKit.SavePrefab(root, DecorButtonPath).GetComponent<DecorButtonView>();
+        }
+
+        private static TextMeshProUGUI Line(RectTransform parent, string name, float yMin, float yMax, float size, FontStyles style)
+        {
+            RectTransform rect = UiKit.Rect(name, parent, new Vector2(0f, yMin), new Vector2(1f, yMax), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-12f, 0f));
+            return UiKit.AddText(rect, name, size, TextAlignmentOptions.Center, UiKit.TextDark, style);
         }
     }
 }

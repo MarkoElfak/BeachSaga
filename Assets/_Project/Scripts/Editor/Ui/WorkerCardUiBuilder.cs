@@ -8,7 +8,8 @@ namespace BeachTycoon.EditorTools
     /// <summary>The worker card: portrait and flag, name, country, level and wage, five skill rows of stars, stand buttons and Dismiss.</summary>
     internal static class WorkerCardUiBuilder
     {
-        private const int StandButtons = 6;
+        private const int StandButtons = 12;
+        private const int Columns = 3;
         private const int Stars = 5;
         private static readonly Color Navy = new Color(0.08f, 0.22f, 0.42f);
         private static readonly Color Muted = new Color(0.35f, 0.33f, 0.3f);
@@ -19,7 +20,7 @@ namespace BeachTycoon.EditorTools
         public static void Build(Transform parent)
         {
             RectTransform host = UiKit.Stretch("WorkerCard", parent);
-            RectTransform root = MetaUiBuilder.Modal(host, "Job seeker", new Vector2(920f, 1500f), out RectTransform window, out Button close);
+            RectTransform root = MetaUiBuilder.Modal(host, "Job seeker", new Vector2(920f, 1580f), out RectTransform window, out Button close);
             TMP_Text title = window.Find("Title").GetComponent<TMP_Text>();
             RectTransform frame = UiKit.Rect("PortraitFrame", window, Top, Top, Top, new Vector2(-250f, -150f), new Vector2(260f, 260f));
             UiKit.AddImage(frame, Navy, false);
@@ -48,11 +49,11 @@ namespace BeachTycoon.EditorTools
             var buttons = new Object[StandButtons];
             for (int i = 0; i < StandButtons; i++)
             {
-                var at = new Vector2(i % 2 == 0 ? -205f : 205f, -965f - (i / 2) * 125f);
-                buttons[i] = Button(window, $"Stand{i}", "Stand", at, new Vector2(390f, 110f), Stand, 36f, out _);
+                var at = new Vector2((i % Columns - 1) * 285f, -960f - (i / Columns) * 118f);
+                buttons[i] = Button(window, $"Stand{i}", "Stand", at, new Vector2(272f, 106f), Stand, 32f, out _);
             }
 
-            Button dismiss = Button(window, "DismissButton", "Let go", new Vector2(0f, -1360f), new Vector2(600f, 100f), Dismiss, 36f, out TextMeshProUGUI dismissLabel);
+            Button dismiss = Button(window, "DismissButton", "Let go", new Vector2(0f, -1450f), new Vector2(600f, 100f), Dismiss, 36f, out TextMeshProUGUI dismissLabel);
 
             var view = host.gameObject.AddComponent<WorkerCardView>();
             PrimitiveKit.SetReference(view, "root", root.gameObject);

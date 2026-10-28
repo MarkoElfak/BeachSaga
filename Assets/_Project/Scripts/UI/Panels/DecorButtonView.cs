@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>One row in the decorations shop: name, popularity bonus, how many are placed, and the price.</summary>
+    /// <summary>One decoration in the build bar's Decor tab: name, popularity bonus, how many are placed, and the price.</summary>
     public sealed class DecorButtonView : MonoBehaviour
     {
         [SerializeField] private Button button = null;
@@ -32,7 +32,7 @@ namespace BeachTycoon.UI
         public void Refresh()
         {
             int placed = _decorations.CountOf(_definition);
-            detailLabel.text = $"Popularity +{_definition.popularity:0.##}   {placed}/{_definition.maxCount} placed";
+            detailLabel.text = $"+{_definition.popularity:0.##} pop.  {placed}/{_definition.maxCount}";
             if (!_decorations.IsUnlocked(_definition))
             {
                 priceLabel.text = "Tier " + _definition.requiredTier;

@@ -22,7 +22,7 @@ namespace BeachTycoon.EditorTools
 
             RectTransform safe = CreateCanvas("HUD");
             BuildTopBar(safe);
-            BuildBarView buildBar = BuildBuildBar(safe, buttonPrefab);
+            BuildBarView buildBar = BuildBarUiBuilder.Build(safe, buttonPrefab);
 
             RectTransform floatingLayer = UiKit.Stretch("FloatingText", safe);
             var floating = floatingLayer.gameObject.AddComponent<FloatingTextSpawner>();
@@ -42,8 +42,6 @@ namespace BeachTycoon.EditorTools
             PlacementSceneBuilder.BuildMoveHint(safe);
             PlacementSceneBuilder.BuildSelectionArrows(safe, worldCamera);
             UpgradePanelBuilder.Build(safe);
-            DecorPanelView decorPanel = CommunityUiBuilder.BuildDecorPanel(safe);
-            PrimitiveKit.SetReference(buildBar, "decorPanel", decorPanel);
             StartScreenView startScreen = StartScreenUiBuilder.Build(safe);
             SettingsUiBuilder.Build(safe, startScreen);
             MetaUiBuilder.BuildDailyRewards(safe);
@@ -124,36 +122,6 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(pop.gameObject.AddComponent<PopularityLabelView>(), "label", popLabel);
         }
 
-        private static BuildBarView BuildBuildBar(Transform parent, ProductButtonView buttonPrefab)
-        {
-            RectTransform bar = UiKit.Rect("BuildBar", parent, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), new Vector2(-40f, 340f));
-            UiKit.AddImage(bar, UiKit.PanelColor);
-
-            RectTransform row = UiKit.Rect("Products", bar, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(-28f, 190f));
-            var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 12f;
-            layout.childControlWidth = true;
-            layout.childControlHeight = true;
-            layout.childForceExpandWidth = true;
-            layout.childForceExpandHeight = true;
-
-            RectTransform buildingRect = UiKit.Rect("BuildingButton", bar, new Vector2(0f, 0f), new Vector2(0.72f, 0f), new Vector2(0f, 0f), new Vector2(14f, 14f), new Vector2(-21f, 110f));
-            Button buildingButton = UiKit.AddButton(buildingRect, UiKit.ButtonColor, out _);
-            TextMeshProUGUI buildingLabel = UiKit.ChildText(buildingRect, "Label", "Upgrade", 40f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
-
-            RectTransform decorRect = UiKit.Rect("DecorButton", bar, new Vector2(0.72f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(7f, 14f), new Vector2(-21f, 110f));
-            Button decorButton = UiKit.AddButton(decorRect, new Color(0.55f, 0.85f, 0.75f), out _);
-            UiKit.ChildText(decorRect, "Label", "Decor", 40f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
-
-            var view = bar.gameObject.AddComponent<BuildBarView>();
-            PrimitiveKit.SetReference(view, "productButtonPrefab", buttonPrefab);
-            PrimitiveKit.SetReference(view, "productRow", row);
-            PrimitiveKit.SetReference(view, "buildingButton", buildingButton);
-            PrimitiveKit.SetReference(view, "buildingLabel", buildingLabel);
-            PrimitiveKit.SetReference(view, "decorButton", decorButton);
-            return view;
-        }
-
         private static ProductButtonView BuildProductButtonPrefab()
         {
             var root = new GameObject("ProductButton", typeof(RectTransform));
@@ -197,7 +165,7 @@ namespace BeachTycoon.EditorTools
             return PrimitiveKit.SavePrefab(root, FloatingTextPath).GetComponent<FloatingTextItem>();
         }
 
-        private static void SetColor(Object target, string field, Color color)
+        internal static void SetColor(Object target, string field, Color color)
         {
             var serialized = new SerializedObject(target);
             serialized.FindProperty(field).colorValue = color;

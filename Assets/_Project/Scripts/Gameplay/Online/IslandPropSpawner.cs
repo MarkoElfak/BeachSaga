@@ -6,7 +6,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Shows a visited island's buildings, houses, stands and decorations as plain props: the same prefabs as at
     /// home dressed in the owner's culture, but nothing is bound to game state, so tapping or long-pressing them
-    /// does nothing.
+    /// does nothing. A first-aid station shows as a hospital on an island big enough.
     /// </summary>
     public sealed class IslandPropSpawner : MonoBehaviour
     {
@@ -37,7 +37,9 @@ namespace BeachTycoon.Gameplay
             {
                 ProductDefinition product = database.FindProduct(layout.Stands[i].productId);
                 GameObject stand = Add(product != null ? product.standPrefab : null, placement.GetStandPosition(i), 0f, layout.Stands[i].yaw);
-                if (stand != null) MakeStatic(stand, layout.Stands[i].manager);
+                if (stand == null) continue;
+                MakeStatic(stand, layout.Stands[i].manager);
+                if (stand.TryGetComponent(out StandView view)) view.ShowGrown(product.IsGrownAt(layout.Buildings.MainTier));
             }
 
             for (int i = 0; i < layout.Decorations.Count; i++)

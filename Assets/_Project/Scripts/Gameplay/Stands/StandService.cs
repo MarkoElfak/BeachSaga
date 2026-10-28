@@ -58,6 +58,9 @@ namespace BeachTycoon.Gameplay
             return null;
         }
 
+        /// <summary>The main building's tier (names such as Hospital follow it).</summary>
+        public int MainTier => _buildings.MainTier;
+
         public bool IsTierReached(ProductDefinition product) => _buildings.MainTier >= product.requiredTier;
 
         /// <summary>False for other countries' places (and for every place before a culture is picked).</summary>

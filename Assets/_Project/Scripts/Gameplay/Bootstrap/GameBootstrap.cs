@@ -93,6 +93,7 @@ namespace BeachTycoon.Gameplay
             Add(new VisitorService(database, buildings, stands, popularity, navigation, events, abilities));
             var characters = Add(new CharacterService(database, culture, stands, placement, navigation, data.meta));
             var staff = Add(new StaffService(database, data, stands, buildings, culture, characters, placement, navigation, economy));
+            Add(new ServiceBuildings(database, stands, placement, buildings, popularity));
             var neighbours = Add(new NeighbourService(database, buildings, progression, data.neighbours, season));
             neighbours.AttachPlacement(placement);
             Add(new QuestService(database, neighbours, stands, economy, progression));

@@ -16,12 +16,23 @@ MonoBehaviour:
   displayName: Surf lessons
   description: 
   icon: {fileID: 0}
+  category: 0
   cultureId: 
   unlockCost: 3000
   price: 60
   serveSeconds: 8
   upgradeBaseCost: 25
   skill: 3
+  workerSlots: 1
+  service:
+    kind: 0
+    reach: 8
+    amount: 0.15
+    eventSeconds: 240
+    popularity: 0
+    grownTier: 0
+    grownName: 
+    grownScale: 1.5
   requiredTier: 4
   standPrefab: {fileID: 1221009819822141175, guid: 39742e849141249a3920fcba83c8bcec, type: 3}
   standFootprint:
@@ -32,3 +43,4 @@ MonoBehaviour:
     height: 1.3
   queueStart: {x: 0, y: -1.7}
   autoFootprint: 1
+  freeStanding: 0

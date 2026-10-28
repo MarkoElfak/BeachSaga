@@ -13,6 +13,12 @@ namespace BeachTycoon.Services
             return worker.IsUnhappy ? speed * config.unhappySpeedFactor : speed;
         }
 
+        /// <summary>
+        /// Speed of a place with several people at work (a restaurant): the fastest one's speed plus a share of
+        /// everyone else's. 'others' is the sum of the other people's speeds.
+        /// </summary>
+        public static float TeamSpeed(StaffConfig config, float fastest, float others) => fastest + others * config.extraWorkerShare;
+
         /// <summary>Sales needed at this level to reach the next one (0 at the top level).</summary>
         public static int SalesToNextLevel(StaffConfig config, int level) =>
             level >= config.maxLevel ? 0 : config.salesPerLevel * Math.Max(1, level);

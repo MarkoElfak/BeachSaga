@@ -80,7 +80,8 @@ namespace BeachTycoon.EditorTools
             MetaModel meta = ServiceLocator.Get<ISaveService>().Data.meta;
             meta.tutorialStep = ServiceLocator.Get<TutorialService>().StepCount;
             EventBus.Publish(new TutorialStepChanged(meta.tutorialStep));
-            Check(Games.Count == ServiceLocator.Get<GameDatabase>().products.Length, $"{Games.Count} mini-games, one per stand");
+            int selling = System.Array.FindAll(ServiceLocator.Get<GameDatabase>().products, p => !p.IsService).Length;
+            Check(Games.Count == selling, $"{Games.Count} mini-games, one per place that sells");
             ServiceLocator.Get<IEconomyService>().Earn(2000000);
             Check(Buildings.TryBuild(0), "tent started");
         }

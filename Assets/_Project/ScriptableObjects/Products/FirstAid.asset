@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae043bd4bca84682806cbd0bd605bfa, type: 3}
+  m_Name: FirstAid
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
+  id: first_aid
+  displayName: First aid
+  description: shade, water and plasters
+  icon: {fileID: 0}
+  category: 2
+  cultureId: 
+  unlockCost: 900
+  price: 0
+  serveSeconds: 1
+  upgradeBaseCost: 80
+  skill: 4
+  workerSlots: 1
+  service:
+    kind: 2
+    reach: 9
+    amount: 0.5
+    eventSeconds: 240
+    popularity: 0
+    grownTier: 5
+    grownName: Hospital
+    grownScale: 1.5
+  requiredTier: 2
+  standPrefab: {fileID: 2870138641707283506, guid: 003ebf6df1e454ec2b2fcb9105aba2fc, type: 3}
+  standFootprint:
+    serializedVersion: 2
+    x: -1.8000001
+    y: -1.4
+    width: 3.6000001
+    height: 2.9
+  queueStart: {x: 0, y: 0}
+  autoFootprint: 1
+  freeStanding: 1

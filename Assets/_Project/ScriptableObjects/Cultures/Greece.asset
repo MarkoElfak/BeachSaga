@@ -63,7 +63,9 @@ MonoBehaviour:
   - Thalassa
   - Kokkini Bay
   - Lefki Akti
-  prefabSwaps: []
+  prefabSwaps:
+  - original: {fileID: 8616521830520627945, guid: ae91f216b51a645158728c6fa59a2b48, type: 3}
+    replacement: {fileID: 3081468722752738854, guid: d16049ce788124f0aa461bb627bd7acc, type: 3}
   character: {fileID: 11400000, guid: 3181ca0ecffb543cf82472f3b2ad3fe3, type: 2}
   ability:
     name: Filoxenia

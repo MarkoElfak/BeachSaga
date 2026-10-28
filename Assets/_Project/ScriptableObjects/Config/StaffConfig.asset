@@ -20,6 +20,7 @@ MonoBehaviour:
   bonusPerStar: 0.04
   ownCountryBonus: 0.05
   unhappySpeedFactor: 0.75
+  extraWorkerShare: 0.5
   salesPerLevel: 30
   maxLevel: 5
   collectCoinsLevel: 3

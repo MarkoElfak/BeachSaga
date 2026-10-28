@@ -31,6 +31,7 @@ namespace BeachTycoon.Tests
         {
             foreach (ProductDefinition product in _database.products)
             {
+                if (product.IsService) continue; // a chapel or first aid sells nothing, so it has no game
                 MiniGameDefinition game = System.Array.Find(_database.miniGames, g => g != null && g.product == product);
                 Assert.IsNotNull(game, product.id);
                 Assert.AreEqual(5, game.LevelCount, game.id);

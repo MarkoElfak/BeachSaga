@@ -46,11 +46,14 @@ namespace BeachTycoon.UI
         {
             StandModel model = stand.Model;
             EconomyConfig economy = _database.economy;
-            title.text = stand.Product.displayName + " stand";
+            string name = stand.Product.NameAt(_buildings.MainTier);
+            title.text = stand.Product.category == BuildCategory.Stands ? name + " stand" : name;
             _text.Append("Level ").Append(model.level + 1).Append(" of ").Append(economy.maxStandLevel + 1);
-            _text.Append("\nIncome: +").Append(UnityEngine.Mathf.RoundToInt(model.level * economy.standLevelIncomeBonus * 100f))
+            string gain = stand.Product.IsService ? "Help" : "Income";
+            _text.Append('\n').Append(gain).Append(": +").Append(UnityEngine.Mathf.RoundToInt(model.level * economy.standLevelIncomeBonus * 100f))
                 .Append("% (next level +").Append(UnityEngine.Mathf.RoundToInt(economy.standLevelIncomeBonus * 100f)).Append("%)");
             AppendStaff(stand);
+            AppendService(stand);
             AppendMiniGame(stand.Product);
 
             if (_stands.IsMaxLevel(stand)) SetButton("Max level", false);
@@ -65,27 +68,25 @@ namespace BeachTycoon.UI
             hireButton.interactable = true;
         }
 
-        // Who runs the stand and how fast it serves; level 3 workers also collect the coins.
+        // Who runs the stand (two people at a restaurant) and how fast it serves; level 3 workers also collect the coins.
         private void AppendStaff(StandController stand)
         {
-            int speed = UnityEngine.Mathf.RoundToInt(stand.ServeSpeed * 100f);
-            StaffMember worker = _staff.WorkerAt(stand.Index);
-            if (_characters.HasJoined && _characters.StandIndex == stand.Index)
+            int places = stand.Product.workerSlots;
+            bool character = _characters.HasJoined && _characters.StandIndex == stand.Index;
+            if (character) _text.Append('\n').Append(_characters.Character.displayName).Append(" works here");
+            foreach (StaffMember worker in _staff.Staff)
             {
-                _text.Append('\n').Append(_characters.Character.displayName).Append(" works here");
-            }
-            else if (worker != null)
-            {
+                if (worker.Model.stand != stand.Index) continue;
                 WorkerModel model = worker.Model;
                 _text.Append('\n').Append(model.name).Append(" works here (level ").Append(model.level).Append(')');
                 _text.Append(_staff.CollectsCoins(model) ? ", collecting the coins" : $". From level {_staff.Config.collectCoinsLevel} they collect the coins");
             }
-            else
-            {
-                _text.Append("\nNobody works here. Hire a job seeker from the beach.");
-            }
 
-            _text.Append("\nServing speed: ").Append(speed).Append('%');
+            int people = _staff.CountAt(stand.Index) + (character ? 1 : 0);
+            if (people == 0) _text.Append("\nNobody works here. Hire a job seeker from the beach.");
+            else if (people < places) _text.Append("\nThere is room for ").Append(places - people).Append(" more.");
+            if (stand.Product.IsService) return; // its speed is how much it helps (below)
+            _text.Append("\nServing speed: ").Append(UnityEngine.Mathf.RoundToInt(stand.ServeSpeed * 100f)).Append('%');
         }
 
         // Mini-game levels passed and the sales bonus they give (play it from the stand's Play button).

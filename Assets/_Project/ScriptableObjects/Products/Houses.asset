@@ -16,12 +16,23 @@ MonoBehaviour:
   displayName: Houses
   description: 
   icon: {fileID: 0}
+  category: 0
   cultureId: 
   unlockCost: 25000
   price: 5000
   serveSeconds: 20
   upgradeBaseCost: 25
   skill: 1
+  workerSlots: 1
+  service:
+    kind: 0
+    reach: 8
+    amount: 0.15
+    eventSeconds: 240
+    popularity: 0
+    grownTier: 0
+    grownName: 
+    grownScale: 1.5
   requiredTier: 5
   standPrefab: {fileID: 3529815805896294033, guid: fb8215d916c4140ac8c4ade7227382a1, type: 3}
   standFootprint:
@@ -32,3 +43,4 @@ MonoBehaviour:
     height: 1.4000001
   queueStart: {x: 0, y: -1.7}
   autoFootprint: 1
+  freeStanding: 0

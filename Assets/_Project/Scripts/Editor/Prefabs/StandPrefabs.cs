@@ -132,7 +132,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // A navy cap with a gold band above the stand's corner: the stand has a manager. Hidden until hired.
-        private static GameObject ManagerHat(Transform parent, PaletteDefinition p)
+        internal static GameObject ManagerHat(Transform parent, PaletteDefinition p)
         {
             GameObject hat = PrimitiveKit.Empty(ManagerHatName, parent, new Vector3(0.95f, 2.45f, -0.35f), new Vector3(-15f, 0f, 0f));
             Material navy = p.GetMaterial("shorts");

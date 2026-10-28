@@ -7,7 +7,8 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Shows a stand's serve progress and drops coins on sales (they collect themselves while a level 3 worker runs
     /// it, shown by a hat) and wears one more decoration per mini-game level passed. Tapping selects it (rotate,
-    /// upgrade, play); long-pressing moves it on its own. Tells WorldNavigation where its queue starts.
+    /// upgrade, play); long-pressing moves it on its own. Tells WorldNavigation where its queue starts. A service
+    /// building that grows (first aid into a hospital) swaps its base look for its grown one at that tier.
     /// </summary>
     public sealed class StandView : MonoBehaviour, ITappable, IMovable
     {
@@ -22,6 +23,10 @@ namespace BeachTycoon.Gameplay
 
         [Tooltip("Shown one by one as the stand's mini-game levels are passed.")]
         [SerializeField] private GameObject[] upgradePieces = new GameObject[0];
+
+        [Tooltip("Service buildings that grow: shown until the growing tier, then the grown look takes its place.")]
+        [SerializeField] private GameObject baseLook = null;
+        [SerializeField] private GameObject grownLook = null;
 
         private CoinSpawner _coinSpawner;
         private PlacementService _placement;
@@ -44,7 +49,9 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<ManagerLeft>(OnManagerLeft);
             EventBus.Subscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
             EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
+            EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
             ShowManager(stand.Model.manager);
+            ShowGrown(stand.Product.IsGrownAt(ServiceLocator.Get<BuildingManager>().MainTier));
             ShowUpgrades(ServiceLocator.TryGet(out MiniGameService games) ? games.LevelsPassed(stand.Model.productId) : 0);
             SnapToPlacement();
         }
@@ -79,11 +86,30 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<ManagerLeft>(OnManagerLeft);
             EventBus.Unsubscribe<MiniGameLevelPassed>(OnMiniGameLevelPassed);
             EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
+            EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
         }
 
         public void ShowManager(bool hired)
         {
             if (managerHat != null) managerHat.SetActive(hired);
+        }
+
+        public bool IsGrown => grownLook != null && grownLook.activeSelf;
+
+        /// <summary>Shows the grown look (a hospital) instead of the base one; stands without one ignore it.</summary>
+        public void ShowGrown(bool grown)
+        {
+            if (grownLook == null) return;
+            grownLook.SetActive(grown);
+            if (baseLook != null) baseLook.SetActive(!grown);
+        }
+
+        // The main building reached the tier this building grows at: it grows with a bounce.
+        private void OnTierUpgraded(TierUpgraded evt)
+        {
+            if (Stand == null || evt.LotIndex != BuildingManager.MainLotIndex || IsGrown == Stand.Product.IsGrownAt(evt.Tier)) return;
+            ShowGrown(Stand.Product.IsGrownAt(evt.Tier));
+            Punch();
         }
 
         /// <summary>Pieces shown so far (one per level passed).</summary>

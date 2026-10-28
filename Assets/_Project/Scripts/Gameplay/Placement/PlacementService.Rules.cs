@@ -11,13 +11,20 @@ namespace BeachTycoon.Gameplay
     /// </summary>
     public sealed partial class PlacementService
     {
-        // A stand also keeps the area in front of it free for its queue lines (toward -z before turning).
+        private const float DoorwayDepth = 1.2f;
+
+        // A stand also keeps the area in front of it free for its queue lines (toward -z before turning); a service
+        // building, which has no line, only its doorway.
         private Rect BlockingRect(PlaceableId id, Vector2 at, float yaw)
         {
             Rect local = LocalFootprint(id);
-            if (id.Kind == PlaceableKind.Stand)
+            ProductDefinition product = id.Kind == PlaceableKind.Stand ? Product(id.Index) : null;
+            if (product != null && product.IsService)
             {
-                ProductDefinition product = Product(id.Index);
+                local.yMin -= DoorwayDepth;
+            }
+            else if (id.Kind == PlaceableKind.Stand)
+            {
                 Vector2 start = product != null ? product.queueStart : Vector2.zero;
                 float length = QueueLayout.Length(_database.visitors);
                 float halfWidth = QueueLayout.Width(_database.visitors, _config.queueWidth) * 0.5f;

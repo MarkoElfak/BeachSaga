@@ -38,6 +38,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
             SubscribeStaff(true);
+            SubscribeVillage(true);
             EventBus.Subscribe<FiestaChanged>(OnFiestaChanged);
             if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
         }
@@ -62,6 +63,7 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
             SubscribeStaff(false);
+            SubscribeVillage(false);
             EventBus.Unsubscribe<FiestaChanged>(OnFiestaChanged);
         }
 
