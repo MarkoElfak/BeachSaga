@@ -8,6 +8,9 @@ namespace BeachTycoon.EditorTools
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 20 (village buildings)", priority = 22)]
+        private static void RequestVillage() => File.WriteAllText(RequestPath, SuiteVillage);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 19 (country abilities)", priority = 23)]
         private static void RequestAbilities() => File.WriteAllText(RequestPath, SuiteAbilities);
 
@@ -84,13 +87,14 @@ namespace BeachTycoon.EditorTools
         private const string SuiteCharacter = "character";
         private const string SuiteStaff = "staff";
         private const string SuiteAbilities = "abilities";
+        private const string SuiteVillage = "village";
 
         private static bool IsKnownSuite(string suite) =>
             suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
             || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames
             || suite == SuiteFeel || suite == SuiteRelease || suite == SuiteStart || suite == SuiteCulture
             || suite == SuiteCamera || suite == SuiteMap || suite == SuiteCharacter || suite == SuiteStaff
-            || suite == SuiteAbilities;
+            || suite == SuiteAbilities || suite == SuiteVillage;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -115,6 +119,7 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteCharacter) return "M17 character";
                 if (Suite == SuiteStaff) return "M18 staff";
                 if (Suite == SuiteAbilities) return "M19 abilities";
+                if (Suite == SuiteVillage) return "M20 village";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -138,6 +143,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteCharacter) return CharacterPlaytestSteps.IsReady(step);
             if (Suite == SuiteStaff) return StaffPlaytestSteps.IsReady(step);
             if (Suite == SuiteAbilities) return AbilityPlaytestSteps.IsReady(step);
+            if (Suite == SuiteVillage) return VillagePlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -160,6 +166,7 @@ namespace BeachTycoon.EditorTools
             else if (Suite == SuiteCharacter) CharacterPlaytestSteps.Run(step);
             else if (Suite == SuiteStaff) StaffPlaytestSteps.Run(step);
             else if (Suite == SuiteAbilities) AbilityPlaytestSteps.Run(step);
+            else if (Suite == SuiteVillage) VillagePlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
         }

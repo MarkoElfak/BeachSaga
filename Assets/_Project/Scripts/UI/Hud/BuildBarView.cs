@@ -10,22 +10,32 @@ using UnityEngine.UI;
 namespace BeachTycoon.UI
 {
     /// <summary>
-    /// Bottom bar: one button per product (other countries' places hidden), the main building's upgrade button and
-    /// the decorations shop.
+    /// Bottom bar: tabs (Stands, Food, Services, Decor) over a row of the tab's products (other countries' places
+    /// hidden) or decorations, and the main building's upgrade button.
     /// </summary>
     public sealed class BuildBarView : MonoBehaviour
     {
+        public const int DecorTab = 3;
+
         [SerializeField] private ProductButtonView productButtonPrefab = null;
+        [SerializeField] private DecorButtonView decorTilePrefab = null;
         [SerializeField] private Transform productRow = null;
+        [SerializeField] private Button[] tabButtons = new Button[0];
+        [SerializeField] private Color tabColor = Color.gray;
+        [SerializeField] private Color activeTabColor = Color.white;
         [SerializeField] private Button buildingButton = null;
         [SerializeField] private TMP_Text buildingLabel = null;
-        [SerializeField] private Button decorButton = null;
-        [SerializeField] private DecorPanelView decorPanel = null;
 
         private readonly List<ProductButtonView> _buttons = new List<ProductButtonView>();
+        private readonly List<DecorButtonView> _tiles = new List<DecorButtonView>();
         private BuildingManager _buildings;
         private GameDatabase _database;
         private StandService _stands;
+
+        /// <summary>The tab shown: a BuildCategory, or DecorTab.</summary>
+        public int Tab { get; private set; }
+
+        public int TabCount => tabButtons.Length;
 
         private void Start()
         {
@@ -44,35 +54,69 @@ namespace BeachTycoon.UI
                 _buttons.Add(button);
             }
 
+            var decorations = ServiceLocator.Get<DecorationService>();
+            foreach (DecorationDefinition definition in _database.decorations ?? new DecorationDefinition[0])
+            {
+                DecorButtonView tile = Instantiate(decorTilePrefab, productRow, false);
+                tile.Bind(definition, decorations, economy);
+                _tiles.Add(tile);
+            }
+
+            for (int i = 0; i < tabButtons.Length; i++)
+            {
+                int tab = i;
+                tabButtons[i].onClick.AddListener(() => ShowTab(tab));
+            }
+
             buildingButton.onClick.AddListener(OnBuildingClicked);
-            decorButton.onClick.AddListener(decorPanel.Open);
-            EventBus.Subscribe<CoinsChanged>(OnCoinsChanged);
-            EventBus.Subscribe<LotStateChanged>(OnLotStateChanged);
-            EventBus.Subscribe<StandCreated>(OnStandCreated);
-            EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
-            EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
-            EventBus.Subscribe<CultureChosen>(OnCultureChosen);
-            Refresh();
+            Subscribe(true);
+            ShowTab(0);
         }
 
         private void OnDestroy()
         {
+            for (int i = 0; i < tabButtons.Length; i++) tabButtons[i].onClick.RemoveAllListeners();
             buildingButton.onClick.RemoveListener(OnBuildingClicked);
-            if (decorPanel != null) decorButton.onClick.RemoveListener(decorPanel.Open);
-            EventBus.Unsubscribe<CoinsChanged>(OnCoinsChanged);
-            EventBus.Unsubscribe<LotStateChanged>(OnLotStateChanged);
-            EventBus.Unsubscribe<StandCreated>(OnStandCreated);
-            EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
-            EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
-            EventBus.Unsubscribe<CultureChosen>(OnCultureChosen);
+            Subscribe(false);
         }
 
-        private void OnCoinsChanged(CoinsChanged evt) => Refresh();
-        private void OnLotStateChanged(LotStateChanged evt) => Refresh();
-        private void OnStandCreated(StandCreated evt) => Refresh();
-        private void OnStandUpgraded(StandUpgraded evt) => Refresh();
-        private void OnTierUpgraded(TierUpgraded evt) => Refresh();
-        private void OnCultureChosen(CultureChosen evt) => Refresh();
+        /// <summary>Shows one tab's products (or the decorations) in the row.</summary>
+        public void ShowTab(int tab)
+        {
+            Tab = Mathf.Clamp(tab, 0, Mathf.Max(0, tabButtons.Length - 1));
+            for (int i = 0; i < tabButtons.Length; i++) tabButtons[i].targetGraphic.color = i == Tab ? activeTabColor : tabColor;
+            Refresh();
+            EventBus.Publish(new BuildTabChanged(Tab));
+        }
+
+        /// <summary>The tab a product is listed under.</summary>
+        public static int TabOf(ProductDefinition product) => (int)product.category;
+
+        private void Subscribe(bool on)
+        {
+            if (on)
+            {
+                EventBus.Subscribe<CoinsChanged>(OnChanged);
+                EventBus.Subscribe<LotStateChanged>(OnChanged);
+                EventBus.Subscribe<StandCreated>(OnChanged);
+                EventBus.Subscribe<StandUpgraded>(OnChanged);
+                EventBus.Subscribe<TierUpgraded>(OnChanged);
+                EventBus.Subscribe<CultureChosen>(OnChanged);
+                EventBus.Subscribe<DecorationPlaced>(OnChanged);
+            }
+            else
+            {
+                EventBus.Unsubscribe<CoinsChanged>(OnChanged);
+                EventBus.Unsubscribe<LotStateChanged>(OnChanged);
+                EventBus.Unsubscribe<StandCreated>(OnChanged);
+                EventBus.Unsubscribe<StandUpgraded>(OnChanged);
+                EventBus.Unsubscribe<TierUpgraded>(OnChanged);
+                EventBus.Unsubscribe<CultureChosen>(OnChanged);
+                EventBus.Unsubscribe<DecorationPlaced>(OnChanged);
+            }
+        }
+
+        private void OnChanged<T>(T evt) where T : struct => Refresh();
 
         private void OnBuildingClicked()
         {
@@ -83,11 +127,24 @@ namespace BeachTycoon.UI
         {
             for (int i = 0; i < _buttons.Count; i++)
             {
-                bool available = _stands.IsAvailable(_buttons[i].Product);
-                if (_buttons[i].gameObject.activeSelf != available) _buttons[i].gameObject.SetActive(available);
-                if (available) _buttons[i].Refresh();
+                ProductButtonView button = _buttons[i];
+                bool shown = TabOf(button.Product) == Tab && _stands.IsAvailable(button.Product);
+                if (button.gameObject.activeSelf != shown) button.gameObject.SetActive(shown);
+                if (shown) button.Refresh();
             }
 
+            for (int i = 0; i < _tiles.Count; i++)
+            {
+                bool shown = Tab == DecorTab;
+                if (_tiles[i].gameObject.activeSelf != shown) _tiles[i].gameObject.SetActive(shown);
+                if (shown) _tiles[i].Refresh();
+            }
+
+            RefreshBuilding();
+        }
+
+        private void RefreshBuilding()
+        {
             LotModel lot = _buildings.GetLot(BuildingManager.MainLotIndex);
             TierDefinition next = _buildings.GetNextTier(BuildingManager.MainLotIndex);
             buildingButton.interactable = lot.state == LotState.Built;

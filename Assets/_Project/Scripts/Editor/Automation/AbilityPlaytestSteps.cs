@@ -87,7 +87,10 @@ namespace BeachTycoon.EditorTools
 
         private static void CheckBuildBar()
         {
-            Check(Shows("gelateria") && !Shows("taverna") && !Shows("tapas_bar"), "the build bar offers the Gelateria, not the Taverna or the Tapas bar");
+            BuildBarView bar = PlaytestTools.Find<BuildBarView>();
+            bar.ShowTab(BuildBarView.TabOf(Database.FindProduct("gelateria")));
+            Check(Shows("gelateria") && !Shows("taverna") && !Shows("tapas_bar"), "the build bar's Food tab offers the Gelateria, not the Taverna or the Tapas bar");
+            bar.ShowTab(0);
             Check(Shows("donuts") && Shows("houses"), "the shared products are all still there");
             Check(!Stands.CanUnlock(Database.FindProduct("gelateria")), "the Gelateria waits for the Cabin");
             Check(Buildings.TryUpgrade(0), "cabin started");
@@ -110,6 +113,7 @@ namespace BeachTycoon.EditorTools
             Check(_gelatoSales > 0, $"the Gelateria sells ({_gelatoSales} sales)");
             Vector3 gelateria = StandViewOf("gelateria").transform.position;
             PlaytestTools.FocusCamera(gelateria, 16f);
+            PlaytestTools.Find<BuildBarView>().ShowTab(BuildBarView.TabOf(Gelateria.Product));
             PlaytestTools.CapturePortraitWithHud("m19_2_build_bar.png");
             PlaytestTools.FocusCamera(gelateria, 9f);
             PlaytestTools.CapturePortrait("m19_3_gelateria.png");

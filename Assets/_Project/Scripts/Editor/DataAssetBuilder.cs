@@ -42,6 +42,7 @@ namespace BeachTycoon.EditorTools
             CultureAssetBuilder.Fill(database);
             CharacterAssetBuilder.Fill(database);
             AbilityAssetBuilder.Fill(database);
+            VillageAssetBuilder.Fill(database);
             StaffAssetBuilder.Fill(database);
             FootprintMeasure.Bake(database);
 

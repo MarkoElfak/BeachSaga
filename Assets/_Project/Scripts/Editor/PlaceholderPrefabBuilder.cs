@@ -26,6 +26,12 @@ namespace BeachTycoon.EditorTools
         public const string TavernaPath = Stands + "Taverna.prefab";
         public const string TapasBarPath = Stands + "TapasBar.prefab";
         public const string GelateriaPath = Stands + "Gelateria.prefab";
+        public const string BeachCafePath = Stands + "BeachCafe.prefab";
+        public const string RestaurantPath = Stands + "Restaurant.prefab";
+        public const string FirstAidPath = Stands + "FirstAid.prefab";
+        public const string ChapelGreekPath = Stands + "ChapelGreek.prefab";
+        public const string ChapelSpanishPath = Stands + "ChapelSpanish.prefab";
+        public const string ChapelItalianPath = Stands + "ChapelItalian.prefab";
         public const string LotPath = ProjectPaths.Prefabs + "/World/Lot.prefab";
         public const string PalmPath = ProjectPaths.Prefabs + "/World/Palm.prefab";
         public const string CoinPath = ProjectPaths.Prefabs + "/Effects/CoinPickup.prefab";
@@ -59,6 +65,12 @@ namespace BeachTycoon.EditorTools
             Build(TavernaPath, overwrite, () => PlacePrefabs.BuildTaverna(p));
             Build(TapasBarPath, overwrite, () => PlacePrefabs.BuildTapasBar(p));
             Build(GelateriaPath, overwrite, () => PlacePrefabs.BuildGelateria(p));
+            Build(BeachCafePath, overwrite, () => VillagePrefabs.BuildBeachCafe(p));
+            Build(RestaurantPath, overwrite, () => VillagePrefabs.BuildRestaurant(p));
+            Build(FirstAidPath, overwrite, () => VillagePrefabs.BuildFirstAid(p));
+            Build(ChapelGreekPath, overwrite, () => ChapelPrefabs.BuildGreek(p));
+            Build(ChapelSpanishPath, overwrite, () => ChapelPrefabs.BuildSpanish(p));
+            Build(ChapelItalianPath, overwrite, () => ChapelPrefabs.BuildItalian(p));
             Build(LotPath, overwrite, () => WorldPrefabs.BuildLot(p));
             Build(PalmPath, overwrite, () => WorldPrefabs.BuildPalm(p));
             Build(CoinPath, overwrite, () => WorldPrefabs.BuildCoin(p));

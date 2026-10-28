@@ -16,12 +16,23 @@ MonoBehaviour:
   displayName: Gelateria
   description: gelato and pizza slices
   icon: {fileID: 0}
+  category: 1
   cultureId: italy
   unlockCost: 400
   price: 15
   serveSeconds: 3
   upgradeBaseCost: 70
   skill: 0
+  workerSlots: 1
+  service:
+    kind: 0
+    reach: 8
+    amount: 0.15
+    eventSeconds: 240
+    popularity: 0
+    grownTier: 0
+    grownName: 
+    grownScale: 1.5
   requiredTier: 2
   standPrefab: {fileID: 6549567338862245648, guid: 4a1c2847f985047bfa73e1b408b4188c, type: 3}
   standFootprint:
@@ -32,3 +43,4 @@ MonoBehaviour:
     height: 1.3
   queueStart: {x: 0, y: -1.7}
   autoFootprint: 1
+  freeStanding: 0

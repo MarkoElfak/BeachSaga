@@ -47,6 +47,8 @@ namespace BeachTycoon.UI
 
         public void Refresh()
         {
+            string name = _product.NameAt(_stands.MainTier); // the first-aid station becomes a hospital
+            if (nameLabel.text != name) nameLabel.text = name;
             StandController stand = _stands.FindByProduct(_product.id);
             if (stand != null)
             {

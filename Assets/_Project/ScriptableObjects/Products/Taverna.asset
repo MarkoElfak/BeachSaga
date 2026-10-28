@@ -16,12 +16,23 @@ MonoBehaviour:
   displayName: Taverna
   description: souvlaki and moussaka
   icon: {fileID: 0}
+  category: 1
   cultureId: greece
   unlockCost: 400
   price: 15
   serveSeconds: 3
   upgradeBaseCost: 70
   skill: 0
+  workerSlots: 1
+  service:
+    kind: 0
+    reach: 8
+    amount: 0.15
+    eventSeconds: 240
+    popularity: 0
+    grownTier: 0
+    grownName: 
+    grownScale: 1.5
   requiredTier: 2
   standPrefab: {fileID: 5306062141565852178, guid: e20a7f807148349b68f9fcbe9da33c57, type: 3}
   standFootprint:
@@ -32,3 +43,4 @@ MonoBehaviour:
     height: 1.25
   queueStart: {x: 0, y: -1.7}
   autoFootprint: 1
+  freeStanding: 0

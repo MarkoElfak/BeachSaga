@@ -8,8 +8,8 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Hired staff (M18). Job seekers wait on the beach with a badge; hired, a worker walks to a stand and runs it:
-    /// the stand serves at full speed plus their skill bonus (half speed with nobody there). One person per stand,
-    /// the player's character included. Workers level up from sales, are paid every payday and, unpaid, slow down
+    /// the stand serves at full speed plus their skill bonus (half speed with nobody there). One person per stand
+    /// (two at a restaurant), the player's character included. Workers level up from sales, are paid every payday and, unpaid, slow down
     /// and finally quit. The main building's tier sets how many can be hired.
     /// </summary>
     public sealed partial class StaffService : ITickable, IDisposable
@@ -52,6 +52,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Subscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Subscribe<CharacterAssigned>(OnCharacterAssigned);
             EventBus.Subscribe<CharacterJoined>(OnCharacterJoined);
+            EventBus.Subscribe<CharacterStartedWork>(OnCharacterStartedWork);
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
             Restore();
         }
@@ -69,17 +70,6 @@ namespace BeachTycoon.Gameplay
 
         /// <summary>A worker or job seeker by id, or null.</summary>
         public StaffMember Find(int workerId) => Find(_staff, workerId) ?? Find(_seekers, workerId);
-
-        /// <summary>The worker assigned to a stand (walking there or at work), or null.</summary>
-        public StaffMember WorkerAt(int standIndex)
-        {
-            for (int i = 0; i < _staff.Count; i++) if (_staff[i].Model.stand == standIndex) return _staff[i];
-            return null;
-        }
-
-        /// <summary>Nobody works there: no worker and not the player's character.</summary>
-        public bool IsStandFree(int standIndex) =>
-            standIndex >= 0 && standIndex < _stands.Count && WorkerAt(standIndex) == null && standIndex != CharacterStand;
 
         public long Wage(WorkerModel worker) => StaffMath.Wage(_config, worker);
 
@@ -121,7 +111,8 @@ namespace BeachTycoon.Gameplay
             return true;
         }
 
-        public bool CanMove(int workerId, int standIndex) => Find(_staff, workerId) != null && IsStandFree(standIndex);
+        public bool CanMove(int workerId, int standIndex) =>
+            Find(_staff, workerId) is StaffMember member && member.Model.stand != standIndex && IsStandFree(standIndex);
 
         /// <summary>Sends a worker to another free stand.</summary>
         public bool TryMove(int workerId, int standIndex)
@@ -159,6 +150,7 @@ namespace BeachTycoon.Gameplay
             EventBus.Unsubscribe<ObjectMoved>(OnObjectMoved);
             EventBus.Unsubscribe<CharacterAssigned>(OnCharacterAssigned);
             EventBus.Unsubscribe<CharacterJoined>(OnCharacterJoined);
+            EventBus.Unsubscribe<CharacterStartedWork>(OnCharacterStartedWork);
             EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
             Portraits.Dispose();
         }

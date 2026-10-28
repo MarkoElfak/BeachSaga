@@ -124,7 +124,7 @@ namespace BeachTycoon.Gameplay
 
             agent.StandIndex = stand.Index;
             agent.QueueSlot = -1;
-            agent.Patience = agent.Type.patienceSeconds;
+            agent.Patience = agent.Type.patienceSeconds * stand.PatienceMultiplier; // a first-aid station nearby: longer
             agent.State = VisitorState.Queueing;
         }
 

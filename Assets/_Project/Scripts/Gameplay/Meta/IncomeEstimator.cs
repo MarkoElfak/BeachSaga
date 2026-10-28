@@ -59,16 +59,21 @@ namespace BeachTycoon.Gameplay
             float spend = AverageSpendMultiplier(_buildings.MainTier);
             double capacity = 0.0;
             double totalValue = 0.0;
+            int selling = 0;
             for (int i = 0; i < _stands.Count; i++)
             {
                 StandController stand = _stands.Get(i);
+                if (stand.Product.IsService) continue; // a chapel or first aid sells nothing
+                selling++;
                 capacity += stand.ServeSpeed / Math.Max(0.1f, stand.Product.serveSeconds);
                 double value = EconomyMath.SaleValue(stand.Product.price, spend, stand.Model.level,
                     _database.economy.standLevelIncomeBonus);
+                value *= stand.SaleBonus;
                 totalValue += _miniGames != null ? value * _miniGames.IncomeMultiplier(stand.Product) : value;
             }
 
-            double averageSale = totalValue / _stands.Count * (_abilities != null ? _abilities.AveragePriceMultiplier : 1f);
+            if (selling == 0) return rent;
+            double averageSale = totalValue / selling * (_abilities != null ? _abilities.AveragePriceMultiplier : 1f);
             return Math.Min(demand, capacity) * averageSale + rent;
         }
 

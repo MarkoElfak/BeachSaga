@@ -31,7 +31,11 @@ namespace BeachTycoon.Gameplay
         public int ShakeCount { get; private set; }
 
         /// <summary>Glides to full zoom-out over the centre of the land.</summary>
-        public void FlyToWholeMap() => FlyTo(new Vector3(_area.center.x, 0f, _area.center.y), _maxDistance);
+        public void FlyToWholeMap()
+        {
+            if (_initialized) RefitIfReshaped();
+            FlyTo(new Vector3(_area.center.x, 0f, _area.center.y), _maxDistance);
+        }
 
         /// <summary>Glides to the usual close-up distance over a ground point.</summary>
         public void FlyToCloseUp(Vector3 point)
@@ -44,6 +48,7 @@ namespace BeachTycoon.Gameplay
         public void FlyToArea(Rect area)
         {
             if (!_initialized) return;
+            RefitIfReshaped();
             float distance = Mathf.Clamp(FitDistance(area, _aspect), Mathf.Min(_config.startDistance, _maxDistance), _maxDistance);
             FlyTo(ClampFocus(new Vector3(area.center.x, 0f, area.center.y), distance), distance);
         }
@@ -60,6 +65,14 @@ namespace BeachTycoon.Gameplay
         }
 
         private void StopFlying() => _flying = false;
+
+        // The screen turned or the window changed shape (maybe this very frame, before LateUpdate): fit it again.
+        private bool RefitIfReshaped()
+        {
+            if (Mathf.Approximately(_camera.aspect, _aspect)) return false;
+            Refit();
+            return true;
+        }
 
         private void OnDoubleTap(DoubleTapEvent evt)
         {
@@ -84,12 +97,7 @@ namespace BeachTycoon.Gameplay
         private void LateUpdate()
         {
             if (!_initialized) return;
-            bool moved = false;
-            if (!Mathf.Approximately(_camera.aspect, _aspect))
-            {
-                Refit(); // the screen turned or the window changed shape
-                moved = true;
-            }
+            bool moved = RefitIfReshaped();
 
             float dt = Time.unscaledDeltaTime;
             moved |= Glide(dt) || SpringBack(dt);

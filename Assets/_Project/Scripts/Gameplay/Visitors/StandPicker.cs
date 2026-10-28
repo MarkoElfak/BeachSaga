@@ -4,7 +4,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Chooses the stand a visitor queues at: a running event's product first (by its demand chance),
-    /// then the visitor type's preferred products, then any stand with room, starting at a random one.
+    /// then the visitor type's preferred products, then any stand with room, starting at a random one. Service buildings sell nothing.
     /// </summary>
     public sealed class StandPicker
     {
@@ -39,7 +39,7 @@ namespace BeachTycoon.Gameplay
             for (int i = 0; i < count; i++)
             {
                 StandController stand = _stands.Get((start + i) % count);
-                if (!stand.IsFull) return stand;
+                if (!stand.IsFull && !stand.Product.IsService) return stand;
             }
 
             return null;

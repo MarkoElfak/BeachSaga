@@ -57,7 +57,9 @@ MonoBehaviour:
   - Costa Serena
   - Isola Bella
   - Punta Rosa
-  prefabSwaps: []
+  prefabSwaps:
+  - original: {fileID: 8616521830520627945, guid: ae91f216b51a645158728c6fa59a2b48, type: 3}
+    replacement: {fileID: 3341856516803517307, guid: 63f13a6df823741cbbc9917adad8909b, type: 3}
   character: {fileID: 11400000, guid: 14a7072f01ed5404cbc59c0847438c9d, type: 2}
   ability:
     name: Fatto a mano

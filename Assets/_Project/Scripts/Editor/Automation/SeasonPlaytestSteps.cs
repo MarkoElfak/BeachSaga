@@ -129,7 +129,9 @@ namespace BeachTycoon.EditorTools
             }
 
             Check(Neighbours.Accept(), "a neighbour moved in");
-            Check(Stands.Count == 6 && Decorations.Count > 0, $"season 1 has {Stands.Count} stands (the Taverna too) and {Decorations.Count} decorations");
+            int open = System.Array.FindAll(ServiceLocator.Get<GameDatabase>().products, p => Stands.IsAvailable(p)).Length;
+            Check(Stands.Count == open && Stands.FindByProduct("taverna") != null && Stands.FindByProduct("chapel") != null && Decorations.Count > 0,
+                $"season 1 has {Stands.Count} places (the Taverna and the chapel too) and {Decorations.Count} decorations");
         }
 
         private static void Check(bool condition, string description)
