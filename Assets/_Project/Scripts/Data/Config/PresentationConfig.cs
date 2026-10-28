@@ -8,6 +8,17 @@ namespace BeachTycoon.Data
     {
         [Min(15)] public int targetFrameRate = 60;
 
+        [Header("Smooth on slower phones (builds only)")]
+        [Tooltip("While the phone can't hold the frame rate, lower the render scale a step at a time, then turn shadows off.")]
+        public bool adaptiveQuality = true;
+        [Range(0.3f, 1f)] public float minRenderScale = 0.6f;
+        [Range(0.05f, 0.5f)] public float renderScaleStep = 0.1f;
+        [Tooltip("A frame is slow when it takes this many times the target frame's time (1.2 at 60 fps: under 50 fps).")]
+        [Min(1f)] public float slowFrameFactor = 1.2f;
+        [Min(1f)] public float qualityCheckSeconds = 5f;
+        [Tooltip("The share of slow frames in a check that lowers the picture one step.")]
+        [Range(0.1f, 1f)] public float slowFrameShare = 0.5f;
+
         [Header("Coin pickups")]
         [Min(1)] public int coinPoolPrewarm = 12;
         [Min(1)] public int coinPoolMaxSize = 64;

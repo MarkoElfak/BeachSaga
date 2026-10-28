@@ -3,7 +3,7 @@ using BeachTycoon.Services;
 
 namespace BeachTycoon.Gameplay
 {
-    /// <summary>Sound, music, vibration and screen feedback services.</summary>
+    /// <summary>Sound, music, vibration and screen feedback services, and the picture quality on slower phones.</summary>
     public sealed partial class GameBootstrap
     {
         private void AddFeedback(SettingsService settings, DayClock dayClock)
@@ -13,6 +13,7 @@ namespace BeachTycoon.Gameplay
             Add(new AudioService(database.sounds, settings, gameObject, haptics));
             Add(new MusicPlayer(database.sounds, settings, dayClock, gameObject));
             Add(new FeelDirector(database.presentation));
+            Add(new FrameRateGuard(database.presentation));
         }
     }
 }
