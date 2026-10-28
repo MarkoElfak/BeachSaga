@@ -50,8 +50,8 @@ namespace BeachTycoon.EditorTools
                 case 0:
                     Time.timeScale = TestTimeScale;
                     CheckFreshStart();
-                    Economy.Earn(20000);
-                    Check(Book.IsComplete(Index("Coins10K")) && Book.ClaimableCount == 1, "earning 20,000 coins completes Beach business");
+                    Economy.Earn(25000); // the Cabin, Bungalow and Hotel cost 22,650 since M21
+                    Check(Book.IsComplete(Index("Coins10K")) && Book.ClaimableCount == 1, "earning 25,000 coins completes Beach business");
                     Check(Badge() == "1", "Trophies badge shows 1 reward waiting");
                     Check(Buildings.TryBuild(0), "tent started");
                     break;

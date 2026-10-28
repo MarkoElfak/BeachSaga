@@ -14,7 +14,7 @@ namespace BeachTycoon.EditorTools
     {
         public static void Fill(GameDatabase database)
         {
-            Ability(database, "greece", "Filoxenia", CultureAbilityKind.LongerStays, 0.2f);
+            Ability(database, "greece", "Filoxenia", CultureAbilityKind.LongerStays, 0.1f);
             Ability(database, "spain", "Fiesta", CultureAbilityKind.NightAndEvents, 0.25f);
             Ability(database, "italy", "Fatto a mano", CultureAbilityKind.HigherPrices, 0.1f);
 

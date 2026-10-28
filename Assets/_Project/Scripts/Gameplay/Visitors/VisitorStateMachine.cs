@@ -28,7 +28,7 @@ namespace BeachTycoon.Gameplay
             _config = config;
             _random = random;
             _despawn = despawn;
-            _picker = new StandPicker(stands, random, events);
+            _picker = new StandPicker(stands, random, events, config.preferredChance);
         }
 
         public void Begin(VisitorAgent agent)

@@ -70,4 +70,4 @@ MonoBehaviour:
   ability:
     name: Filoxenia
     kind: 1
-    amount: 0.2
+    amount: 0.1

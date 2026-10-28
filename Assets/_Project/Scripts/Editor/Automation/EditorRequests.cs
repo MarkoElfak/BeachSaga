@@ -14,6 +14,7 @@ namespace BeachTycoon.EditorTools
     ///   packages add a b ...    adds packages (latest compatible version) through the Package Manager
     ///   build android|ios|mac   see ReleaseBuilder
     ///   shot file.png           runs the Mac build at phone quality; it saves a screenshot of the beach and quits
+    ///   economy [id=price ...]  writes the economy balance table (EconomyReport); with prices, a what-if to Logs
     /// </summary>
     [InitializeOnLoad]
     internal static class EditorRequests
@@ -48,6 +49,7 @@ namespace BeachTycoon.EditorTools
             else if (words[0] == "packages" && words.Length > 2 && words[1] == "add") StartAdding(words);
             else if (words[0] == "build" && words.Length > 1) Write(ReleaseBuilder.Build(words[1]));
             else if (words[0] == "shot" && words.Length > 1) Write(LaunchShot(words[1]));
+            else if (words[0] == "economy") Write(EconomyReport.WriteRequest(words));
             else Write("RESULT: unknown command '" + command + "'");
         }
 

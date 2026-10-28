@@ -6,7 +6,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Estimates average coins per second for offline earnings: sales are limited by whichever is lower,
-    /// visitor demand (arrivals, capped by maxVisitors / visit length, x purchases per visit) or stand
+    /// visitor demand (arrivals, capped by the beach's room / visit length, x purchases per visit) or stand
     /// capacity (1 / serve time per stand); rent is added on top. The season's seashell bonus scales it all; the
     /// country's price bonus (a Fiesta averaged over the day) scales the sales.
     /// </summary>
@@ -48,12 +48,14 @@ namespace BeachTycoon.Gameplay
             }
 
             VisitorConfig visitors = _database.visitors;
-            double purchasesPerVisit = (visitors.purchasesRange.x + visitors.purchasesRange.y) * 0.5;
+            float stay = _abilities != null ? _abilities.StayMultiplier : 1f; // Filoxenia: longer visits, more purchases
+            double purchasesPerVisit = (visitors.purchasesRange.x + visitors.purchasesRange.y) * 0.5 * stay;
             double visitorsPerSecond = (1.0 + _popularity.Value) / _database.economy.baseSpawnIntervalSeconds;
 
-            // The beach never holds more than maxVisitors at once, so arrivals are capped by how fast visits end.
+            // The beach holds only so many at once, so arrivals are capped by how fast visits end.
             TierDefinition tier = _database.GetTier(_buildings.MainTier);
-            double turnover = tier != null ? tier.maxVisitors / (double)visitors.estimatedVisitSeconds : 0.0;
+            int room = tier != null ? EconomyMath.BeachRoom(tier.maxVisitors, _stands.Count, visitors.visitorsPerPlace, stay, visitors.poolMaxSize) : 0;
+            double turnover = room / (visitors.estimatedVisitSeconds * (double)stay);
             double demand = Math.Min(visitorsPerSecond, turnover) * purchasesPerVisit;
 
             float spend = AverageSpendMultiplier(_buildings.MainTier);
