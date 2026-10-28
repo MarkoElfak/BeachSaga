@@ -76,6 +76,8 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 4:
                     UnlockProducts();
+                    // The character serves at the drinks bar, so its queue has room for the heatwave's extra orders.
+                    ServiceLocator.Get<CharacterService>().TrySendTo(Stands.FindByProduct("drinks").Index);
                     if (Events.IsActive) Events.End(); // a random event may have started while building
                     Clock.SetPhase(Morning); // daylight for the screenshots
                     break;

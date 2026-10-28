@@ -68,7 +68,9 @@ namespace BeachTycoon.EditorTools
         {
             Check(_saleOk, _saleText);
             float share = Share(Drinks() - _heatDrinks, Total() - _heatTotal);
-            Check(share >= _baselineShare + 0.15f, $"drinks get more of the orders in a heatwave ({_baselineShare:P0} -> {share:P0} of {Total() - _heatTotal})");
+            string queues = string.Empty;
+            for (int i = 0; i < Stands.Count; i++) queues += $" {Stands.Get(i).Product.id}:{Stands.Get(i).OrderCount}/{Stands.Get(i).TotalOrders}";
+            Check(share >= _baselineShare + 0.15f, $"drinks get more of the orders in a heatwave ({_baselineShare:P0} -> {share:P0} of {Total() - _heatTotal};{queues})");
             Events.End();
             Check(!Banner.IsShowing && Events.PriceMultiplier(Stands.FindByProduct("drinks").Product) == 1f, "ending the heatwave puts drink prices back");
         }

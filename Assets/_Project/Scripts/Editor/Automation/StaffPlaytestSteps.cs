@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 namespace BeachTycoon.EditorTools
 {
     /// <summary>
-    /// Milestone 18 playtest (hiring visitors): the tent has no staff slots; the hut brings three job seekers with a
+    /// Milestone 18 playtest (hiring visitors): the tent has no staff slots; the cabin brings three job seekers with a
     /// badge. Tapping one opens their card with stars per skill; hiring them for the towel stand (half speed while
     /// empty) sends them over, and it serves faster. The staff list and the stand panel show them, a missed payday
     /// slows them down until they are paid, and after a restart they are still at work.
@@ -69,12 +69,12 @@ namespace BeachTycoon.EditorTools
         private static void Upgrade()
         {
             Check(Staff.Slots == 0 && Staff.Seekers.Count == 0 && !List.ShowsButton, "the tent has no staff slots and nobody applies");
-            Check(Buildings.TryUpgrade(0), "hut started");
+            Check(Buildings.TryUpgrade(0), "cabin started");
         }
 
         private static void HireFromCard()
         {
-            Check(Staff.Slots == 2 && Staff.Seekers.Count == Staff.Config.maxJobSeekers, $"the hut allows 2 staff; {Staff.Seekers.Count} job seekers came");
+            Check(Staff.Slots == 2 && Staff.Seekers.Count == Staff.Config.maxJobSeekers, $"the cabin allows 2 staff; {Staff.Seekers.Count} job seekers came");
             bool badges = true;
             foreach (StaffMember seeker in Staff.Seekers) badges &= Views.Find(seeker.Id) != null && Views.Find(seeker.Id).ShowsBadge;
             Check(badges, "every job seeker shows a badge");

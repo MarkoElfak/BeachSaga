@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
   id: towels
   displayName: Towels
+  description: 
   icon: {fileID: 0}
+  cultureId: 
   unlockCost: 200
   price: 12
   serveSeconds: 2

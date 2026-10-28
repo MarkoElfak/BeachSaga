@@ -38,6 +38,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
             SubscribeStaff(true);
+            EventBus.Subscribe<FiestaChanged>(OnFiestaChanged);
             if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
         }
 
@@ -61,6 +62,7 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
             SubscribeStaff(false);
+            EventBus.Unsubscribe<FiestaChanged>(OnFiestaChanged);
         }
 
         /// <summary>Queues a message; one already showing or waiting is not repeated.</summary>
@@ -99,6 +101,13 @@ namespace BeachTycoon.UI
             if (evt.LotIndex != BuildingManager.MainLotIndex || evt.Tier <= 1) return;
             TierDefinition tier = _database.GetTier(evt.Tier);
             if (tier != null) Show($"Your {tier.displayName} is open!");
+        }
+
+        // Spanish Fiesta: the night (or an event) pays more.
+        private void OnFiestaChanged(FiestaChanged evt)
+        {
+            CultureAbility ability = evt.Active && ServiceLocator.TryGet(out CultureAbilities abilities) ? abilities.Current : null;
+            if (ability != null) Show($"{ability.name}! {CountryAbilityText.Effect(ability)}");
         }
 
         private void OnProductUnlocked(ProductUnlocked evt)

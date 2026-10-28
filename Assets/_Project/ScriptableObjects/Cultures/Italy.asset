@@ -59,3 +59,7 @@ MonoBehaviour:
   - Punta Rosa
   prefabSwaps: []
   character: {fileID: 11400000, guid: 14a7072f01ed5404cbc59c0847438c9d, type: 2}
+  ability:
+    name: Fatto a mano
+    kind: 3
+    amount: 0.1

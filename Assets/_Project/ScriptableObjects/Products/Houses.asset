@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
   id: houses
   displayName: Houses
+  description: 
   icon: {fileID: 0}
+  cultureId: 
   unlockCost: 25000
   price: 5000
   serveSeconds: 20

@@ -14,6 +14,9 @@ namespace BeachTycoon.Gameplay
         private const float NightStart = 0.55f;
         private const float NightEnd = 0.95f;
 
+        /// <summary>Share of the day that is night.</summary>
+        public const float NightShare = NightEnd - NightStart;
+
         private readonly DayNightConfig _config;
         private readonly MetaModel _meta;
 

@@ -8,7 +8,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// The player's culture and how any culture looks: its flag image, its version of a prefab, and its wall and
-    /// roof colours on buildings. Images and repainted materials are made on first use and kept.
+    /// roof colours on buildings. Also which country's own place a village may open. Images and repainted materials are made on first use and kept.
     /// </summary>
     public sealed class CultureService : IDisposable
     {
@@ -34,6 +34,22 @@ namespace BeachTycoon.Gameplay
         public CultureDefinition Find(string cultureId) => _database.FindCulture(cultureId);
 
         public bool IsKnown(string cultureId) => Find(cultureId) != null;
+
+        /// <summary>Places of other countries stay closed; everything else is open to every village.</summary>
+        public bool CanOpen(ProductDefinition product) => product != null && product.IsOpenTo(_meta.cultureId);
+
+        /// <summary>The country's own place (the product carrying its id), or null.</summary>
+        public ProductDefinition PlaceOf(CultureDefinition culture)
+        {
+            ProductDefinition[] products = _database.products;
+            if (culture == null || products == null) return null;
+            for (int i = 0; i < products.Length; i++)
+            {
+                if (products[i] != null && products[i].cultureId == culture.id) return products[i];
+            }
+
+            return null;
+        }
 
         public Texture2D Flag(CultureDefinition culture)
         {

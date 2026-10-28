@@ -33,6 +33,16 @@ namespace BeachTycoon.Tests
 
         public GameDatabase Database { get; }
 
+        /// <summary>Adds a product after the three above, such as a country's own place.</summary>
+        public ProductDefinition AddProduct(string id, int tier, string cultureId)
+        {
+            ProductDefinition product = Product(id, tier);
+            product.cultureId = cultureId;
+            var products = new List<ProductDefinition>(Database.products) { product };
+            Database.products = products.ToArray();
+            return product;
+        }
+
         public void Dispose()
         {
             foreach (Object asset in _assets) Object.DestroyImmediate(asset);

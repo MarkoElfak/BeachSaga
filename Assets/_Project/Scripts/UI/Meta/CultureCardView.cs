@@ -29,14 +29,15 @@ namespace BeachTycoon.UI
         public Texture PortraitImage => portrait.texture;
         public bool IsPicked { get; private set; }
 
-        public void Show(CultureDefinition culture, Texture flagImage, Texture portraitImage)
+        public void Show(CultureDefinition culture, Texture flagImage, Texture portraitImage, ProductDefinition place = null)
         {
             CultureId = culture.id;
             label.text = culture.displayName;
             flag.texture = flagImage;
             CharacterDefinition character = culture.character;
             characterName.text = character != null ? character.displayName : culture.displayName;
-            ability.text = character != null ? $"{character.tagline}\n<size=85%>{character.ability}</size>" : string.Empty;
+            string country = CountryAbilityText.Describe(culture, place, false);
+            ability.text = character != null ? $"{character.tagline}\n<size=85%>{character.ability} {country}</size>" : string.Empty;
             portrait.texture = portraitImage;
             portrait.gameObject.SetActive(portraitImage != null);
             SetPicked(false);

@@ -9,7 +9,10 @@ using UnityEngine.UI;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Bottom bar: one button per product, the main building's upgrade button and the decorations shop.</summary>
+    /// <summary>
+    /// Bottom bar: one button per product (other countries' places hidden), the main building's upgrade button and
+    /// the decorations shop.
+    /// </summary>
     public sealed class BuildBarView : MonoBehaviour
     {
         [SerializeField] private ProductButtonView productButtonPrefab = null;
@@ -22,6 +25,7 @@ namespace BeachTycoon.UI
         private readonly List<ProductButtonView> _buttons = new List<ProductButtonView>();
         private BuildingManager _buildings;
         private GameDatabase _database;
+        private StandService _stands;
 
         private void Start()
         {
@@ -31,12 +35,12 @@ namespace BeachTycoon.UI
             }
 
             _buildings = ServiceLocator.Get<BuildingManager>();
-            var stands = ServiceLocator.Get<StandService>();
+            _stands = ServiceLocator.Get<StandService>();
             var economy = ServiceLocator.Get<IEconomyService>();
             foreach (ProductDefinition product in _database.products)
             {
                 ProductButtonView button = Instantiate(productButtonPrefab, productRow, false);
-                button.Bind(product, stands, economy);
+                button.Bind(product, _stands, economy);
                 _buttons.Add(button);
             }
 
@@ -47,6 +51,7 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<StandCreated>(OnStandCreated);
             EventBus.Subscribe<StandUpgraded>(OnStandUpgraded);
             EventBus.Subscribe<TierUpgraded>(OnTierUpgraded);
+            EventBus.Subscribe<CultureChosen>(OnCultureChosen);
             Refresh();
         }
 
@@ -59,6 +64,7 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<StandCreated>(OnStandCreated);
             EventBus.Unsubscribe<StandUpgraded>(OnStandUpgraded);
             EventBus.Unsubscribe<TierUpgraded>(OnTierUpgraded);
+            EventBus.Unsubscribe<CultureChosen>(OnCultureChosen);
         }
 
         private void OnCoinsChanged(CoinsChanged evt) => Refresh();
@@ -66,6 +72,7 @@ namespace BeachTycoon.UI
         private void OnStandCreated(StandCreated evt) => Refresh();
         private void OnStandUpgraded(StandUpgraded evt) => Refresh();
         private void OnTierUpgraded(TierUpgraded evt) => Refresh();
+        private void OnCultureChosen(CultureChosen evt) => Refresh();
 
         private void OnBuildingClicked()
         {
@@ -76,7 +83,9 @@ namespace BeachTycoon.UI
         {
             for (int i = 0; i < _buttons.Count; i++)
             {
-                _buttons[i].Refresh();
+                bool available = _stands.IsAvailable(_buttons[i].Product);
+                if (_buttons[i].gameObject.activeSelf != available) _buttons[i].gameObject.SetActive(available);
+                if (available) _buttons[i].Refresh();
             }
 
             LotModel lot = _buildings.GetLot(BuildingManager.MainLotIndex);
