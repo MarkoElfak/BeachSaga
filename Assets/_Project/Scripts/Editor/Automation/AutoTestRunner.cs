@@ -212,7 +212,8 @@ namespace BeachTycoon.EditorTools
         {
             if (CurrentStage != Stage.Idle && type != LogType.Log && !message.StartsWith("Account API"))
             {
-                Write($"[{type}] {message}");
+                string where = type == LogType.Exception ? "\n  " + stackTrace.Trim().Replace("\n", "\n  ") : string.Empty;
+                Write($"[{type}] {message}{where}");
             }
         }
     }

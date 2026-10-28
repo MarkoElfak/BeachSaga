@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bungalow
   displayName: Bungalow
   buildingPrefab: {fileID: 3134971211246960186, guid: 79184aed8c9374ca0a1fec79450b3f1d, type: 3}
-  upgradeCost: 1200
+  upgradeCost: 2500
   buildSeconds: 6
   maxVisitors: 15
   unlockedProducts:

@@ -4,7 +4,7 @@ using BeachTycoon.Data;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// The picked country's bonus for the whole beach: Filoxenia (visitors stay longer), Fiesta (more coins at night
+    /// The picked country's bonus for the whole beach: Filoxenia (visitors stay longer, buy more and more of them fit), Fiesta (more coins at night
     /// and during events) or Fatto a mano (higher prices). Sales and visitors read the multipliers below; nothing is
     /// saved. Announces when a Fiesta starts and ends.
     /// </summary>
@@ -50,7 +50,7 @@ namespace BeachTycoon.Gameplay
             }
         }
 
-        /// <summary>Scales how long visitors relax on the beach.</summary>
+        /// <summary>Scales how long visitors relax, how much each buys and how many the beach holds (Filoxenia).</summary>
         public float StayMultiplier => Has(CultureAbilityKind.LongerStays) ? 1f + Current.amount : 1f;
 
         /// <summary>The price bonus averaged over a day (offline earnings): a Fiesta only counts for the night.</summary>

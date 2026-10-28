@@ -4,16 +4,19 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Chooses the stand a visitor queues at: a running event's product first (by its demand chance),
-    /// then the visitor type's preferred products, then any stand with room, starting at a random one. Service buildings sell nothing.
+    /// then (some of the time) the visitor type's preferred products, then any stand with room, starting at a random one.
+    /// Service buildings sell nothing.
     /// </summary>
     public sealed class StandPicker
     {
         private readonly StandService _stands;
         private readonly System.Random _random;
         private readonly BeachEventService _events;
+        private readonly float _preferredChance;
 
-        public StandPicker(StandService stands, System.Random random, BeachEventService events)
+        public StandPicker(StandService stands, System.Random random, BeachEventService events, float preferredChance = 1f)
         {
+            _preferredChance = preferredChance;
             _stands = stands;
             _random = random;
             _events = events;
@@ -25,7 +28,7 @@ namespace BeachTycoon.Gameplay
             StandController wanted = EventDemand();
             if (wanted != null) return wanted;
 
-            if (type.preferredProducts != null)
+            if (type.preferredProducts != null && PrefersFavourite())
             {
                 foreach (ProductDefinition product in type.preferredProducts)
                 {
@@ -44,6 +47,9 @@ namespace BeachTycoon.Gameplay
 
             return null;
         }
+
+        // Rolls only when the favourite is not a sure thing, so a chance of 1 keeps the old choices.
+        private bool PrefersFavourite() => _preferredChance >= 1f || _random.NextDouble() < _preferredChance;
 
         // Rolls only while an event adds demand, so the usual visitor choices are unchanged otherwise.
         private StandController EventDemand()

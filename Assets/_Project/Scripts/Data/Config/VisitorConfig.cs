@@ -24,6 +24,8 @@ namespace BeachTycoon.Data
         public Vector2 relaxSecondsRange = new Vector2(3f, 8f);
         [Tooltip("Purchases a visitor makes before going home (min, max inclusive).")]
         public Vector2Int purchasesRange = new Vector2Int(1, 4);
+        [Tooltip("Chance a visitor goes to their favourite stand first; otherwise they pick any stand with room.")]
+        [Range(0f, 1f)] public float preferredChance = 0.5f;
         [Tooltip("Relax time before trying again when every stand queue is full.")]
         [Min(0.1f)] public float retryQueueSeconds = 3f;
         [Tooltip("Average length of one visit (arrive to leave). Used only to estimate offline income.")]
@@ -32,6 +34,8 @@ namespace BeachTycoon.Data
 
         [Header("Pool")]
         [Min(1)] public int poolPrewarm = 8;
+        [Tooltip("Room for this many more visitors at once for every place opened (stands and village buildings).")]
+        [Min(0)] public int visitorsPerPlace = 2;
         [Tooltip("Hard cap on simultaneous visitors, whatever the tier allows.")]
         [Min(1)] public int poolMaxSize = 120;
 

@@ -1,13 +1,14 @@
 using System.IO;
 using UnityEditor;
-using BeachTycoon.Services;
-using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 21 (economy balance)", priority = 21)]
+        private static void RequestEconomy() => File.WriteAllText(RequestPath, SuiteEconomy);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 20 (village buildings)", priority = 22)]
         private static void RequestVillage() => File.WriteAllText(RequestPath, SuiteVillage);
 
@@ -88,13 +89,14 @@ namespace BeachTycoon.EditorTools
         private const string SuiteStaff = "staff";
         private const string SuiteAbilities = "abilities";
         private const string SuiteVillage = "village";
+        private const string SuiteEconomy = "economy";
 
         private static bool IsKnownSuite(string suite) =>
             suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
             || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames
             || suite == SuiteFeel || suite == SuiteRelease || suite == SuiteStart || suite == SuiteCulture
             || suite == SuiteCamera || suite == SuiteMap || suite == SuiteCharacter || suite == SuiteStaff
-            || suite == SuiteAbilities || suite == SuiteVillage;
+            || suite == SuiteAbilities || suite == SuiteVillage || suite == SuiteEconomy;
 
         private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
@@ -120,6 +122,7 @@ namespace BeachTycoon.EditorTools
                 if (Suite == SuiteStaff) return "M18 staff";
                 if (Suite == SuiteAbilities) return "M19 abilities";
                 if (Suite == SuiteVillage) return "M20 village";
+                if (Suite == SuiteEconomy) return "M21 economy";
                 return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
             }
         }
@@ -144,6 +147,7 @@ namespace BeachTycoon.EditorTools
             if (Suite == SuiteStaff) return StaffPlaytestSteps.IsReady(step);
             if (Suite == SuiteAbilities) return AbilityPlaytestSteps.IsReady(step);
             if (Suite == SuiteVillage) return VillagePlaytestSteps.IsReady(step);
+            if (Suite == SuiteEconomy) return EconomyPlaytestSteps.IsReady(step);
             return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
         }
 
@@ -167,35 +171,9 @@ namespace BeachTycoon.EditorTools
             else if (Suite == SuiteStaff) StaffPlaytestSteps.Run(step);
             else if (Suite == SuiteAbilities) AbilityPlaytestSteps.Run(step);
             else if (Suite == SuiteVillage) VillagePlaytestSteps.Run(step);
+            else if (Suite == SuiteEconomy) EconomyPlaytestSteps.Run(step);
             else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
             else MetaPlaytestSteps.Run(step);
-        }
-
-        // Snapshots written by earlier runs (own island, demo friends) start over with the save.
-        private static void DeleteIslandSnapshots()
-        {
-            string folder = Path.Combine(Application.persistentDataPath, LocalIslandRepository.FolderName);
-            if (Directory.Exists(folder)) Directory.Delete(folder, true);
-        }
-
-        /// <summary>Shifts the save's last-seen time back before the next Play mode starts (offline earnings test).</summary>
-        public static void RestartPlayModeAfterAbsence(double hours)
-        {
-            SessionState.SetFloat(KeyPrefix + "AbsenceHours", (float)hours);
-            RestartPlayMode();
-        }
-
-        // Rewrites lastSeenUtc in the save the game just wrote on quit, as if the player had been away.
-        private static void ApplySimulatedAbsence()
-        {
-            float hours = SessionState.GetFloat(KeyPrefix + "AbsenceHours", 0f);
-            SessionState.EraseFloat(KeyPrefix + "AbsenceHours");
-            if (hours <= 0f || !File.Exists(SavePath)) return;
-
-            var data = JsonUtility.FromJson<BeachTycoon.Data.GameSaveData>(File.ReadAllText(SavePath));
-            data.lastSeenUtc = System.DateTime.UtcNow.AddHours(-hours).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
-            File.WriteAllText(SavePath, JsonUtility.ToJson(data));
-            Write($"Simulated an absence of {hours} h");
         }
     }
 }

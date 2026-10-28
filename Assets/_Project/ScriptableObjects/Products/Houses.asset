@@ -19,7 +19,7 @@ MonoBehaviour:
   category: 0
   cultureId: 
   unlockCost: 25000
-  price: 5000
+  price: 500
   serveSeconds: 20
   upgradeBaseCost: 25
   skill: 1

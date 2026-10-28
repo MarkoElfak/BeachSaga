@@ -15,7 +15,7 @@ MonoBehaviour:
   id: resort
   displayName: Resort
   buildingPrefab: {fileID: 6714442220044402485, guid: 4c69e2bd32717474eb4ee35e61adbbf3, type: 3}
-  upgradeCost: 60000
+  upgradeCost: 120000
   buildSeconds: 10
   maxVisitors: 100
   unlockedProducts:
