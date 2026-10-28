@@ -26,7 +26,8 @@ namespace BeachTycoon.Gameplay
         private float _spawnTimer;
 
         public VisitorService(GameDatabase database, BuildingManager buildings, StandService stands,
-            PopularityService popularity, WorldNavigation navigation, BeachEventService events = null)
+            PopularityService popularity, WorldNavigation navigation, BeachEventService events = null,
+            CultureAbilities abilities = null)
         {
             _database = database;
             _events = events;
@@ -35,7 +36,7 @@ namespace BeachTycoon.Gameplay
             _navigation = navigation;
             VisitorConfig config = database.visitors;
             _random = new System.Random(config.randomSeed);
-            _machine = new VisitorStateMachine(navigation, stands, config, _random, Despawn, events);
+            _machine = new VisitorStateMachine(navigation, stands, config, _random, Despawn, events, abilities);
 
             _agents = new VisitorAgent[config.poolMaxSize];
             _free = new Stack<int>(config.poolMaxSize);

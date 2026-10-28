@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
   id: donuts
   displayName: Donuts
+  description: 
   icon: {fileID: 0}
+  cultureId: 
   unlockCost: 0
   price: 500
   serveSeconds: 3

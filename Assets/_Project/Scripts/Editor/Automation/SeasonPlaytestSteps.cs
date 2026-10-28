@@ -129,7 +129,7 @@ namespace BeachTycoon.EditorTools
             }
 
             Check(Neighbours.Accept(), "a neighbour moved in");
-            Check(Stands.Count == 5 && Decorations.Count > 0, $"season 1 has {Stands.Count} stands and {Decorations.Count} decorations");
+            Check(Stands.Count == 6 && Decorations.Count > 0, $"season 1 has {Stands.Count} stands (the Taverna too) and {Decorations.Count} decorations");
         }
 
         private static void Check(bool condition, string description)

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
   id: drinks
   displayName: Drinks
+  description: 
   icon: {fileID: 0}
+  cultureId: 
   unlockCost: 800
   price: 20
   serveSeconds: 3

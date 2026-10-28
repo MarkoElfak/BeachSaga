@@ -60,6 +60,8 @@ namespace BeachTycoon.Data
         public PrefabSwap[] prefabSwaps = new PrefabSwap[0];
         [Tooltip("The hero picked with this culture: they run the beach and work at a stand.")]
         public CharacterDefinition character;
+        [Tooltip("The country's bonus for the whole beach. Its own place is the product with this culture's id.")]
+        public CultureAbility ability = new CultureAbility();
 
         /// <summary>This culture's version of a prefab, or the prefab itself when it has none.</summary>
         public GameObject Resolve(GameObject prefab)

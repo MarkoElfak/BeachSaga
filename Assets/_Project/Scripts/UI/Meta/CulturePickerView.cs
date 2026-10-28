@@ -39,7 +39,7 @@ namespace BeachTycoon.UI
                 CultureCardView card = Instantiate(cardTemplate, cardRow, false);
                 card.name = "Card " + all[i].id;
                 card.gameObject.SetActive(true);
-                card.Show(all[i], cultures.Flag(all[i]), characters != null ? characters.Portrait(all[i].character) : null);
+                card.Show(all[i], cultures.Flag(all[i]), characters != null ? characters.Portrait(all[i].character) : null, cultures.PlaceOf(all[i]));
                 string id = all[i].id;
                 card.Button.onClick.AddListener(() => Pick(id));
                 _cards.Add(card);

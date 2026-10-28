@@ -8,7 +8,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Owns every stand: restores them from the save, creates free products when a tier is reached,
-    /// unlocks paid products, upgrades stand levels and ticks serving.
+    /// unlocks paid products (a country's own place only for that country), upgrades stand levels and ticks serving.
     /// </summary>
     public sealed class StandService : ITickable, IDisposable
     {
@@ -18,10 +18,12 @@ namespace BeachTycoon.Gameplay
         private readonly List<StandModel> _models;
         private readonly List<StandController> _stands = new List<StandController>();
         private readonly SaleMultipliers _multipliers;
+        private readonly CultureService _cultures;
 
         public StandService(GameDatabase database, IEconomyService economy, BuildingManager buildings,
-            List<StandModel> savedStands, SaleMultipliers multipliers)
+            List<StandModel> savedStands, SaleMultipliers multipliers, CultureService cultures = null)
         {
+            _cultures = cultures;
             _multipliers = multipliers;
             _database = database;
             _economy = economy;
@@ -58,12 +60,17 @@ namespace BeachTycoon.Gameplay
 
         public bool IsTierReached(ProductDefinition product) => _buildings.MainTier >= product.requiredTier;
 
+        /// <summary>False for other countries' places (and for every place before a culture is picked).</summary>
+        public bool IsAvailable(ProductDefinition product) =>
+            _cultures != null ? _cultures.CanOpen(product) : product.IsOpenTo(null);
+
         public bool CanUnlock(ProductDefinition product) =>
-            FindByProduct(product.id) == null && IsTierReached(product) && _economy.CanAfford(product.unlockCost);
+            FindByProduct(product.id) == null && IsAvailable(product) && IsTierReached(product) && _economy.CanAfford(product.unlockCost);
 
         public bool TryUnlockProduct(ProductDefinition product)
         {
-            if (FindByProduct(product.id) != null || !IsTierReached(product) || !_economy.TrySpend(product.unlockCost))
+            if (FindByProduct(product.id) != null || !IsAvailable(product) || !IsTierReached(product)
+                || !_economy.TrySpend(product.unlockCost))
             {
                 return false;
             }
@@ -124,7 +131,7 @@ namespace BeachTycoon.Gameplay
 
             foreach (ProductDefinition product in tier.unlockedProducts)
             {
-                bool isFree = product != null && product.unlockCost == 0;
+                bool isFree = product != null && product.unlockCost == 0 && IsAvailable(product);
                 if (isFree && product.requiredTier <= evt.Tier && FindByProduct(product.id) == null)
                 {
                     CreateStand(product, evt.LotIndex);

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
   id: surf_lessons
   displayName: Surf lessons
+  description: 
   icon: {fileID: 0}
+  cultureId: 
   unlockCost: 3000
   price: 60
   serveSeconds: 8

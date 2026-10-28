@@ -81,15 +81,16 @@ namespace BeachTycoon.Gameplay
             var placement = Add(new PlacementService(database, buildings, data.stands, data.decorations));
             var events = Add(new BeachEventService(database.beachEvents, buildings, analytics));
             var miniGames = Add(new MiniGameService(database, data.miniGames, analytics));
-            var sales = Add(new SaleMultipliers(boost, season, events, miniGames));
-            var stands = Add(new StandService(database, economy, buildings, data.stands, sales));
+            var dayClock = Add(new DayClock(database.dayNight, data.meta));
+            var abilities = Add(new CultureAbilities(culture, dayClock, events));
+            var sales = Add(new SaleMultipliers(boost, season, events, miniGames, abilities));
+            var stands = Add(new StandService(database, economy, buildings, data.stands, sales, culture));
             events.AttachStands(stands);
             placement.EnsureShoreStands();
-            var dayClock = Add(new DayClock(database.dayNight, data.meta));
             var popularity = Add(new PopularityService(database, progression, stands));
             Add(new DecorationService(database, economy, progression, popularity, data.decorations)).AttachPlacement(placement);
             var navigation = Add(new WorldNavigation(database.world, database.visitors, placement));
-            Add(new VisitorService(database, buildings, stands, popularity, navigation, events));
+            Add(new VisitorService(database, buildings, stands, popularity, navigation, events, abilities));
             var characters = Add(new CharacterService(database, culture, stands, placement, navigation, data.meta));
             var staff = Add(new StaffService(database, data, stands, buildings, culture, characters, placement, navigation, economy));
             var neighbours = Add(new NeighbourService(database, buildings, progression, data.neighbours, season));
@@ -97,7 +98,7 @@ namespace BeachTycoon.Gameplay
             Add(new QuestService(database, neighbours, stands, economy, progression));
 
             // Meta systems read the restored island, so they come last.
-            var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours, season, miniGames));
+            var estimator = Add(new IncomeEstimator(database, buildings, stands, popularity, neighbours, season, miniGames, abilities));
             Add(new OfflineEarningsService(database, _save, clock, estimator, economy, ads, analytics, staff.WagesPerSecond));
             Add(new TutorialService(database.tutorial, data.meta, buildings));
             Add(new DailyRewardService(database.dailyRewards, data.meta, clock, estimator.IncomePerSecond, economy,

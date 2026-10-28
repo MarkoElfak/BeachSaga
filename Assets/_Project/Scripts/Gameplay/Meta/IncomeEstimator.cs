@@ -7,7 +7,8 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Estimates average coins per second for offline earnings: sales are limited by whichever is lower,
     /// visitor demand (arrivals, capped by maxVisitors / visit length, x purchases per visit) or stand
-    /// capacity (1 / serve time per stand); rent is added on top. The season's seashell bonus scales it all.
+    /// capacity (1 / serve time per stand); rent is added on top. The season's seashell bonus scales it all; the
+    /// country's price bonus (a Fiesta averaged over the day) scales the sales.
     /// </summary>
     public sealed class IncomeEstimator
     {
@@ -20,11 +21,13 @@ namespace BeachTycoon.Gameplay
         private readonly NeighbourService _neighbours;
         private readonly SeasonService _season;
         private readonly MiniGameService _miniGames;
+        private readonly CultureAbilities _abilities;
 
         public IncomeEstimator(GameDatabase database, BuildingManager buildings, StandService stands,
             PopularityService popularity, NeighbourService neighbours, SeasonService season = null,
-            MiniGameService miniGames = null)
+            MiniGameService miniGames = null, CultureAbilities abilities = null)
         {
+            _abilities = abilities;
             _season = season;
             _miniGames = miniGames;
             _database = database;
@@ -65,7 +68,7 @@ namespace BeachTycoon.Gameplay
                 totalValue += _miniGames != null ? value * _miniGames.IncomeMultiplier(stand.Product) : value;
             }
 
-            double averageSale = totalValue / _stands.Count;
+            double averageSale = totalValue / _stands.Count * (_abilities != null ? _abilities.AveragePriceMultiplier : 1f);
             return Math.Min(demand, capacity) * averageSale + rent;
         }
 

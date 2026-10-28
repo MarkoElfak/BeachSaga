@@ -13,6 +13,8 @@ namespace BeachTycoon.UI
     /// </summary>
     public sealed class ProductButtonView : MonoBehaviour
     {
+        private const float MinNameSize = 20f;
+
         [SerializeField] private Button button = null;
         [SerializeField] private Image background = null;
         [SerializeField] private TMP_Text nameLabel = null;
@@ -26,12 +28,19 @@ namespace BeachTycoon.UI
         private StandService _stands;
         private IEconomyService _economy;
 
+        public ProductDefinition Product => _product;
+
         public void Bind(ProductDefinition product, StandService stands, IEconomyService economy)
         {
             _product = product;
             _stands = stands;
             _economy = economy;
             nameLabel.text = product.displayName;
+            // Long names (Gelateria, Surf lessons) shrink to one line instead of breaking mid-word.
+            nameLabel.enableAutoSizing = true;
+            nameLabel.fontSizeMax = nameLabel.fontSize;
+            nameLabel.fontSizeMin = MinNameSize;
+            nameLabel.textWrappingMode = TextWrappingModes.NoWrap;
             button.onClick.AddListener(OnClick);
             Refresh();
         }

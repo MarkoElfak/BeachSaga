@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace BeachTycoon.UI
 {
     /// <summary>
-    /// The player's character card: portrait, flag, name, ability and where they work. Opens when the character is
+    /// The player's character card: portrait, flag, name, abilities (their own and the country's) and where they work. Opens when the character is
     /// tapped on the beach, or from the HUD portrait button, which also flies the camera over to them.
     /// </summary>
     public sealed class CharacterCardView : MonoBehaviour
@@ -34,6 +34,7 @@ namespace BeachTycoon.UI
         public bool ShowsButton => openButton.gameObject.activeSelf;
         public string NameText => nameLabel.text;
         public string WorkText => workLabel.text;
+        public string AbilityText => abilityLabel.text;
         public Texture PortraitImage => portrait.texture;
 
         private void Start()
@@ -73,7 +74,7 @@ namespace BeachTycoon.UI
             flag.texture = _cultures.Flag(_cultures.Current);
             nameLabel.text = character.displayName;
             taglineLabel.text = character.tagline;
-            abilityLabel.text = character.ability;
+            abilityLabel.text = $"{character.ability}\n<size=80%>{CountryAbilityText.Describe(_cultures.Current, _cultures.PlaceOf(_cultures.Current))}</size>";
             hintLabel.text = $"To move {character.displayName}, tap a stand, then Work here.";
             RefreshWork();
             root.SetActive(true);

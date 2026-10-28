@@ -23,6 +23,9 @@ namespace BeachTycoon.EditorTools
         public const string DrinksBarPath = Stands + "DrinksBar.prefab";
         public const string SurfSchoolPath = Stands + "SurfSchool.prefab";
         public const string RealEstatePath = Stands + "RealEstateOffice.prefab";
+        public const string TavernaPath = Stands + "Taverna.prefab";
+        public const string TapasBarPath = Stands + "TapasBar.prefab";
+        public const string GelateriaPath = Stands + "Gelateria.prefab";
         public const string LotPath = ProjectPaths.Prefabs + "/World/Lot.prefab";
         public const string PalmPath = ProjectPaths.Prefabs + "/World/Palm.prefab";
         public const string CoinPath = ProjectPaths.Prefabs + "/Effects/CoinPickup.prefab";
@@ -53,6 +56,9 @@ namespace BeachTycoon.EditorTools
             Build(DrinksBarPath, overwrite, () => StandPrefabs.BuildDrinksBar(p));
             Build(SurfSchoolPath, overwrite, () => StandPrefabs.BuildSurfSchool(p));
             Build(RealEstatePath, overwrite, () => StandPrefabs.BuildRealEstate(p));
+            Build(TavernaPath, overwrite, () => PlacePrefabs.BuildTaverna(p));
+            Build(TapasBarPath, overwrite, () => PlacePrefabs.BuildTapasBar(p));
+            Build(GelateriaPath, overwrite, () => PlacePrefabs.BuildGelateria(p));
             Build(LotPath, overwrite, () => WorldPrefabs.BuildLot(p));
             Build(PalmPath, overwrite, () => WorldPrefabs.BuildPalm(p));
             Build(CoinPath, overwrite, () => WorldPrefabs.BuildCoin(p));

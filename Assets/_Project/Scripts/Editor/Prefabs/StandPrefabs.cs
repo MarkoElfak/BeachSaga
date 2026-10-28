@@ -97,7 +97,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // Counter, top and awning posts shared by the simple stands.
-        private static GameObject Counter(string name, PaletteDefinition p, Material awning)
+        internal static GameObject Counter(string name, PaletteDefinition p, Material awning)
         {
             var root = new GameObject(name);
             Transform t = root.transform;
@@ -111,7 +111,7 @@ namespace BeachTycoon.EditorTools
             return root;
         }
 
-        private static GameObject Finish(GameObject root, PaletteDefinition p)
+        internal static GameObject Finish(GameObject root, PaletteDefinition p)
         {
             Transform t = root.transform;
             PrimitiveKit.AddBox(root, new Vector3(0f, 1.1f, 0f), new Vector3(1.9f, 2.2f, 1.4f));

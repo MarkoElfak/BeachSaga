@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae043bd4bca84682806cbd0bd605bfa, type: 3}
+  m_Name: Gelateria
+  m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.ProductDefinition
+  id: gelateria
+  displayName: Gelateria
+  description: gelato and pizza slices
+  icon: {fileID: 0}
+  cultureId: italy
+  unlockCost: 400
+  price: 15
+  serveSeconds: 3
+  upgradeBaseCost: 70
+  skill: 0
+  requiredTier: 2
+  standPrefab: {fileID: 6549567338862245648, guid: 4a1c2847f985047bfa73e1b408b4188c, type: 3}
+  standFootprint:
+    serializedVersion: 2
+    x: -0.95
+    y: -0.55
+    width: 1.9
+    height: 1.3
+  queueStart: {x: 0, y: -1.7}
+  autoFootprint: 1

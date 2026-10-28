@@ -59,7 +59,7 @@ namespace BeachTycoon.EditorTools
                 case 1:
                     Check(Staff.Slots == 0, "the tent has no staff slots");
                     Economy.Earn(ServiceLocator.Get<GameDatabase>().GetTier(2).upgradeCost);
-                    Check(Buildings.TryUpgrade(0), "hut started (two staff slots)");
+                    Check(Buildings.TryUpgrade(0), "cabin started (two staff slots)");
                     break;
                 case 2:
                     // The donut stand may be the character's: then the towel stand is the one to staff.
