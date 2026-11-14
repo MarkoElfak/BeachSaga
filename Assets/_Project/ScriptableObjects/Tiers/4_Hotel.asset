@@ -15,7 +15,7 @@ MonoBehaviour:
   id: hotel
   displayName: Hotel
   buildingPrefab: {fileID: 4188414397252504216, guid: 14e6fc0e8dfb94333aa026ff2de00b30, type: 3}
-  upgradeCost: 9000
+  upgradeCost: 20000
   buildSeconds: 8
   maxVisitors: 40
   unlockedProducts:

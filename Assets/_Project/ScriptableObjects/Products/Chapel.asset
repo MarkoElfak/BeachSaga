@@ -18,7 +18,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   category: 2
   cultureId: 
-  unlockCost: 3000
+  unlockCost: 4000
   price: 400
   serveSeconds: 1
   upgradeBaseCost: 150

@@ -9,8 +9,8 @@ namespace BeachTycoon.Gameplay
 {
     public sealed partial class GameBootstrap
     {
-        // Real store and analytics in builds (when their packages are installed), mocks in the Editor. Ads stay
-        // mocked until an ads SDK is added; a bought "remove ads" grants rewards without the video either way.
+        // Real store, analytics and ads in builds (when their packages are installed), mocks in the Editor. Ads stay
+        // mocked until the LevelPlay keys are set; a bought "remove ads" grants rewards without the video either way.
         private IAnalyticsService AddPlatform(GameSaveData data, MonetizationConfig monetization, PrivacyService privacy,
             out IAdsService ads)
         {
@@ -24,8 +24,9 @@ namespace BeachTycoon.Gameplay
                 ?? new MockIapService(data.meta, removeAds, monetization.mockRemoveAdsPrice);
             ServiceLocator.Register(Track(iap));
 
-            var mockAds = Track(new MockAdsService(monetization.mockAdSeconds));
-            ads = new RemoveAdsGate(mockAds, iap, removeAds);
+            IAdsService video = (real ? PlatformServices.CreateAds(monetization, privacy.HasAnswered, privacy.PersonalizedAds) : null)
+                ?? new MockAdsService(monetization.mockAdSeconds);
+            ads = new RemoveAdsGate(Track(video), iap, removeAds);
             ServiceLocator.Register(ads);
             return analytics;
         }

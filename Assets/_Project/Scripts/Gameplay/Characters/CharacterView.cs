@@ -55,7 +55,8 @@ namespace BeachTycoon.Gameplay
             transform.SetPositionAndRotation(GroundPosition(), facing);
 
             float swing = 0f, height = 0f, serve = 0f;
-            IsServingPose = !agent.IsMoving && _character.IsWorking && _stands.Get(_character.StandIndex).IsServing;
+            int stand = _character.StandIndex; // the stands may be gone a frame before this view (leaving Play mode)
+            IsServingPose = !agent.IsMoving && _character.IsWorking && stand >= 0 && stand < _stands.Count && _stands.Get(stand).IsServing;
             if (agent.IsMoving)
             {
                 _phase += Time.deltaTime * _config.visitorBobSpeed;

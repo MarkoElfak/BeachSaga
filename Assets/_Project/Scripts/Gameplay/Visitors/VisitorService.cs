@@ -2,19 +2,22 @@ using System;
 using System.Collections.Generic;
 using BeachTycoon.Core;
 using BeachTycoon.Data;
+using BeachTycoon.Services;
 using UnityEngine;
 
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Spawns pooled visitors (interval = base / (1 + popularity) / event rate, capped by the tier's
-    /// maxVisitors; an event's burst may go past the cap), picks their type by spawnWeight and ticks their
-    /// state machines. All agents are preallocated.
+    /// Spawns pooled visitors (interval = base / (1 + popularity) / event rate, capped by the beach's room: the tier's
+    /// maxVisitors plus room for every open place, more with Filoxenia; an event's burst may go past the cap), picks
+    /// their type by spawnWeight and ticks their state machines. All agents are preallocated.
     /// </summary>
     public sealed class VisitorService : ITickable, IDisposable
     {
         private readonly GameDatabase _database;
         private readonly BuildingManager _buildings;
+        private readonly StandService _stands;
+        private readonly CultureAbilities _abilities;
         private readonly PopularityService _popularity;
         private readonly BeachEventService _events;
         private readonly WorldNavigation _navigation;
@@ -32,6 +35,8 @@ namespace BeachTycoon.Gameplay
             _database = database;
             _events = events;
             _buildings = buildings;
+            _stands = stands;
+            _abilities = abilities;
             _popularity = popularity;
             _navigation = navigation;
             VisitorConfig config = database.visitors;
@@ -73,7 +78,8 @@ namespace BeachTycoon.Gameplay
             get
             {
                 TierDefinition tier = _database.GetTier(_buildings.MainTier);
-                return tier != null ? Mathf.Min(tier.maxVisitors, _agents.Length) : 0;
+                if (tier == null) return 0;
+                return EconomyMath.BeachRoom(tier.maxVisitors, _stands.Count, _database.visitors.visitorsPerPlace, StayMultiplier, _agents.Length);
             }
         }
 
@@ -119,11 +125,15 @@ namespace BeachTycoon.Gameplay
             agent.EntryIndex = _random.Next(_navigation.EntryCount);
             Vector2Int purchases = _database.visitors.purchasesRange;
             agent.MaxPurchases = _random.Next(purchases.x, purchases.y + 1);
+            float stay = StayMultiplier; // Filoxenia: guests who stay longer buy more
+            if (stay != 1f) agent.MaxPurchases = EconomyMath.ScaledCount(agent.MaxPurchases, stay, _random.NextDouble());
             _machine.Begin(agent);
             _active.Add(agent);
             EventBus.Publish(new VisitorSpawned(agent.Id));
             return true;
         }
+
+        private float StayMultiplier => _abilities != null ? _abilities.StayMultiplier : 1f;
 
         private void Despawn(VisitorAgent agent)
         {
@@ -164,10 +174,7 @@ namespace BeachTycoon.Gameplay
         private int PickTypeIndex(int tier)
         {
             VisitorTypeDefinition[] types = _database.visitorTypes;
-            if (types == null)
-            {
-                return -1;
-            }
+            if (types == null) return -1;
 
             float total = 0f;
             for (int i = 0; i < types.Length; i++)

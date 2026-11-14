@@ -23,6 +23,17 @@ namespace BeachTycoon.Platform
 #endif
         }
 
+        /// <summary>Rewarded ads through LevelPlay, or null (keep the mock) without the package or the keys.</summary>
+        /// <param name="answered">Whether the privacy question was answered; the SDK waits for it.</param>
+        public static IAdsService CreateAds(MonetizationConfig config, bool answered, bool personalized)
+        {
+#if BEACH_LEVELPLAY
+            return config.HasAdsKeys ? new LevelPlayAdsService(config.AdsAppKey.Trim(), config.RewardedAdUnit.Trim(), answered, personalized) : null;
+#else
+            return null;
+#endif
+        }
+
         /// <param name="allowed">The player's current privacy answer; later changes arrive as PrivacyChanged.</param>
         public static IAnalyticsService CreateAnalytics(bool allowed)
         {
