@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeachTycoon.Data::BeachTycoon.Data.AchievementDefinition
   id: Managers3
   title: Delegator
-  description: Hire {0} stand managers
+  description: Have {0} stands run by level 3 workers
   goal: 15
   product: {fileID: 0}
   target: 3

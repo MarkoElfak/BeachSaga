@@ -3,11 +3,13 @@ using BeachTycoon.Core;
 using BeachTycoon.Data;
 using BeachTycoon.Gameplay;
 using BeachTycoon.UI;
+using BeachTycoon.Services;
 using UnityEditor;
+using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
-    /// <summary>Test save files: a clean start, a damaged save for the recovery test, the privacy answer and the village.</summary>
+    /// <summary>Test save files: a clean start, a damaged save for the recovery test, the privacy answer, the village and a simulated absence.</summary>
     internal static partial class AutoTestRunner
     {
         private static readonly string[] SaveSuffixes = { "", ".tmp", ".bak", ".corrupt" };
@@ -47,13 +49,41 @@ namespace BeachTycoon.EditorTools
         // Older suites play an already founded village and skip the greeting, so the start screen stays away.
         private static void AnswerStartScreen()
         {
-            if (Suite == SuiteStart || Suite == SuiteCulture || !ServiceLocator.TryGet(out VillageService village)) return;
+            bool picksOwnCulture = Suite == SuiteStart || Suite == SuiteCulture || Suite == SuiteCharacter || Suite == SuiteAbilities;
+            if (picksOwnCulture || !ServiceLocator.TryGet(out VillageService village)) return;
             StartScreenView.SkipGreetingThisRun();
             string culture = ServiceLocator.Get<GameDatabase>().cultures[0].id;
             if (!village.IsFounded) village.TryFound("Test Bay", culture, out _);
             else if (village.NeedsCulture) village.TryChooseCulture(culture, out _);
             StartScreenView screen = PlaytestTools.Find<StartScreenView>();
             if (screen != null && screen.IsOpen) screen.Close();
+        }
+
+        // Snapshots written by earlier runs (own island, demo friends) start over with the save.
+        private static void DeleteIslandSnapshots()
+        {
+            string folder = Path.Combine(Application.persistentDataPath, LocalIslandRepository.FolderName);
+            if (Directory.Exists(folder)) Directory.Delete(folder, true);
+        }
+
+        /// <summary>Shifts the save's last-seen time back before the next Play mode starts (offline earnings test).</summary>
+        public static void RestartPlayModeAfterAbsence(double hours)
+        {
+            SessionState.SetFloat(KeyPrefix + "AbsenceHours", (float)hours);
+            RestartPlayMode();
+        }
+
+        // Rewrites lastSeenUtc in the save the game just wrote on quit, as if the player had been away.
+        private static void ApplySimulatedAbsence()
+        {
+            float hours = SessionState.GetFloat(KeyPrefix + "AbsenceHours", 0f);
+            SessionState.EraseFloat(KeyPrefix + "AbsenceHours");
+            if (hours <= 0f || !File.Exists(SavePath)) return;
+
+            var data = JsonUtility.FromJson<BeachTycoon.Data.GameSaveData>(File.ReadAllText(SavePath));
+            data.lastSeenUtc = System.DateTime.UtcNow.AddHours(-hours).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+            File.WriteAllText(SavePath, JsonUtility.ToJson(data));
+            Write($"Simulated an absence of {hours} h");
         }
     }
 }

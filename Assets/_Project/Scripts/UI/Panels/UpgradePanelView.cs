@@ -10,8 +10,8 @@ using UnityEngine.UI;
 namespace BeachTycoon.UI
 {
     /// <summary>
-    /// Modal upgrade panel. For a lot it upgrades the building; for a stand it levels the stand up and hires
-    /// its manager. Opened from the selection's Upgrade button or the build bar.
+    /// Modal upgrade panel. For a lot it upgrades the building; for a stand it levels the stand up and shows who
+    /// works there (its button opens their card, or the staff list). Opened from the selection's Upgrade button or the build bar.
     /// </summary>
     public sealed partial class UpgradePanelView : MonoBehaviour
     {
@@ -28,12 +28,16 @@ namespace BeachTycoon.UI
         private readonly StringBuilder _text = new StringBuilder();
         private BuildingManager _buildings;
         private StandService _stands;
+        private StaffService _staff;
+        private CharacterService _characters;
         private IEconomyService _economy;
         private GameDatabase _database;
         private int _lotIndex = -1;
         private int _standIndex = -1;
 
         public bool IsOpen => root.activeSelf;
+        public string BodyText => body.text;
+        public string HireText => hireLabel.text;
 
         /// <summary>The stand shown, or null when the panel is about a building.</summary>
         public StandController Stand => _standIndex >= 0 && _standIndex < _stands.Count ? _stands.Get(_standIndex) : null;
@@ -48,6 +52,8 @@ namespace BeachTycoon.UI
 
             _buildings = ServiceLocator.Get<BuildingManager>();
             _stands = ServiceLocator.Get<StandService>();
+            _staff = ServiceLocator.Get<StaffService>();
+            _characters = ServiceLocator.Get<CharacterService>();
             _economy = ServiceLocator.Get<IEconomyService>();
             upgradeButton.onClick.AddListener(OnUpgradeClicked);
             hireButton.onClick.AddListener(OnHireClicked);
@@ -103,10 +109,15 @@ namespace BeachTycoon.UI
             }
         }
 
+        // The stand's worker card, or the staff list when nobody is hired for it.
         private void OnHireClicked()
         {
             StandController stand = Stand;
-            if (stand != null && _stands.TryHireManager(stand)) Refresh();
+            if (stand == null) return;
+            StaffMember worker = _staff.WorkerAt(stand.Index);
+            Close();
+            if (worker != null) EventBus.Publish(new WorkerCardRequested(worker.Id));
+            else EventBus.Publish(new StaffPanelRequested());
         }
 
         private void Refresh()

@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace BeachTycoon.UI
 {
-    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, new land, locked land, house info.</summary>
-    public sealed class ToastView : MonoBehaviour
+    /// <summary>Short messages that slide in and fade: quest done, achievement, new neighbour, building, new land, locked land, house info, staff.</summary>
+    public sealed partial class ToastView : MonoBehaviour
     {
         private const float ShowSeconds = 2.6f;
         private const float FadeSeconds = 0.35f;
@@ -37,6 +37,9 @@ namespace BeachTycoon.UI
             EventBus.Subscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Subscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Subscribe<RotateBlocked>(OnRotateBlocked);
+            SubscribeStaff(true);
+            SubscribeVillage(true);
+            EventBus.Subscribe<FiestaChanged>(OnFiestaChanged);
             if (ServiceLocator.TryGet(out ISaveService save)) ShowRecovery(save.Recovery);
         }
 
@@ -59,6 +62,9 @@ namespace BeachTycoon.UI
             EventBus.Unsubscribe<LockedLandTapped>(OnLockedLandTapped);
             EventBus.Unsubscribe<AchievementCompleted>(OnAchievementCompleted);
             EventBus.Unsubscribe<RotateBlocked>(OnRotateBlocked);
+            SubscribeStaff(false);
+            SubscribeVillage(false);
+            EventBus.Unsubscribe<FiestaChanged>(OnFiestaChanged);
         }
 
         /// <summary>Queues a message; one already showing or waiting is not repeated.</summary>
@@ -97,6 +103,13 @@ namespace BeachTycoon.UI
             if (evt.LotIndex != BuildingManager.MainLotIndex || evt.Tier <= 1) return;
             TierDefinition tier = _database.GetTier(evt.Tier);
             if (tier != null) Show($"Your {tier.displayName} is open!");
+        }
+
+        // Spanish Fiesta: the night (or an event) pays more.
+        private void OnFiestaChanged(FiestaChanged evt)
+        {
+            CultureAbility ability = evt.Active && ServiceLocator.TryGet(out CultureAbilities abilities) ? abilities.Current : null;
+            if (ability != null) Show($"{ability.name}! {CountryAbilityText.Effect(ability)}");
         }
 
         private void OnProductUnlocked(ProductUnlocked evt)

@@ -57,6 +57,17 @@ namespace BeachTycoon.Core
         }
     }
 
+    /// <summary>A country's night-and-events bonus (Spanish Fiesta) started or stopped earning extra.</summary>
+    public readonly struct FiestaChanged
+    {
+        public readonly bool Active;
+
+        public FiestaChanged(bool active)
+        {
+            Active = active;
+        }
+    }
+
     /// <summary>Sound or music settings changed.</summary>
     public readonly struct SettingsChanged
     {

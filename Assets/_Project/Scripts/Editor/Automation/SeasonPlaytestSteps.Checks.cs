@@ -63,6 +63,7 @@ namespace BeachTycoon.EditorTools
                 $"coins start over ({Economy.Coins} now, all earned since the reboot)");
             LotModel main = Buildings.GetLot(0);
             Check(main.state == LotState.Empty && main.tier == 0 && Stands.Count == 0, "the main lot is empty again and there are no stands");
+            Check(data.staff.Count == 0 && ServiceLocator.Get<StaffService>().Staff.Count == 0, "the staff start over");
             Check(Decorations.Count == SessionState.GetInt(Key + "Decor", -1), $"{Decorations.Count} decorations kept");
             Check(Neighbours.Count == SessionState.GetInt(Key + "Neighbours", -1)
                 && Buildings.GetLot(Neighbours.Get(0).lotIndex).state == LotState.Built, $"{Neighbours.Count} neighbour and their house kept");

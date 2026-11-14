@@ -87,7 +87,7 @@ namespace BeachTycoon.EditorTools
             PlaytestTools.CapturePortraitWithHud("m14_1_found.png");
             screen.InputText = "Kalamaki";
             PlaytestTools.Click(screen, "ConfirmButton");
-            Check(!Village.IsFounded && screen.ErrorText == "Pick a culture.", "founding without a culture is refused");
+            Check(!Village.IsFounded && screen.ErrorText == "Pick a character.", "founding without a culture is refused");
 
             picker.Card(0).Button.onClick.Invoke();
             Check(picker.PickedId == "greece" && picker.Card(0).IsPicked && !picker.Card(1).IsPicked && screen.ErrorText.Length == 0,
@@ -99,7 +99,7 @@ namespace BeachTycoon.EditorTools
             screen.InputText = "Kalamaki";
             PlaytestTools.Click(screen, "ConfirmButton");
             Check(!screen.IsOpen && Village.Name == "Kalamaki" && Village.CultureId == "greece", "Kalamaki is founded as a Greek village");
-            Check(!Village.TryChooseCulture("spain", out string error) && error == "Your culture is already chosen.", "the culture cannot be changed");
+            Check(!Village.TryChooseCulture("spain", out string error) && error == "Your character is already chosen.", "the culture cannot be changed");
             Check(PlaytestTools.Find<VillageNameView>().Flag == FlagOf("greece"), "the HUD shows the Greek flag");
 
             ServiceLocator.Get<IEconomyService>().Earn(500000);
@@ -132,12 +132,12 @@ namespace BeachTycoon.EditorTools
             Time.timeScale = TestTimeScale;
             StartScreenView screen = Screen;
             Check(Village.IsFounded && Village.NeedsCulture && screen.IsNamePage, "a village without a culture is asked for one");
-            Check(screen.HeadingText == "Choose your culture" && !screen.ShowsNameField && screen.ShowsCultures && !screen.CanClose,
+            Check(screen.HeadingText == "Choose your character" && !screen.ShowsNameField && screen.ShowsCultures && !screen.CanClose,
                 "the page shows only the cultures, with no way to skip");
             Check(PlaytestTools.Find<VillageNameView>().Flag == null, "the HUD has no flag yet");
             PlaytestTools.CapturePortraitWithHud("m14_4_choose.png");
             PlaytestTools.Click(screen, "ConfirmButton");
-            Check(screen.IsOpen && screen.ErrorText == "Pick a culture.", "Confirm without a pick is refused");
+            Check(screen.IsOpen && screen.ErrorText == "Pick a character.", "Confirm without a pick is refused");
             screen.Picker.Card(2).Button.onClick.Invoke();
             PlaytestTools.Click(screen, "ConfirmButton");
             Check(!screen.IsOpen && Village.CultureId == "italy" && Village.Name == "Kalamaki", "Italy is chosen and the name is kept");

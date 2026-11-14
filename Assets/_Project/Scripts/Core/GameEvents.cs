@@ -105,7 +105,7 @@ namespace BeachTycoon.Core
     }
 
     /// <summary>
-    /// Show the upgrade panel for this lot's building, or for one stand (level up, hire a manager) when
+    /// Show the upgrade panel for this lot's building, or for one stand (level up, its staff) when
     /// StandIndex is set.
     /// </summary>
     public readonly struct UpgradePanelRequested
@@ -120,7 +120,9 @@ namespace BeachTycoon.Core
         }
     }
 
-    /// <summary>A manager was hired for a stand: its coins now collect themselves.</summary>
+    /// <summary>
+    /// A stand's coins collect themselves from now on: a level 3 worker works there (managers merged into staff).
+    /// </summary>
     public readonly struct ManagerHired
     {
         public readonly int StandIndex;
@@ -130,6 +132,17 @@ namespace BeachTycoon.Core
         {
             StandIndex = standIndex;
             ProductId = productId;
+        }
+    }
+
+    /// <summary>The worker who collected a stand's coins left it: coins wait for a tap again.</summary>
+    public readonly struct ManagerLeft
+    {
+        public readonly int StandIndex;
+
+        public ManagerLeft(int standIndex)
+        {
+            StandIndex = standIndex;
         }
     }
 

@@ -51,7 +51,7 @@ namespace BeachTycoon.Gameplay
                 if (!Settle(layout.Placement, PlaceableId.Lot(lot), (x, z) => Place(house, x, z))) house.state = LotState.Empty;
             }
 
-            AddStands(database, layout, tier);
+            AddStands(database, layout, tier, demo.cultureId);
             AddDecorations(database, layout, tier, demo.decorations);
             IslandSnapshot snapshot = IslandSnapshotFactory.Capture(demo.ownerId, demo.displayName, demo.villageName, demo.cultureId, layout.Lots,
                 layout.Stands, layout.Decorations, layout.Placement, demo.popularity, utcNow);
@@ -59,11 +59,12 @@ namespace BeachTycoon.Gameplay
             return snapshot;
         }
 
-        private static void AddStands(GameDatabase database, IslandLayout layout, int tier)
+        // Every stand the tier allows, with the friend's own country place but no other country's.
+        private static void AddStands(GameDatabase database, IslandLayout layout, int tier, string cultureId)
         {
             foreach (ProductDefinition product in database.products ?? new ProductDefinition[0])
             {
-                if (product == null || product.requiredTier > tier) continue;
+                if (product == null || product.requiredTier > tier || !product.IsOpenTo(cultureId)) continue;
                 var stand = new StandModel { productId = product.id, slotIndex = layout.Stands.Count, level = Mathf.Min(tier - 1, 3) };
                 layout.Stands.Add(stand);
                 if (!Settle(layout.Placement, PlaceableId.Stand(layout.Stands.Count - 1), (x, z) => Place(stand, x, z)))

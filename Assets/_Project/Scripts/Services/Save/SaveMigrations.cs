@@ -4,7 +4,7 @@ using BeachTycoon.Data;
 namespace BeachTycoon.Services
 {
     /// <summary>Every save migration step, oldest first. SaveService uses this list by default.</summary>
-    public static class SaveMigrations
+    public static partial class SaveMigrations
     {
         public static IEnumerable<ISaveMigration> All => new ISaveMigration[]
         {
@@ -23,6 +23,8 @@ namespace BeachTycoon.Services
             new AddPrivacy(),
             new AddVillage(),
             new MoveHouseLots(),
+            new AddCharacter(),
+            new AddStaff(),
         };
 
         /// <summary>
@@ -169,6 +171,16 @@ namespace BeachTycoon.Services
                 data.version = 16;
                 return UnityEngine.JsonUtility.ToJson(data);
             }
+        }
+
+        /// <summary>
+        /// v16 -> v17: the player's character (M17). characterStand defaults to -1, so the character of the
+        /// culture already picked starts at the first stand.
+        /// </summary>
+        private sealed class AddCharacter : ISaveMigration
+        {
+            public int FromVersion => 16;
+            public string Migrate(string json) => json.Replace("\"version\":16", "\"version\":17");
         }
     }
 }

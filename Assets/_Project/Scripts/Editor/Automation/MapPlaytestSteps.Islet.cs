@@ -22,7 +22,8 @@ namespace BeachTycoon.EditorTools
             }
 
             foreach (int spot in reserved) navigation.ReleaseSpot(spot);
-            Check(islet >= 0, $"towel spots on the islet are free to use ({reserved.Count} open spots)");
+            if (islet < 0) islet = IsletSpotInUse(navigation); // a busy beach: visitors may hold every free islet towel
+            Check(islet >= 0, $"towel spots on the islet are open to visitors ({reserved.Count} free spots)");
             if (islet < 0) return;
 
             var path = new List<Vector3>();
@@ -31,6 +32,18 @@ namespace BeachTycoon.EditorTools
             Check(path.Exists(p => Near(p, from)) && path.Exists(p => Near(p, to)), $"the walk to the islet crosses the boardwalk ({path.Count} waypoints)");
             float deck = PlaytestTools.Find<BeachWorldBuilder>().Shape.WalkHeight(0f, 10f);
             Check(deck > PlaytestTools.Find<BeachWorldBuilder>().Shape.WaterLevel, $"visitors walk on the deck above the sea ({deck:0.00} m)");
+        }
+
+        private static int IsletSpotInUse(WorldNavigation navigation)
+        {
+            IReadOnlyList<VisitorAgent> visitors = ServiceLocator.Get<VisitorService>().Active;
+            for (int i = 0; i < visitors.Count; i++)
+            {
+                int spot = visitors[i].SpotIndex;
+                if (spot >= 0 && navigation.GetSpot(spot).z > 20f) return spot;
+            }
+
+            return -1;
         }
 
         private static void CheckVisitorOnIslet()

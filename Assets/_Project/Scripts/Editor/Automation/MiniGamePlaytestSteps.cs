@@ -80,7 +80,8 @@ namespace BeachTycoon.EditorTools
             MetaModel meta = ServiceLocator.Get<ISaveService>().Data.meta;
             meta.tutorialStep = ServiceLocator.Get<TutorialService>().StepCount;
             EventBus.Publish(new TutorialStepChanged(meta.tutorialStep));
-            Check(Games.Count == Products.Length, $"{Games.Count} mini-games, one per stand");
+            int selling = System.Array.FindAll(ServiceLocator.Get<GameDatabase>().products, p => !p.IsService).Length;
+            Check(Games.Count == selling, $"{Games.Count} mini-games, one per place that sells");
             ServiceLocator.Get<IEconomyService>().Earn(2000000);
             Check(Buildings.TryBuild(0), "tent started");
         }
@@ -89,6 +90,14 @@ namespace BeachTycoon.EditorTools
         {
             UnlockProducts();
             Check(Buildings.TryUpgrade(0), $"tier {Buildings.MainTier + 1} started");
+        }
+
+        // The shared products plus the village's own country place.
+        private static int OpenProductCount()
+        {
+            int count = 0;
+            foreach (ProductDefinition product in ServiceLocator.Get<GameDatabase>().products) if (Stands.IsAvailable(product)) count++;
+            return count;
         }
 
         private static void UnlockProducts()

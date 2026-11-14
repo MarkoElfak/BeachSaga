@@ -56,7 +56,7 @@ namespace BeachTycoon.EditorTools
         private static void CheckStandsAndShore()
         {
             UnlockProducts();
-            Check(Stands.Count == Products.Length, $"all {Stands.Count} stands are built");
+            Check(Stands.Count == OpenProductCount(), $"all {Stands.Count} stands are built (the village's own place too)");
             DailyRewardPanelView daily = PlaytestTools.Find<DailyRewardPanelView>();
             if (daily != null && daily.IsOpen) daily.Close();
 

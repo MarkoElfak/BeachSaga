@@ -25,7 +25,10 @@ namespace BeachTycoon.Data
         /// <summary>Upgrade level, 0 = not upgraded.</summary>
         public int level;
 
-        /// <summary>A manager was hired (v10): sale coins collect themselves.</summary>
+        /// <summary>
+        /// Sale coins collect themselves (v10: a hired manager). Since v18 a worker of StaffConfig.collectCoinsLevel or
+        /// higher at the stand sets it, and it clears when they leave.
+        /// </summary>
         public bool manager;
     }
 }

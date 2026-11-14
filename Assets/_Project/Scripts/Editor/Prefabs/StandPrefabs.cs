@@ -97,7 +97,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // Counter, top and awning posts shared by the simple stands.
-        private static GameObject Counter(string name, PaletteDefinition p, Material awning)
+        internal static GameObject Counter(string name, PaletteDefinition p, Material awning)
         {
             var root = new GameObject(name);
             Transform t = root.transform;
@@ -111,7 +111,7 @@ namespace BeachTycoon.EditorTools
             return root;
         }
 
-        private static GameObject Finish(GameObject root, PaletteDefinition p)
+        internal static GameObject Finish(GameObject root, PaletteDefinition p)
         {
             Transform t = root.transform;
             PrimitiveKit.AddBox(root, new Vector3(0f, 1.1f, 0f), new Vector3(1.9f, 2.2f, 1.4f));
@@ -132,7 +132,7 @@ namespace BeachTycoon.EditorTools
         }
 
         // A navy cap with a gold band above the stand's corner: the stand has a manager. Hidden until hired.
-        private static GameObject ManagerHat(Transform parent, PaletteDefinition p)
+        internal static GameObject ManagerHat(Transform parent, PaletteDefinition p)
         {
             GameObject hat = PrimitiveKit.Empty(ManagerHatName, parent, new Vector3(0.95f, 2.45f, -0.35f), new Vector3(-15f, 0f, 0f));
             Material navy = p.GetMaterial("shorts");

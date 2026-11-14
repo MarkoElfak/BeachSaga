@@ -6,7 +6,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// New season (prestige). Once the main building reaches EconomyConfig.seasonUnlockTier the player may
-    /// start over: coins, the main building and every stand reset, and the season's earnings turn into
+    /// start over: coins, the main building, every stand and the staff reset, and the season's earnings turn into
     /// seashells that raise all income for good. Neighbours, houses, decorations, trophies and the rest of
     /// the meta progress stay. The reset is written to the save and the game reboots from it.
     /// </summary>
@@ -55,12 +55,17 @@ namespace BeachTycoon.Gameplay
             return true;
         }
 
-        /// <summary>Coins, the main building (an empty lot again, where it stood) and every stand start over.</summary>
+        /// <summary>Coins, the main building (an empty lot again, where it stood), every stand and the staff start over.</summary>
         public static void ResetIsland(GameSaveData data, long startingCoins)
         {
             data.wallet.coins = startingCoins;
             data.wallet.seasonEarned = 0;
             data.stands.Clear();
+            data.staff.Clear();
+            data.jobSeekers.Clear();
+            data.meta.characterStand = -1;
+            data.meta.wageTimer = -1f;
+            data.meta.seekerTimer = -1f;
             int main = BuildingManager.MainLotIndex;
             if (data.lots.Count <= main) return;
 

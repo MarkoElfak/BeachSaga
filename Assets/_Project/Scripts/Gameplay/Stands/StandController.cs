@@ -8,6 +8,7 @@ namespace BeachTycoon.Gameplay
     /// <summary>
     /// Runtime logic for one stand: an ordered queue of visitor orders and a serve timer. The order at
     /// index 0 is the one being served. Each finished order publishes SaleCompleted with its coin value.
+    /// A service building (chapel, first aid) takes no orders.
     /// </summary>
     public sealed class StandController
     {
@@ -39,13 +40,28 @@ namespace BeachTycoon.Gameplay
         public float ServeProgress => IsServing ? 1f - _serveRemaining / Product.serveSeconds : 0f;
         public int ServingVisitorId => IsServing ? _orders[0].VisitorId : NoVisitor;
 
+        /// <summary>How fast orders are served (1 = full speed); whoever works here sets it.</summary>
+        public float ServeSpeed { get; set; } = 1f;
+
+        /// <summary>Serving speed with nobody at work here (StaffService lowers it; 1 without staff rules).</summary>
+        public float UnstaffedSpeed { get; set; } = 1f;
+
+        /// <summary>People at work here now (workers and the character); StaffService keeps it up to date.</summary>
+        public int People { get; set; }
+
+        /// <summary>Extra coins per sale from service buildings in reach (1 = none); ServiceBuildings sets it.</summary>
+        public float SaleBonus { get; set; } = 1f;
+
+        /// <summary>How much longer visitors wait in this line (1 = as usual); ServiceBuildings sets it.</summary>
+        public float PatienceMultiplier { get; set; } = 1f;
+
         /// <summary>Orders taken since launch (not saved); playtests use it to measure demand.</summary>
         public int TotalOrders { get; private set; }
 
         /// <summary>Adds an order to the back of the queue. Returns false when the queue is full.</summary>
         public bool TryEnqueueOrder(int visitorId, float spendMultiplier)
         {
-            if (IsFull)
+            if (IsFull || Product.IsService)
             {
                 return false;
             }
@@ -97,7 +113,7 @@ namespace BeachTycoon.Gameplay
                 return;
             }
 
-            _serveRemaining -= deltaTime;
+            _serveRemaining -= deltaTime * ServeSpeed;
             if (_serveRemaining > 0f)
             {
                 return;
@@ -109,7 +125,7 @@ namespace BeachTycoon.Gameplay
 
             long amount = EconomyMath.SaleValue(
                 Product.price, served.SpendMultiplier, Model.level, _economy.standLevelIncomeBonus);
-            amount = _multipliers.Apply(amount, Product);
+            amount = EconomyMath.ApplyMultiplier(_multipliers.Apply(amount, Product), SaleBonus);
             EventBus.Publish(new SaleCompleted(Index, amount, served.VisitorId));
         }
 

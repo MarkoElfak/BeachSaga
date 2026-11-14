@@ -18,6 +18,7 @@ namespace BeachTycoon.EditorTools
         public static Mesh Pyramid => Save("M_Pyramid", BuildCone(4, 1f, 1f, false));
         public static Mesh Cone => Save("M_Cone", BuildCone(10, 1f, 1f, false));
         public static Mesh Surfboard => Save("M_Surfboard", BuildSurfboard());
+        public static Mesh Ring => Save("M_Ring", BuildRing(64, 0.96f));
 
         internal static Mesh Save(string name, Mesh built)
         {
@@ -166,6 +167,28 @@ namespace BeachTycoon.EditorTools
             }
 
             return triangles;
+        }
+
+        // Flat band on the ground, outer radius 1, facing up (a service building's reach).
+        private static Mesh BuildRing(int sides, float inner)
+        {
+            var vertices = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var triangles = new List<int>();
+            for (int s = 0; s <= sides; s++)
+            {
+                float a = (float)s / sides * Mathf.PI * 2f;
+                var direction = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                vertices.Add(direction * inner);
+                vertices.Add(direction);
+                uvs.Add(new Vector2((float)s / sides, 0f));
+                uvs.Add(new Vector2((float)s / sides, 1f));
+                if (s == sides) continue;
+                int b = s * 2;
+                triangles.AddRange(new[] { b, b + 2, b + 1, b + 1, b + 2, b + 3 });
+            }
+
+            return Finish(vertices, uvs, triangles);
         }
 
         private static Mesh Finish(List<Vector3> vertices, List<Vector2> uvs, List<int> triangles)

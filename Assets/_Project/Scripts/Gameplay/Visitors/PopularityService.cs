@@ -6,8 +6,8 @@ using UnityEngine;
 namespace BeachTycoon.Gameplay
 {
     /// <summary>
-    /// Popularity = sum of reached tiers' popularityBonus + stands * perStand + decoration bonus
-    /// - unserved penalty (which decays over time).
+    /// Popularity = sum of reached tiers' popularityBonus + stands * perStand + decoration bonus + staffed service
+    /// buildings (a chapel) - unserved penalty (which decays over time).
     /// </summary>
     public sealed class PopularityService : ITickable, IDisposable
     {
@@ -18,6 +18,7 @@ namespace BeachTycoon.Gameplay
         private readonly StandService _stands;
         private float _base;
         private float _decorationBonus;
+        private float _serviceBonus;
         private float _penalty;
         private float _lastPublished = -1f;
 
@@ -38,6 +39,13 @@ namespace BeachTycoon.Gameplay
         public void SetDecorationBonus(float bonus)
         {
             _decorationBonus = bonus;
+            Recalculate();
+        }
+
+        /// <summary>Set by ServiceBuildings whenever the staffed service buildings change.</summary>
+        public void SetServiceBonus(float bonus)
+        {
+            _serviceBonus = bonus;
             Recalculate();
         }
 
@@ -73,7 +81,7 @@ namespace BeachTycoon.Gameplay
         private void Recalculate()
         {
             float stands = _stands.Count * _database.visitors.popularityPerStand;
-            _base = _progression.TierPopularity() + stands + _decorationBonus;
+            _base = _progression.TierPopularity() + stands + _decorationBonus + _serviceBonus;
             PublishIfChanged();
         }
 

@@ -7,7 +7,7 @@ namespace BeachTycoon.EditorTools
 {
     /// <summary>
     /// The start screen: game title over the sky, a greeting page (flag, name, Play) and the page that founds the
-    /// village (name and culture cards) or renames it.
+    /// village (name and character cards, one per culture) or renames it.
     /// </summary>
     internal static class StartScreenUiBuilder
     {
@@ -89,12 +89,12 @@ namespace BeachTycoon.EditorTools
             page.gameObject.SetActive(false);
         }
 
-        // "Choose your culture" over a row of cards; the view makes one card per culture from the hidden template.
+        // "Choose your character" over a row of cards; the view makes one card per culture from the hidden template.
         private static CulturePickerView BuildPicker(RectTransform page)
         {
-            RectTransform rect = UiKit.Rect("CulturePicker", page, Top, Top, Top, new Vector2(0f, -400f), new Vector2(820f, 390f));
-            TextMeshProUGUI pickerLabel = Text(rect, "Label", "Choose your culture", 0f, 60f, 40f, Navy, FontStyles.Bold);
-            RectTransform row = UiKit.Rect("Cards", rect, Top, Top, Top, new Vector2(0f, -80f), new Vector2(820f, 300f));
+            RectTransform rect = UiKit.Rect("CulturePicker", page, Top, Top, Top, new Vector2(0f, -375f), new Vector2(820f, 415f));
+            TextMeshProUGUI pickerLabel = Text(rect, "Label", "Choose your character", 0f, 50f, 38f, Navy, FontStyles.Bold);
+            RectTransform row = UiKit.Rect("Cards", rect, Top, Top, Top, new Vector2(0f, -55f), new Vector2(820f, 360f));
             var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
             layout.spacing = 30f;
             layout.childControlWidth = true;
@@ -102,17 +102,27 @@ namespace BeachTycoon.EditorTools
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = true;
 
-            RectTransform cardRect = UiKit.Rect("CardTemplate", row, Top, Top, Top, Vector2.zero, new Vector2(250f, 300f));
+            RectTransform cardRect = UiKit.Rect("CardTemplate", row, Top, Top, Top, Vector2.zero, new Vector2(250f, 360f));
             Button button = UiKit.AddButton(cardRect, Color.white, out Image background);
-            RawImage flag = Flag(cardRect, "Flag", new Vector2(0f, -30f), new Vector2(180f, 120f));
-            RectTransform labelRect = UiKit.Rect("Name", cardRect, Vector2.zero, new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 25f), new Vector2(-20f, 90f));
-            TextMeshProUGUI label = UiKit.AddText(labelRect, "Culture", 44f, TextAlignmentOptions.Center, UiKit.TextDark, FontStyles.Bold);
+            RectTransform frame = UiKit.Rect("PortraitFrame", cardRect, Top, Top, Top, new Vector2(0f, -12f), new Vector2(150f, 150f));
+            UiKit.AddImage(frame, Navy, false);
+            RawImage portrait = CharacterUiBuilder.Picture(frame, "Portrait", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(140f, 140f));
+            RawImage flag = Flag(cardRect, "Flag", new Vector2(70f, -126f), new Vector2(66f, 44f));
+            TextMeshProUGUI name = CardText(cardRect, "CharacterName", -166f, 48f, 40f, Navy, FontStyles.Bold);
+            TextMeshProUGUI label = CardText(cardRect, "Name", -212f, 34f, 26f, UiKit.TextDark, FontStyles.Italic);
+            TextMeshProUGUI ability = CardText(cardRect, "Ability", -248f, 104f, 22f, UiKit.TextDark, FontStyles.Normal);
+            ability.enableAutoSizing = true;
+            ability.fontSizeMin = 16f;
+            ability.fontSizeMax = 22f;
 
             var card = cardRect.gameObject.AddComponent<CultureCardView>();
             PrimitiveKit.SetReference(card, "button", button);
             PrimitiveKit.SetReference(card, "background", background);
+            PrimitiveKit.SetReference(card, "portrait", portrait);
             PrimitiveKit.SetReference(card, "flag", flag);
             PrimitiveKit.SetReference(card, "label", label);
+            PrimitiveKit.SetReference(card, "characterName", name);
+            PrimitiveKit.SetReference(card, "ability", ability);
             cardRect.gameObject.SetActive(false);
 
             var picker = rect.gameObject.AddComponent<CulturePickerView>();
@@ -120,6 +130,12 @@ namespace BeachTycoon.EditorTools
             PrimitiveKit.SetReference(picker, "cardRow", row);
             PrimitiveKit.SetReference(picker, "label", pickerLabel.gameObject);
             return picker;
+        }
+
+        private static TextMeshProUGUI CardText(RectTransform card, string name, float y, float height, float size, Color color, FontStyles style)
+        {
+            RectTransform rect = UiKit.Rect(name, card, new Vector2(0f, 1f), Vector2.one, Top, new Vector2(0f, y), new Vector2(-16f, height));
+            return UiKit.AddText(rect, string.Empty, size, TextAlignmentOptions.Top, color, style);
         }
 
         /// <summary>A flag picture in a thin dark frame (the image is set at runtime).</summary>

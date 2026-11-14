@@ -8,7 +8,7 @@ namespace BeachTycoon.Gameplay
 {
     /// <summary>
     /// Owns every stand: restores them from the save, creates free products when a tier is reached,
-    /// unlocks paid products, upgrades stand levels, hires managers and ticks serving.
+    /// unlocks paid products (a country's own place only for that country), upgrades stand levels and ticks serving.
     /// </summary>
     public sealed class StandService : ITickable, IDisposable
     {
@@ -18,10 +18,12 @@ namespace BeachTycoon.Gameplay
         private readonly List<StandModel> _models;
         private readonly List<StandController> _stands = new List<StandController>();
         private readonly SaleMultipliers _multipliers;
+        private readonly CultureService _cultures;
 
         public StandService(GameDatabase database, IEconomyService economy, BuildingManager buildings,
-            List<StandModel> savedStands, SaleMultipliers multipliers)
+            List<StandModel> savedStands, SaleMultipliers multipliers, CultureService cultures = null)
         {
+            _cultures = cultures;
             _multipliers = multipliers;
             _database = database;
             _economy = economy;
@@ -56,14 +58,22 @@ namespace BeachTycoon.Gameplay
             return null;
         }
 
+        /// <summary>The main building's tier (names such as Hospital follow it).</summary>
+        public int MainTier => _buildings.MainTier;
+
         public bool IsTierReached(ProductDefinition product) => _buildings.MainTier >= product.requiredTier;
 
+        /// <summary>False for other countries' places (and for every place before a culture is picked).</summary>
+        public bool IsAvailable(ProductDefinition product) =>
+            _cultures != null ? _cultures.CanOpen(product) : product.IsOpenTo(null);
+
         public bool CanUnlock(ProductDefinition product) =>
-            FindByProduct(product.id) == null && IsTierReached(product) && _economy.CanAfford(product.unlockCost);
+            FindByProduct(product.id) == null && IsAvailable(product) && IsTierReached(product) && _economy.CanAfford(product.unlockCost);
 
         public bool TryUnlockProduct(ProductDefinition product)
         {
-            if (FindByProduct(product.id) != null || !IsTierReached(product) || !_economy.TrySpend(product.unlockCost))
+            if (FindByProduct(product.id) != null || !IsAvailable(product) || !IsTierReached(product)
+                || !_economy.TrySpend(product.unlockCost))
             {
                 return false;
             }
@@ -90,7 +100,7 @@ namespace BeachTycoon.Gameplay
             return true;
         }
 
-        /// <summary>Stands with a hired manager.</summary>
+        /// <summary>Stands whose coins collect themselves (a level 3 worker runs them).</summary>
         public int ManagerCount
         {
             get
@@ -99,18 +109,6 @@ namespace BeachTycoon.Gameplay
                 for (int i = 0; i < _stands.Count; i++) if (_stands[i].Model.manager) count++;
                 return count;
             }
-        }
-
-        public bool CanHireManager(StandController stand) =>
-            !stand.Model.manager && _economy.CanAfford(stand.Product.managerCost);
-
-        /// <summary>Pays the product's manager cost once; from then on the stand's coins collect themselves.</summary>
-        public bool TryHireManager(StandController stand)
-        {
-            if (stand.Model.manager || !_economy.TrySpend(stand.Product.managerCost)) return false;
-            stand.Model.manager = true;
-            EventBus.Publish(new ManagerHired(stand.Index, stand.Product.id));
-            return true;
         }
 
         public void Tick(float deltaTime)
@@ -136,7 +134,7 @@ namespace BeachTycoon.Gameplay
 
             foreach (ProductDefinition product in tier.unlockedProducts)
             {
-                bool isFree = product != null && product.unlockCost == 0;
+                bool isFree = product != null && product.unlockCost == 0 && IsAvailable(product);
                 if (isFree && product.requiredTier <= evt.Tier && FindByProduct(product.id) == null)
                 {
                     CreateStand(product, evt.LotIndex);

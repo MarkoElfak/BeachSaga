@@ -6,8 +6,8 @@ namespace BeachTycoon.Services
 {
     /// <summary>
     /// Snapshots come from other players, so nothing in them is trusted: this returns a clean copy with known
-    /// content only (tiers clamped, unknown products and decorations dropped, bad or duplicate entries removed,
-    /// counts capped), or null when the snapshot is unusable.
+    /// content only (tiers clamped, unknown products, other countries' places and unknown decorations dropped, bad
+    /// or duplicate entries removed, counts capped), or null when the snapshot is unusable.
     /// </summary>
     public static class IslandSnapshotValidator
     {
@@ -52,7 +52,8 @@ namespace BeachTycoon.Services
             var products = new HashSet<string>();
             foreach (SnapshotStand stand in raw.stands ?? new List<SnapshotStand>())
             {
-                if (stand == null || database.FindProduct(stand.productId) == null || !IsFinite(stand.x, stand.z)) continue;
+                ProductDefinition product = stand != null ? database.FindProduct(stand.productId) : null;
+                if (product == null || !product.IsOpenTo(clean.cultureId) || !IsFinite(stand.x, stand.z)) continue;
                 if (!products.Add(stand.productId)) continue;
                 clean.stands.Add(new SnapshotStand
                 {

@@ -41,7 +41,7 @@ namespace BeachTycoon.EditorTools
             };
         }
 
-        private static MiniGameDefinition Make(GameDatabase database, string id, MiniGameKind kind, string productId,
+        internal static MiniGameDefinition Make(GameDatabase database, string id, MiniGameKind kind, string productId,
             string title, string howToPlay, params MiniGameLevel[] levels)
         {
             var game = DataAssetBuilder.LoadOrCreate<MiniGameDefinition>($"{Folder}/{id}.asset", out bool created);
@@ -60,7 +60,7 @@ namespace BeachTycoon.EditorTools
             return game;
         }
 
-        private static MiniGameLevel L(int target, int lives, float speed = 0f, float pace = 1f, float patience = 3f,
+        internal static MiniGameLevel L(int target, int lives, float speed = 0f, float pace = 1f, float patience = 3f,
             float tolerance = 0.2f, int choices = 3, float timeLimit = 0f)
         {
             return new MiniGameLevel

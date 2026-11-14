@@ -51,6 +51,18 @@ namespace BeachTycoon.Data
 
         /// <summary>Culture picked when the village was founded; it never changes afterwards.</summary>
         public string cultureId = string.Empty;
+
+        // Version 17: the player's character.
+        /// <summary>Stand the character works at; -1 until the first stand exists.</summary>
+        public int characterStand = -1;
+
+        // Version 18: staff.
+        /// <summary>Id the next worker or job seeker gets.</summary>
+        public int nextWorkerId = 1;
+
+        /// <summary>Seconds of play until the next payday, and until the next job seeker arrives.</summary>
+        public float wageTimer = -1f;
+        public float seekerTimer = -1f;
     }
 
     [Serializable]

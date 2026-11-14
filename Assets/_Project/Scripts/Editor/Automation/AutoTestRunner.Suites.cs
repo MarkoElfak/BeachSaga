@@ -1,13 +1,31 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
-using BeachTycoon.Services;
-using UnityEngine;
 
 namespace BeachTycoon.EditorTools
 {
     /// <summary>The playtest suites AutoTestRunner can run, their menu items, the simulated absence and test files.</summary>
     internal static partial class AutoTestRunner
     {
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 22 (device check)", priority = 20)]
+        private static void RequestDevice() => File.WriteAllText(RequestPath, SuiteDevice);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 21 (economy balance)", priority = 21)]
+        private static void RequestEconomy() => File.WriteAllText(RequestPath, SuiteEconomy);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 20 (village buildings)", priority = 22)]
+        private static void RequestVillage() => File.WriteAllText(RequestPath, SuiteVillage);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 19 (country abilities)", priority = 23)]
+        private static void RequestAbilities() => File.WriteAllText(RequestPath, SuiteAbilities);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 18 (hiring staff)", priority = 24)]
+        private static void RequestStaff() => File.WriteAllText(RequestPath, SuiteStaff);
+
+        [MenuItem("Beach Tycoon/Run Playtest: Milestone 17 (your character)", priority = 25)]
+        private static void RequestCharacter() => File.WriteAllText(RequestPath, SuiteCharacter);
+
         [MenuItem("Beach Tycoon/Run Playtest: Milestone 16 (bigger map under fog)", priority = 26)]
         private static void RequestMap() => File.WriteAllText(RequestPath, SuiteMap);
 
@@ -72,101 +90,64 @@ namespace BeachTycoon.EditorTools
         private const string SuiteCulture = "culture";
         private const string SuiteCamera = "camera";
         private const string SuiteMap = "map";
+        private const string SuiteCharacter = "character";
+        private const string SuiteStaff = "staff";
+        private const string SuiteAbilities = "abilities";
+        private const string SuiteVillage = "village";
+        private const string SuiteEconomy = "economy";
+        private const string SuiteDevice = "device";
 
-        private static bool IsKnownSuite(string suite) =>
-            suite == SuiteIsland || suite == SuiteMove || suite == SuiteOnline || suite == SuiteAchievements || suite == SuitePolish
-            || suite == SuiteManagers || suite == SuiteEvents || suite == SuiteSeason || suite == SuiteMiniGames
-            || suite == SuiteFeel || suite == SuiteRelease || suite == SuiteStart || suite == SuiteCulture
-            || suite == SuiteCamera || suite == SuiteMap;
-
-        private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
-
-        private static string SuiteTitle
+        /// <summary>A suite's title in the log, whether a step may run yet, and the step itself.</summary>
+        private readonly struct SuiteSteps
         {
-            get
+            public readonly string Title;
+            public readonly Func<int, bool> IsReady;
+            public readonly Action<int> Run;
+
+            public SuiteSteps(string title, Func<int, bool> isReady, Action<int> run)
             {
-                if (Suite == SuiteIsland) return "M2 island";
-                if (Suite == SuiteOnline) return "M6 visiting";
-                if (Suite == SuiteAchievements) return "M7 achievements";
-                if (Suite == SuitePolish) return "Polish";
-                if (Suite == SuiteManagers) return "M8 managers";
-                if (Suite == SuiteEvents) return "M9 day/night + events";
-                if (Suite == SuiteSeason) return "M10 new season";
-                if (Suite == SuiteMiniGames) return "Mini-games";
-                if (Suite == SuiteFeel) return "M11 sound and feel";
-                if (Suite == SuiteRelease) return "M12 release";
-                if (Suite == SuiteStart) return "M13 start screen";
-                if (Suite == SuiteCulture) return "M14 cultures";
-                if (Suite == SuiteCamera) return "M15 camera";
-                if (Suite == SuiteMap) return "M16 map";
-                return Suite == SuiteMove ? "M4 move + performance" : "M3 meta";
+                Title = title;
+                IsReady = isReady;
+                Run = run;
             }
         }
 
-        private static bool IsStepReady(int step)
+        private static readonly Dictionary<string, SuiteSteps> Suites = new Dictionary<string, SuiteSteps>
         {
-            if (Suite == SuiteIsland) return PlaytestSteps.IsReady(step);
-            if (Suite == SuiteOnline) return OnlinePlaytestSteps.IsReady(step);
-            if (Suite == SuiteAchievements) return AchievementPlaytestSteps.IsReady(step);
-            if (Suite == SuitePolish) return PolishPlaytestSteps.IsReady(step);
-            if (Suite == SuiteManagers) return ManagerPlaytestSteps.IsReady(step);
-            if (Suite == SuiteEvents) return EventPlaytestSteps.IsReady(step);
-            if (Suite == SuiteSeason) return SeasonPlaytestSteps.IsReady(step);
-            if (Suite == SuiteMiniGames) return MiniGamePlaytestSteps.IsReady(step);
-            if (Suite == SuiteFeel) return FeelPlaytestSteps.IsReady(step);
-            if (Suite == SuiteRelease) return ReleasePlaytestSteps.IsReady(step);
-            if (Suite == SuiteStart) return StartPlaytestSteps.IsReady(step);
-            if (Suite == SuiteCulture) return CulturePlaytestSteps.IsReady(step);
-            if (Suite == SuiteCamera) return CameraPlaytestSteps.IsReady(step);
-            if (Suite == SuiteMap) return MapPlaytestSteps.IsReady(step);
-            return Suite == SuiteMove ? MovePlaytestSteps.IsReady(step) : MetaPlaytestSteps.IsReady(step);
-        }
+            { SuiteIsland, new SuiteSteps("M2 island", PlaytestSteps.IsReady, PlaytestSteps.Run) },
+            { SuiteMeta, new SuiteSteps("M3 meta", MetaPlaytestSteps.IsReady, MetaPlaytestSteps.Run) },
+            { SuiteMove, new SuiteSteps("M4 move + performance", MovePlaytestSteps.IsReady, MovePlaytestSteps.Run) },
+            { SuiteOnline, new SuiteSteps("M6 visiting", OnlinePlaytestSteps.IsReady, OnlinePlaytestSteps.Run) },
+            { SuiteAchievements, new SuiteSteps("M7 achievements", AchievementPlaytestSteps.IsReady, AchievementPlaytestSteps.Run) },
+            { SuitePolish, new SuiteSteps("Polish", PolishPlaytestSteps.IsReady, PolishPlaytestSteps.Run) },
+            { SuiteManagers, new SuiteSteps("M8 managers", ManagerPlaytestSteps.IsReady, ManagerPlaytestSteps.Run) },
+            { SuiteEvents, new SuiteSteps("M9 day/night + events", EventPlaytestSteps.IsReady, EventPlaytestSteps.Run) },
+            { SuiteSeason, new SuiteSteps("M10 new season", SeasonPlaytestSteps.IsReady, SeasonPlaytestSteps.Run) },
+            { SuiteMiniGames, new SuiteSteps("Mini-games", MiniGamePlaytestSteps.IsReady, MiniGamePlaytestSteps.Run) },
+            { SuiteFeel, new SuiteSteps("M11 sound and feel", FeelPlaytestSteps.IsReady, FeelPlaytestSteps.Run) },
+            { SuiteRelease, new SuiteSteps("M12 release", ReleasePlaytestSteps.IsReady, ReleasePlaytestSteps.Run) },
+            { SuiteStart, new SuiteSteps("M13 start screen", StartPlaytestSteps.IsReady, StartPlaytestSteps.Run) },
+            { SuiteCulture, new SuiteSteps("M14 cultures", CulturePlaytestSteps.IsReady, CulturePlaytestSteps.Run) },
+            { SuiteCamera, new SuiteSteps("M15 camera", CameraPlaytestSteps.IsReady, CameraPlaytestSteps.Run) },
+            { SuiteMap, new SuiteSteps("M16 map", MapPlaytestSteps.IsReady, MapPlaytestSteps.Run) },
+            { SuiteCharacter, new SuiteSteps("M17 character", CharacterPlaytestSteps.IsReady, CharacterPlaytestSteps.Run) },
+            { SuiteStaff, new SuiteSteps("M18 staff", StaffPlaytestSteps.IsReady, StaffPlaytestSteps.Run) },
+            { SuiteAbilities, new SuiteSteps("M19 abilities", AbilityPlaytestSteps.IsReady, AbilityPlaytestSteps.Run) },
+            { SuiteVillage, new SuiteSteps("M20 village", VillagePlaytestSteps.IsReady, VillagePlaytestSteps.Run) },
+            { SuiteEconomy, new SuiteSteps("M21 economy", EconomyPlaytestSteps.IsReady, EconomyPlaytestSteps.Run) },
+            { SuiteDevice, new SuiteSteps("M22 device", DevicePlaytestSteps.IsReady, DevicePlaytestSteps.Run) },
+        };
 
-        private static void RunStep(int step)
-        {
-            if (Suite == SuiteIsland) PlaytestSteps.Run(step);
-            else if (Suite == SuiteOnline) OnlinePlaytestSteps.Run(step);
-            else if (Suite == SuiteAchievements) AchievementPlaytestSteps.Run(step);
-            else if (Suite == SuitePolish) PolishPlaytestSteps.Run(step);
-            else if (Suite == SuiteManagers) ManagerPlaytestSteps.Run(step);
-            else if (Suite == SuiteEvents) EventPlaytestSteps.Run(step);
-            else if (Suite == SuiteSeason) SeasonPlaytestSteps.Run(step);
-            else if (Suite == SuiteMiniGames) MiniGamePlaytestSteps.Run(step);
-            else if (Suite == SuiteFeel) FeelPlaytestSteps.Run(step);
-            else if (Suite == SuiteRelease) ReleasePlaytestSteps.Run(step);
-            else if (Suite == SuiteStart) StartPlaytestSteps.Run(step);
-            else if (Suite == SuiteCulture) CulturePlaytestSteps.Run(step);
-            else if (Suite == SuiteCamera) CameraPlaytestSteps.Run(step);
-            else if (Suite == SuiteMap) MapPlaytestSteps.Run(step);
-            else if (Suite == SuiteMove) MovePlaytestSteps.Run(step);
-            else MetaPlaytestSteps.Run(step);
-        }
+        private static bool IsKnownSuite(string suite) => Suites.ContainsKey(suite);
 
-        // Snapshots written by earlier runs (own island, demo friends) start over with the save.
-        private static void DeleteIslandSnapshots()
-        {
-            string folder = Path.Combine(Application.persistentDataPath, LocalIslandRepository.FolderName);
-            if (Directory.Exists(folder)) Directory.Delete(folder, true);
-        }
+        private static string Suite => SessionState.GetString(KeyPrefix + "Suite", SuiteMeta);
 
-        /// <summary>Shifts the save's last-seen time back before the next Play mode starts (offline earnings test).</summary>
-        public static void RestartPlayModeAfterAbsence(double hours)
-        {
-            SessionState.SetFloat(KeyPrefix + "AbsenceHours", (float)hours);
-            RestartPlayMode();
-        }
+        private static SuiteSteps Current => Suites.TryGetValue(Suite, out SuiteSteps steps) ? steps : Suites[SuiteMeta];
 
-        // Rewrites lastSeenUtc in the save the game just wrote on quit, as if the player had been away.
-        private static void ApplySimulatedAbsence()
-        {
-            float hours = SessionState.GetFloat(KeyPrefix + "AbsenceHours", 0f);
-            SessionState.EraseFloat(KeyPrefix + "AbsenceHours");
-            if (hours <= 0f || !File.Exists(SavePath)) return;
+        private static string SuiteTitle => Current.Title;
 
-            var data = JsonUtility.FromJson<BeachTycoon.Data.GameSaveData>(File.ReadAllText(SavePath));
-            data.lastSeenUtc = System.DateTime.UtcNow.AddHours(-hours).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
-            File.WriteAllText(SavePath, JsonUtility.ToJson(data));
-            Write($"Simulated an absence of {hours} h");
-        }
+        private static bool IsStepReady(int step) => Current.IsReady(step);
+
+        private static void RunStep(int step) => Current.Run(step);
     }
 }

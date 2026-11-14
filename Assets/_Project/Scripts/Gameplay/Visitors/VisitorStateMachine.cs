@@ -17,16 +17,18 @@ namespace BeachTycoon.Gameplay
         private readonly System.Random _random;
         private readonly Action<VisitorAgent> _despawn;
         private readonly StandPicker _picker;
+        private readonly CultureAbilities _abilities;
 
         public VisitorStateMachine(WorldNavigation navigation, StandService stands, VisitorConfig config,
-            System.Random random, Action<VisitorAgent> despawn, BeachEventService events = null)
+            System.Random random, Action<VisitorAgent> despawn, BeachEventService events = null, CultureAbilities abilities = null)
         {
+            _abilities = abilities;
             _navigation = navigation;
             _stands = stands;
             _config = config;
             _random = random;
             _despawn = despawn;
-            _picker = new StandPicker(stands, random, events);
+            _picker = new StandPicker(stands, random, events, config.preferredChance);
         }
 
         public void Begin(VisitorAgent agent)
@@ -122,7 +124,7 @@ namespace BeachTycoon.Gameplay
 
             agent.StandIndex = stand.Index;
             agent.QueueSlot = -1;
-            agent.Patience = agent.Type.patienceSeconds;
+            agent.Patience = agent.Type.patienceSeconds * stand.PatienceMultiplier; // a first-aid station nearby: longer
             agent.State = VisitorState.Queueing;
         }
 
@@ -175,7 +177,10 @@ namespace BeachTycoon.Gameplay
         private float RandomRelaxSeconds()
         {
             Vector2 range = _config.relaxSecondsRange;
-            return Mathf.Lerp(range.x, range.y, (float)_random.NextDouble());
+            return Mathf.Lerp(range.x, range.y, (float)_random.NextDouble()) * StayMultiplier;
         }
+
+        // Greek Filoxenia: visitors relax on the beach longer.
+        private float StayMultiplier => _abilities != null ? _abilities.StayMultiplier : 1f;
     }
 }

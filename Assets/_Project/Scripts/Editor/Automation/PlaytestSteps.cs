@@ -72,11 +72,12 @@ namespace BeachTycoon.EditorTools
                     break;
                 case 4:
                     PlaytestTools.ClickProduct(1);
-                    PlaytestTools.Find<DecorPanelView>().Open();
-                    PlaytestTools.Click(PlaytestTools.Find<DecorPanelView>(), "DecorButton(Clone)");
-                    Check(Decorations.Count == 1, "beach umbrella bought from the decor shop");
+                    BuildBarView bar = PlaytestTools.Find<BuildBarView>();
+                    bar.ShowTab(BuildBarView.DecorTab);
+                    PlaytestTools.Click(bar, "DecorButton(Clone)");
+                    Check(Decorations.Count == 1, "beach umbrella bought from the Decor tab");
                     PlaytestTools.Capture("m2_2_decor_shop.png");
-                    PlaytestTools.Find<DecorPanelView>().Close();
+                    bar.ShowTab(0);
                     Check(Buildings.TryUpgrade(0), "bungalow started");
                     break;
                 case 6:

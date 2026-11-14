@@ -14,7 +14,7 @@ namespace BeachTycoon.UI
     /// </summary>
     public sealed class SeasonPanelView : MonoBehaviour
     {
-        private const string Resets = "<b>Starts over:</b> coins, the main building (back to an empty lot) and every stand with its level and manager.";
+        private const string Resets = "<b>Starts over:</b> coins, the main building (back to an empty lot), every stand with its level, and your staff.";
         private const string Keeps = "<b>Stays:</b> seashells, neighbours and their houses, decorations, mini-game levels, trophies, the daily streak and settings.";
         private static readonly Color Locked = new Color(0.72f, 0.72f, 0.72f);
 

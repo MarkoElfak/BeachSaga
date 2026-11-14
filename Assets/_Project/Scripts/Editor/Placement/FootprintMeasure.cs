@@ -156,6 +156,7 @@ namespace BeachTycoon.EditorTools
             for (Transform t = part; t != null; t = t.parent)
             {
                 if (t.name == StandPrefabs.ManagerHatName || t.name == StandUpgradePrefabs.GroupName) return true;
+                if (t.name == VillagePrefabs.ReachRingName) return true;
             }
 
             return false;

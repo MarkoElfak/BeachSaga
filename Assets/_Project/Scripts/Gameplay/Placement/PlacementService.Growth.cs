@@ -26,7 +26,7 @@ namespace BeachTycoon.Gameplay
         }
 
         /// <summary>
-        /// Slot i of the stand row: even slots to the right of the main building, odd ones to the left, each one
+        /// Slot i of the stand row (village buildings are left out of the slot width: they stand apart): even slots to the right of the main building, odd ones to the left, each one
         /// a stand-width further out. Follows the building's current (or reserved) footprint.
         /// </summary>
         public Vector2 DefaultStandPosition(int standIndex)
@@ -47,7 +47,7 @@ namespace BeachTycoon.Gameplay
             float width = 0f;
             foreach (ProductDefinition product in _database.products ?? new ProductDefinition[0])
             {
-                if (product != null) width = Mathf.Max(width, product.standFootprint.width);
+                if (product != null && !product.freeStanding) width = Mathf.Max(width, product.standFootprint.width);
             }
 
             return width > 0f ? width : FallbackFootprint.width;
@@ -81,8 +81,9 @@ namespace BeachTycoon.Gameplay
             PlaceableId stand = PlaceableId.Stand(evt.StandIndex);
             Vector2 slot = GetStandPosition(evt.StandIndex);
             bool shore = IsShoreOnlyStand(stand); // goes straight to the water
+            bool apart = Product(evt.StandIndex)?.freeStanding == true; // a village building keeps its own spot
             Vector2 near = shore ? ShoreStart(evt.StandIndex, slot) : slot;
-            if ((shore || !CanPlace(stand, slot)) && TryFindFreeSpot(stand, near, out Vector2 spot)) SetPosition(stand, spot);
+            if ((shore || apart || !CanPlace(stand, slot)) && TryFindFreeSpot(stand, near, out Vector2 spot)) SetPosition(stand, spot);
         }
 
         private void OnLotStateChanged(LotStateChanged evt)
