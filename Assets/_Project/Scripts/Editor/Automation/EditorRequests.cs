@@ -12,7 +12,7 @@ namespace BeachTycoon.EditorTools
     /// to Temp/BeachTycoonEditor.request; the result goes to Logs/BeachTycoonEditor.log.
     ///   probe                   build targets, identity and packages
     ///   packages add a b ...    adds packages (latest compatible version) through the Package Manager
-    ///   build android|ios|mac   see ReleaseBuilder
+    ///   build android|android-store|android-dev|ios|mac   see ReleaseBuilder
     ///   shot file.png           runs the Mac build at phone quality; it saves a screenshot of the beach and quits
     ///   economy [id=price ...]  writes the economy balance table (EconomyReport); with prices, a what-if to Logs
     /// </summary>

@@ -8,14 +8,17 @@ using UnityEngine.Rendering;
 namespace BeachTycoon.EditorTools
 {
     /// <summary>
-    /// Store-ready player settings (name, app id, portrait, IL2CPP ARM64, icon, splash) and one-click Android and
-    /// iOS builds into Builds/. Settings are applied before every build, so a build never ships stale values.
+    /// Store-ready player settings (name, app id, version, portrait, IL2CPP ARM64, icon, splash) and one-click Android
+    /// and iOS builds into Builds/. Settings are applied before every build, so a build never ships stale values.
+    /// The signed Google Play bundle is in ReleaseBuilder.Store.
     /// </summary>
-    internal static class ReleaseBuilder
+    internal static partial class ReleaseBuilder
     {
         public const string ProductName = "Beach Tycoon";
         public const string CompanyName = "Marko Ilic";
         public const string AppId = "com.markoelfak.beachtycoon";
+        /// <summary>The version players see in the store; raise it for each release.</summary>
+        public const string Version = "1.0.0";
         private const string IconFolder = ProjectPaths.Root + "/Art/Icon";
         private const string IconPath = IconFolder + "/AppIcon.png";
         private const string SplashPath = IconFolder + "/SplashLogo.png";
@@ -26,6 +29,7 @@ namespace BeachTycoon.EditorTools
         {
             PlayerSettings.productName = ProductName;
             PlayerSettings.companyName = CompanyName;
+            PlayerSettings.bundleVersion = Version;
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, AppId);
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, AppId);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
@@ -51,13 +55,15 @@ namespace BeachTycoon.EditorTools
         public const string MacAppPath = "Builds/Mac/BeachTycoon.app";
 
         /// <summary>
-        /// Builds "android" (Builds/Android/BeachTycoon.apk), "ios" (Builds/iOS) or "mac"; returns a short report.
+        /// Builds "android" (Builds/Android/BeachTycoon.apk), "android-store" (the signed Google Play bundle), "ios"
+        /// (Builds/iOS) or "mac"; returns a short report.
         /// Phone test builds: "android-dev" (Vulkan) and "android-gles" (OpenGL ES 3 only) are development builds
         /// that show errors on screen, written next to the release APK.
         /// </summary>
         public static string Build(string platform)
         {
             if (platform == "android-dev" || platform == "android-gles") return BuildAndroidTest(platform == "android-gles");
+            if (platform == "android-store") return BuildAndroidStore();
             // Store builds are always clean: an incremental Android build once shipped without the 3D world.
             BuildOptions options = platform == "mac" ? BuildOptions.None : BuildOptions.CleanBuildCache;
             return Build(platform, options, null);
